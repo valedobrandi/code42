@@ -3,11 +3,11 @@
 void ft_print_reverse_alphabet(void)
 {
   char a;
-  a = 'a';
+  a = 'z';
 
-  while(a <= 'z')
+  while(a >= 'a')
     {
       write(1, &a, 1);
-      a++;
+      a--;
     }
 }
