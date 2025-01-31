@@ -1,0 +1,25 @@
+fn rust(x: i32, y: i32, a: char, b: char) {
+    for o in 1..=x {
+        if o == 1 {
+            for i in 1..=y {
+                if i == 1 {
+                    print!("{}", a);
+                } else if i < y {
+                    print!("{}", b)
+                } else {
+                    print!("{}", a)
+                }
+            }
+        } else if o < x {
+            for i in 1..=y {
+                print!("{}", a)
+            }
+        }  
+        println!("\n")
+    }
+}
+
+
+fn main() {
+    rust(5, 5, 'A', 'B');
+}
