@@ -11,10 +11,24 @@ fn rust(x: i32, y: i32, a: char, b: char) {
                 }
             }
         } else if o < x {
-            for i in 1..=y {
-                print!("{}", a)
+            for middle in 1..=y {
+                if middle == 1 || middle == y {
+                    print!("{}", a)
+                } else {
+                    print!("{}", " ")
+                }
             }
-        }  
+        } else if o == x {
+            for i in 1..=y {
+                if i == 1 {
+                    print!("{}", a);
+                } else if i < y {
+                    print!("{}", b)
+                } else {
+                    print!("{}", a)
+                }
+            }
+        } 
         println!("\n")
     }
 }
