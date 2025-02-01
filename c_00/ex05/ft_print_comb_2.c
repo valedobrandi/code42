@@ -1,26 +1,29 @@
 #include <stdio.h>
+#include <unistd.h>
 
 void	ft_print_comb(void)
 {	
-	int	a = 0;
-	int	b = 1;
-	int	c = 2;
+	int	a = '0';
+	int	b = '1';
+	int	c = '2';
 
-	while (a <= 7)
+	while (a <= '7')
 	{
-		while (c <= 9)
+		while (c <= '9')
 		{
-			printf("%d%d%d", a, b, c);
+			write(1, &a, 1);
+			write(1, &b, 1);
+			write(1, &c, 1);
 			
-			if (a + b + c < 24 )
+			if (!(a == '7' && b == '8' && c == '9'))
 			{
-				printf("%s", ",");
+				write(1, ", ", 2);
 			}
 			c++;
 		}
 		
 
-		if (b == 8)
+		if (b == '8')
 		{
 			a++;
 			b = a + 1;
