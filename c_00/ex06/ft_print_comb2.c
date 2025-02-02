@@ -3,15 +3,19 @@
 
 int	ft_comb1()
 {
-	int     a = '0';
-        int     b = '0';
-        int     c = '0';
-	int	d = '1';
-
+	int     a;
+        int     b;
+        int     c;
+	int	d;
+	
+	a = '0';
         while (a <= '9')
         {
-		while (b <= '8')
+		b = '0';
+		while (b <= '9')
 		{
+			c = a;
+			d = b + 1;
 			while (c <= '9')
 			{	
                 		while (d <= '9')
@@ -21,7 +25,7 @@ int	ft_comb1()
 					write(1, &b, 1);
 					write(1, " ", 1);
                         		write(1, &c, 1);
-					write(1, &d, 2);
+					write(1, &d, 1);
 					if (!(a == '9' && b == '8' && c == '9' && d == '9'))
 					{		
 						write(1, ", ", 2);
@@ -32,11 +36,8 @@ int	ft_comb1()
 				d = '0';
        			}
 			b++;
-			c = '0';
-			d = b + 1;
 		}
 		a++;
-		b = '0';
 	}
 }
 
