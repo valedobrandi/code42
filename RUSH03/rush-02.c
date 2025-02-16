@@ -186,6 +186,7 @@ int    get_line(int is_default)
             get_value(str, &dict_index);
             if (is_default)
                 get_name(str, &dict_index);
+            printf("%s:%s\n", dict[dict_index].value, dict[dict_index].name);
             free(str);
             count = 0;
             dict_index++;
@@ -223,12 +224,10 @@ int     open_file(char *filename)
     close(fd);
     return (buffer_dictionary());    
 }
-
 int main(int argc, char **argv)
 {
     if (open_file("numbers.dict"))
         return (0);
     get_line(1);
-
     return (0);
 }
