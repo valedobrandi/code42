@@ -1,25 +1,37 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_range.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bde-albu <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/02/11 11:27:25 by bde-albu          #+#    #+#             */
+/*   Updated: 2025/02/11 12:15:53 by bde-albu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stdlib.h>
-#include <stdio.h>
-int    *ft_range(int min, int max)
+
+int	*ft_range(int min, int max)
 {
 	int	*table;
 	int	length;
 	int	index;
-	
-	table = NULL;
+
 	if (min >= max)
-		return (table);
+		return (NULL);
 	length = max - min;
-	table = (int*)malloc(length * sizeof(int));
+	if (min < 0)
+		length = max + (-min);
+	table = (int *)malloc(length * sizeof(int));
 	if (!table)
-		return NULL;
+		return (NULL);
 	index = 0;
-	while (min < max)
+	while (index < length)
 	{
 		table[index] = min;
 		min = min + 1;
-		index = index + 1;
+		index += 1;
 	}
-    return (table);
+	return (table);
 }
-
