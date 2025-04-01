@@ -1,0 +1,47 @@
+bzero
+Expect: - 0 0 0 0 0 0 0 0 Output: 0 0 0 0 0 0 0 0 
+ft_memcpy OK!
+---
+memmove OK!
+ft_memmove OK!
+---
+test_strlcpy OK!
+test_ft_strlcpy OK!
+---
+ft_strlcat
+12
+Hello, World
+---
+ft_toupper
+AZ
+ft_tolower
+az
+ft_strchr
+worldNULLFIND
+ft_strrchr
+ldNULLFIND
+ft_strncmp
+test 1 0
+test 2 -1
+
+ft_memchr
+test 1 o world
+test 2 NULL
+
+ft_memcmp
+test 1 1
+test 2 0
+
+ft_strstr
+test 1 Point
+test 2 ialspoint
+
+ft_calloc
+0 0 0 0 0 
+atoi
+test 1 0
+test 2 1316134911
+
+ft_strdup
+test 1: Hello, World!
+
