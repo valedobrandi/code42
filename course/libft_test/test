@@ -1,0 +1,62 @@
+0a1,10
+> bzero
+> Expect: - 0 0 0 0 0 0 0 0 Output: 0 0 0 0 0 0 0 0 
+> ft_memcpy OK!
+> ---
+> memmove OK!
+> ft_memmove OK!
+> ---
+> test_strlcpy OK!
+> test_ft_strlcpy OK!
+> ---
+9c19
+< strchr
+---
+> ft_strchr
+11c21
+< strrchr
+---
+> ft_strrchr
+13c23
+< strcmp
+---
+> ft_strncmp
+17c27
+< memchr
+---
+> ft_memchr
+21c31
+< memcmp
+---
+> ft_memcmp
+25c35
+< strstr
+---
+> ft_strstr
+33c43
+< calloc
+---
+> ft_calloc
+35c45
+< strdup
+---
+> ft_strdup
+43c53
+< substr
+---
+> ft_substr
+46a57
+> %s
+48,56c59,60
+< 
+< strtrim
+< hello world
+< hello world
+< hello world
+< 
+< 
+< hello world
+< 
+---
+> ft_strtrim
+> hello world   
