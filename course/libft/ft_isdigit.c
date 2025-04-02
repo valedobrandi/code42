@@ -1,31 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_atoi.c                                          :+:      :+:    :+:   */
+/*   ft_isdigit.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/02 10:41:03 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/02 10:41:06 by bde-albu         ###   ########.fr       */
+/*   Created: 2025/03/31 11:51:12 by bde-albu          #+#    #+#             */
+/*   Updated: 2025/03/31 12:42:15 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int	ft_atoi(const char *nptr)
+int	ft_isdigit(char c)
 {
-	unsigned int total;
-	int flag;
-
-	flag = 1;
-	while (*nptr == ' ')
-		nptr++;
-	if (*nptr == '-')
-		flag *= -1;
-	nptr++;
-	total = 0;
-	while (*nptr >= '0' && *nptr <= '9')
-	{
-		total += *nptr - '0';
-		nptr++;
-	}
-	return (total * flag);
+	return ((c >= '0' && c <= '9'));
 }

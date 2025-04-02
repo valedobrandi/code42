@@ -1,31 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_atoi.c                                          :+:      :+:    :+:   */
+/*   ft_init.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/02 10:41:03 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/02 10:41:06 by bde-albu         ###   ########.fr       */
+/*   Created: 2025/03/31 11:28:30 by bde-albu          #+#    #+#             */
+/*   Updated: 2025/03/31 14:51:39 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int	ft_atoi(const char *nptr)
-{
-	unsigned int total;
-	int flag;
+#include <stdlib.h>
 
-	flag = 1;
-	while (*nptr == ' ')
-		nptr++;
-	if (*nptr == '-')
-		flag *= -1;
-	nptr++;
-	total = 0;
-	while (*nptr >= '0' && *nptr <= '9')
+int	ft_init(char **str, int size)
+{
+	if (size == 0)
 	{
-		total += *nptr - '0';
-		nptr++;
+		*str = malloc(1 * sizeof(char));
+		if (!*str)
+			return (1);
+		(*str)[0] = '\0';
+		return (1);
 	}
-	return (total * flag);
+	return (0);
 }

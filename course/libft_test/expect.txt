@@ -1,0 +1,69 @@
+ft_toupper$
+AZ$
+ft_tolower$
+az$
+strchr$
+worldNULLFIND$
+strrchr$
+ldNULLFIND$
+strcmp$
+test 1 0$
+test 2 -1$
+$
+memchr$
+test 1 o world$
+test 2 NULL$
+$
+memcmp$
+test 1 1$
+test 2 0$
+$
+strstr$
+test 1 Point$
+test 2 ialspoint$
+$
+atoi$
+test 1 0$
+test 2 1316134911$
+$
+calloc$
+0 0 0 0 0 $
+strdup$
+test 1: Hello, World!$
+$
+strjoin$
+hello world$
+hello$
+world$
+$
+substr$
+hello$
+world$
+world$
+$
+$
+strtrim$
+hello world$
+hello world$
+hello world$
+$
+$
+split$
+hello$
+world$
+from$
+C$
+hello$
+world$
+from$
+C$
+hello$
+world$
+helloworld$
+$
+$
+hello$
+world$
+from$
+C$
+$

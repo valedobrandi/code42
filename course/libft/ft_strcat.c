@@ -1,31 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_atoi.c                                          :+:      :+:    :+:   */
+/*   ft_strcat.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/02 10:41:03 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/02 10:41:06 by bde-albu         ###   ########.fr       */
+/*   Created: 2025/03/31 11:30:25 by bde-albu          #+#    #+#             */
+/*   Updated: 2025/03/31 15:03:15 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int	ft_atoi(const char *nptr)
+int	ft_strlen(char *str)
 {
-	unsigned int total;
-	int flag;
+	int count;
 
-	flag = 1;
-	while (*nptr == ' ')
-		nptr++;
-	if (*nptr == '-')
-		flag *= -1;
-	nptr++;
-	total = 0;
-	while (*nptr >= '0' && *nptr <= '9')
+	count = 0;
+	while (str[count] != '\0')
+		count++;
+	return (count);
+}
+char	*ft_strcat(char *dest, char *src)
+{
+	int	length;
+	int	index;
+
+	index = 0;
+	length = ft_strlen(dest);
+	while (src[index] != '\0')
 	{
-		total += *nptr - '0';
-		nptr++;
+		dest[length] = src[index];
+		index++;
+		length++;
 	}
-	return (total * flag);
+	dest[length] = '\0';
+	return (dest);
 }
