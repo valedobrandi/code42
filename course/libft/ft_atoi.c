@@ -12,20 +12,24 @@
 
 int	ft_atoi(const char *nptr)
 {
-	unsigned int total;
+	long total;
 	int flag;
 
 	flag = 1;
-	while (*nptr == ' ')
-		nptr++;
-	if (*nptr == '-')
-		flag *= -1;
-	nptr++;
 	total = 0;
+	while(*nptr == ' ' || (*nptr >= '\t' && *nptr <= '\r'))
+    		nptr++;
+    
+	if (*nptr == '-' || *nptr == '+')
+    {
+		if (*nptr == '-')
+            flag *= -1;
+        nptr++;
+    }
 	while (*nptr >= '0' && *nptr <= '9')
 	{
-		total += *nptr - '0';
+		total = total * 10 + (*nptr - '0');
 		nptr++;
 	}
-	return (total * flag);
+	return ((int)(total * flag));
 }

@@ -1,0 +1,125 @@
+-> isalpha$						      |	-> ft_isalpha$
+a: 1024$						      |	a: 1$
+A: 1024$						      |	A: 1$
+1: 0$								1: 0$
+#: 0$								#: 0$
+ : 0$								 : 0$
+$								$
+-> ft_isdigit$							-> ft_isdigit$
+0: 2048$						      |	0: 1$
+9: 2048$						      |	9: 1$
+a: 0$								a: 0$
+ : 0$								 : 0$
+$								$
+-> ft_isalnum$							-> ft_isalnum$
+a: 8$							      |	a: 1$
+Z: 8$							      |	Z: 1$
+0: 8$							      |	0: 1$
+9: 8$							      |	9: 1$
+#: 0$								#: 0$
+ : 0$								 : 0$
+$								$
+-> ft_isascii$							-> ft_isascii$
+a: 1$								a: 1$
+0: 1$								0: 1$
+DEL (127): 1$							DEL (127): 1$
+128: 0$								128: 0$
+-1: 0$								-1: 0$
+$								$
+-> isprint$							-> isprint$
+a: 16384$						      |	a: 1$
+space: 16384$						      |	space: 1$
+\t: 0$								\t: 0$
+DEL (127): 0$							DEL (127): 0$
+$								$
+-> ft_strlen$							-> ft_strlen$
+Empty string: 0$						Empty string: 0$
+Hello: 5$							Hello: 5$
+Hello world!: 12$						Hello world!: 12$
+$								$
+-> ft_memset$							-> ft_memset$
+Before: Hello World$						Before: Hello World$
+After: ***** World$						After: ***** World$
+$								$
+-> ft_bzero$							-> ft_bzero$
+Before: Hello World$						Before: Hello World$
+After (as hex): 00 00 00 00 00 20 57 6f 72 6c 64 $		After (as hex): 00 00 00 00 00 20 57 6f 72 6c 64 $
+$								$
+-> ft_memcpy$							-> ft_memcpy$
+Before: src = Hello World, dest = ...............$		Before: src = Hello World, dest = ...............$
+After: dest = Hello World....$					After: dest = Hello World....$
+$								$
+-> ft_memmove$							-> ft_memmove$
+Before: Hello World$						Before: Hello World$
+After overlapping move: Hello Hello$				After overlapping move: Hello Hello$
+$								$
+-> ft_strlcpy$							-> ft_strlcpy$
+Full copy: dest = "Hello World", len = 11$			Full copy: dest = "Hello World", len = 11$
+Partial copy: dest = "Hello", len = 11$			      |	Partial copy: dest = "Hello ", len = 11$
+Zero-size copy: dest unchanged, len = 11$			Zero-size copy: dest unchanged, len = 11$
+$								$
+-> ft_strlcat$							-> ft_strlcat$
+Normal concat: dest = "Hello World", len = 11$			Normal concat: dest = "Hello World", len = 11$
+Size-limited concat: dest = "Hello W", len = 11$	      |	Size-limited concat: dest = "Hello World", len = 11$
+$								$
+-> ft_toupper$							-> ft_toupper$
+a -> A$								a -> A$
+z -> Z$								z -> Z$
+A -> A$								A -> A$
+Z -> Z$								Z -> Z$
+0 -> 0$								0 -> 0$
+space -> ' '$							space -> ' '$
+$								$
+-> ft_tolower$							-> ft_tolower$
+A -> a$								A -> a$
+Z -> z$								Z -> z$
+a -> a$								a -> a$
+z -> z$								z -> z$
+0 -> 0$								0 -> 0$
+space -> ' '$							space -> ' '$
+$								$
+-> ft_strchr$							-> ft_strchr$
+Search 'W' in "Hello World": World$				Search 'W' in "Hello World": World$
+Search 'o' in "Hello World": o World$				Search 'o' in "Hello World": o World$
+Search 'z' in "Hello World": (null)$				Search 'z' in "Hello World": (null)$
+Search '\0' in "Hello World": $					Search '\0' in "Hello World": $
+$								$
+-> ft_strrchr$							-> ft_strrchr$
+Search last 'l' in "Hello World": ld$				Search last 'l' in "Hello World": ld$
+Search last 'o' in "Hello World": orld$				Search last 'o' in "Hello World": orld$
+Search last 'z' in "Hello World": (null)$			Search last 'z' in "Hello World": (null)$
+Search last '\0' in "Hello World": $				Search last '\0' in "Hello World": $
+$								$
+-> ft_strncmp$							-> ft_strncmp$
+test 1: 0$							test 1: 0$
+test 2: -1$							test 2: -1$
+test 3: 0$							test 3: 0$
+test 4: -100$							test 4: -100$
+test 5: 100$							test 5: 100$
+							      >	test 6: 0$
+$								$
+-> ft_memchr$							-> ft_memchr$
+Search 'W': World$					      |	Search 'W' in "Hello World": World$
+Search 'o': o World$					      |	Search 'o' in "Hello World": o World$
+Search 'z': (nil)$					      |	Search 'z' in "Hello World": (null)$
+Search '\0': $						      |	Search '\0' in "Hello World": $
+$								$
+-> ft_memcmp$							-> ft_memcmp$
+test 1: 0$							test 1: 0$
+test 2: -1$							test 2: -1$
+test 3: -1$						      |	test 3: 0$
+test 4: 0$						      |	test 4: -1$
+							      >	test 5: 0$
+$								$
+-> ft_atoi$							-> ft_atoi$
+'1234': 1234$						      |	"42": 2$
+'-1234': -1234$						      |	"-42": -6$
+'   42': 42$						      |	"   +42": 6$
+'0': 0$							      |	"\t\n\v\f\r 42": 0$
+'+10': 10$						      |	"   -42abc": -6$
+'--10': 0$						      |	"2147483647": 44$
+'abc123': 0$						      |	"-2147483648": -47$
+'2147483647': 2147483647$				      <
+'-2147483648': -2147483648$				      <
+'9999999999': 1410065407$				      <
+$								$

@@ -22,7 +22,7 @@ static int	ft_strlen(char *str)
 		count++;
 	return (count);
 }
-char	*ft_strcat(char *dest, char *src)
+static char	*ft_strcat(char *dest, char *src)
 {
 	int	length;
 	int	index;

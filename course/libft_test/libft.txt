@@ -1,0 +1,2 @@
+isalpha() checks a to z and A to Z;
+isdigit();

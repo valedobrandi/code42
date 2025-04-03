@@ -10,10 +10,10 @@ static int ft_strncmp(const char *s1, const char *s2, size_t n)
         s2++;
         n--;
     }
-    return (*s1 - *s2);
+    return (0);
 }
 
-char    *ft_strstr (const char *str_1, const char *str_2)
+char    *ft_strnstr (const char *str_1, const char *str_2)
 {
     unsigned int    index;
 
