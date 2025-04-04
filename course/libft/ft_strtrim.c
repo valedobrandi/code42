@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 10:44:19 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/02 13:31:37 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/04/04 14:57:45 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,15 +34,16 @@ static char	*ft_strdup(const char *s)
 	return (ptr);
 }
 
-static int	ft_strlen(char *str)
+static size_t	ft_strlen(const char *s)
 {
 	int	count;
 
 	count = 0;
-	while (str[count] != '\0')
+	while (s[count] != '\0')
 		count++;
 	return (count);
 }
+
 static size_t	ft_strlcpy(char *dst, const char *restrict src, size_t dsize)
 {
 	size_t	i;
@@ -63,33 +64,34 @@ static size_t	ft_strlcpy(char *dst, const char *restrict src, size_t dsize)
 	return (i);
 }
 
-static char	*ft_strrchr(const char *s, int c)
+static int	ft_strcmp(const char *str, int c)
 {
-	char	*ptr;
-
-	ptr = ((void *)0);
-	while (*s != '\0')
+	if (str == NULL)
+		return (0);
+	while (*str != '\0')
 	{
-		if (*s == (char)c)
-			ptr = (char *)s;
-		s++;
+		if (*str == (char)c)
+			return (1);
+		str++;
 	}
-	if ((char)c == '\0')
-		return ((char *)s);
-	return (ptr);
+	return (0);
 }
 
 char	*ft_strtrim(char const *s1, char const *set)
 {
-	size_t end;
-	char *ptr;
+	size_t	end;
+	char	*ptr;
 
-	while (*s1 && ft_strrchr(set, *s1))
+	if (s1 == NULL)
+		return (NULL);
+	if (set == NULL)
+		return (ft_strdup(s1));
+	while (*s1 && ft_strcmp(set, *s1))
 		s1++;
 	if (*s1 == '\0')
 		return (ft_strdup(""));
 	end = ft_strlen((char *)s1) - 1;
-	while (end > 0 && ft_strrchr(set, s1[end]))
+	while (end > 0 && ft_strcmp(set, s1[end]))
 		end--;
 	ptr = (char *)malloc((end + 2) * sizeof(char));
 	if (!ptr)

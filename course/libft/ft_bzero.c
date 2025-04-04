@@ -1,10 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_bzero.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/04 08:35:37 by bde-albu          #+#    #+#             */
+/*   Updated: 2025/04/04 08:55:25 by bde-albu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include <stddef.h>
 
-void    ft_bzero(void *s, size_t n)
+void	ft_bzero(void *s, size_t n)
 {
-    unsigned char *ptr;
+	unsigned char	*ptr;
 
-    ptr = (unsigned char *)s;
-    while (n--)
-        *ptr++ = 0;
+	ptr = (unsigned char *)s;
+	while (n--)
+		*ptr++ = 0;
 }

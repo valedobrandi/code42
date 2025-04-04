@@ -6,22 +6,25 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 09:15:54 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/02 09:58:10 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/04/04 14:08:38 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stddef.h>
 #include <stdlib.h>
 
-static int	ft_strlen(char *str)
+static size_t	ft_strlen(const char *s)
 {
 	int	count;
 
+	if (!s)
+		return (0);
 	count = 0;
-	while (str[count] != '\0')
+	while (s[count] != '\0')
 		count++;
 	return (count);
 }
+
 static char	*ft_strcat(char *dest, char *src)
 {
 	int	length;
@@ -38,11 +41,12 @@ static char	*ft_strcat(char *dest, char *src)
 	dest[length] = '\0';
 	return (dest);
 }
+
 char	*ft_strjoin(char const *s1, char const *s2)
 {
-	size_t size_s1;
-	size_t size_s2;
-	char *ptr;
+	size_t	size_s1;
+	size_t	size_s2;
+	char	*ptr;
 
 	size_s1 = ft_strlen((char *)s1);
 	size_s2 = ft_strlen((char *)s2);
@@ -50,7 +54,9 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	if (!ptr)
 		return (NULL);
 	*ptr = '\0';
-	ft_strcat(ptr, (char *)s1);
-	ft_strcat(ptr, (char *)s2);
+	if (s1)
+		ft_strcat(ptr, (char *)s1);
+	if (s2)
+		ft_strcat(ptr, (char *)s2);
 	return (ptr);
 }

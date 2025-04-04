@@ -1,0 +1,5 @@
+char *ft_substr(
+	original string, 
+	position begin the extraction, 
+	maximum length to extract,
+	)-> extract a substring from a given string;

@@ -6,19 +6,22 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 11:30:25 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/03/31 15:03:15 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/04/04 11:04:01 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-int	ft_strlen(char *str)
+#include <stddef.h>
+
+static size_t	ft_strlen(const char *s)
 {
-	int count;
+	int	count;
 
 	count = 0;
-	while (str[count] != '\0')
+	while (s[count] != '\0')
 		count++;
 	return (count);
 }
+
 char	*ft_strcat(char *dest, char *src)
 {
 	int	length;

@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 13:37:50 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/02 16:19:20 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/04/04 14:57:24 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ int	word_length(char *str, char c)
 {
 	int	count;
 
+	if (!str)
+		return (0);
 	count = 0;
 	while (*str == c)
 		str++;
@@ -24,25 +26,30 @@ int	word_length(char *str, char c)
 		count++;
 	return (count);
 }
+
 int	count_words(char const *src, char c)
 {
 	int	count;
 	int	index;
 
+	if (!src)
+		return (0);
 	count = 0;
 	index = 0;
 	while (src[index] != '\0')
 	{
-		if (src[index] == c)
+		if (src[index] != c)
 		{
 			count++;
-			while (src[index] == c)
+			while (src[index] != c && src[index] != '\0')
 				index++;
 		}
-		index++;
+		else
+			index++;
 	}
 	return (count);
 }
+
 static char	*ft_strncpy(char *dest, const char *src, char c)
 {
 	int	index;
@@ -57,15 +64,6 @@ static char	*ft_strncpy(char *dest, const char *src, char c)
 	return (dest);
 }
 
-char	*allocate_word(int count)
-{
-	char	*word;
-
-	word = (char *)malloc((count + 1) * sizeof(char));
-	if (!word)
-		return (NULL);
-	return (word);
-}
 int	ft_allocate(char **arr, int index, int count)
 {
 	int	t;
@@ -84,6 +82,7 @@ int	ft_allocate(char **arr, int index, int count)
 	}
 	return (0);
 }
+
 char	**ft_split(char const *s, char c)
 {
 	int		count;
@@ -109,6 +108,6 @@ char	**ft_split(char const *s, char c)
 		}
 		s += count;
 	}
-	arr[index] = (NULL);
+	arr[index] = NULL;
 	return (arr);
 }
