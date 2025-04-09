@@ -1,7 +1,0 @@
-{
-	"files.associations": {
-		"limits": "c",
-		"libft_printf.h": "c",
-		"stdarg.h": "c"
-	}
-}

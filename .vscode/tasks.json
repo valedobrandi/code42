@@ -1,0 +1,30 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build ftprintf test",
+            "type": "shell",
+            "command": "cc",
+            "args": [
+                "-Wall",
+                "-Wextra",
+                "-Werror",
+                "-g",
+                "test_ftprintf_c.c",
+                "-I./ft_printf",
+                "-L./ft_printf",
+                "-lftprintf",
+                "-I./ft_printf/libft",
+                "-L./ft_printf/libft",
+                "-lft",
+                "-o",
+                "test_ftprintf_c"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

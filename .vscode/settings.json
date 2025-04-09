@@ -2,9 +2,19 @@
     "files.associations": {
         "stddef.h": "c",
         "stdlib.h": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "libft.h": "c",
+        "libftprintf.h": "c",
+        "iostream": "cpp",
+        "ft_printf.h": "c",
+        "array": "c",
+        "string_view": "c",
+        "initializer_list": "c",
+        "limits.h": "c",
+        "assert.h": "c",
+        "variant": "c"
     },
     "[c]": {
-        "editor.defaultFormatter": "keyhr.42-c-format"
+        "editor.defaultFormatter": "ms-vscode.cpptools"
     },
 }

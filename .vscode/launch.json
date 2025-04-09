@@ -1,36 +1,27 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "gcc - Build and debug active file",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${fileDirname}/${fileBasenameNoExtension}",
-      "args": [],
-      "stopAtEntry": false,
-      "cwd": "${fileDirname}",
-      "environment": [],
-      "externalConsole": false,
-      "MIMode": "gdb",
-      "setupCommands": [
-        {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
-        },
-        {
-            "description": "Add library source directories",
-            "text": "directory ${workspaceFolder}/../libft",
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug ft_printf test",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/course/ft_print/test_ftprintf_c",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+          {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
             "ignoreFailures": true
-        },
-        {
-            "description": "Set substitution path",
-            "text": "set substitute-path /path/in/binary ${workspaceFolder}/../libft",
-            "ignoreFailures": true
-        }
-      ],
-      "preLaunchTask": "C/C++: gcc build active file",
-      "miDebuggerPath": "/usr/bin/gdb"
-    }
-  ]
-}
+          }
+        ],
+        "preLaunchTask": "Build ftprintf test",
+        "miDebuggerPath": "/usr/bin/gdb"
+      }
+    ]
+  }
+  
