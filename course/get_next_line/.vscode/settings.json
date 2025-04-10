@@ -1,0 +1,14 @@
+{
+	"files.associations": {
+		"array": "c",
+		"string": "c",
+		"string_view": "c",
+		"span": "c",
+		"chrono": "c",
+		"variant": "c",
+		"algorithm": "c",
+		"format": "c",
+		"sstream": "c",
+		"random": "c"
+	}
+}
