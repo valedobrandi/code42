@@ -1,25 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   print_p.c                                          :+:      :+:    :+:   */
+/*    flag.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/10 10:02:04 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/10 10:40:20 by bde-albu         ###   ########.fr       */
+/*   Created: 2025/04/10 09:44:46 by bde-albu          #+#    #+#             */
+/*   Updated: 2025/04/10 09:45:42 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int	print_p(t_format flag, void *ptr)
+void	parse_printf(t_format *flag, const char *format, int *index)
 {
-	int	length;
-
-	length = 2;
-	print_justify_rigth(flag, &length);
-	print_padding(flag, &length);
-	length = ft_putptr_hexa(ptr);
-	print_justify_left(flag, &length);
-	return (length);
+	parse_flag(flag, format, index);
+	parse_width(flag, format, index);
+	parse_precision(flag, format, index);
+	parse_type(flag, format, index);
 }

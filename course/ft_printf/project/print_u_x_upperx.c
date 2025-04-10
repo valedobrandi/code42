@@ -1,40 +1,63 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   print_u_x_upperx.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/04/10 10:02:53 by bde-albu          #+#    #+#             */
+/*   Updated: 2025/04/10 11:54:52 by bde-albu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_printf.h"
-#include "libft/libft.h"
 
-size_t	ft_putnbrlen_base(unsigned long n, char *base)
+static int	ft_strlen(const char *s)
 {
-	size_t	base_length;
-	size_t	count;	
+	int	count;
 
-    count = 0;
-	base_length = ft_strlen(base);
-    if (base_length < 2)
-            return (0);
-	if (n >= base_length)
-        count += ft_putnbrlen_base(n / base_length, base);
-    count++;
-    return (count);
+	if (!s)
+		return (0);
+	count = 0;
+	while (s[count] != '\0')
+		count++;
+	return (count);
 }
 
-int print_u_x_upperx(t_format flags, unsigned long n,  char *base)
+static int	ft_putnbrlen_base(unsigned long n, char *base)
 {
-    int  length;
-    int number_length;
+	unsigned long	base_length;
+	int				count;
 
-    number_length = ft_putnbrlen_base(n, base);
-    length = number_length;
-    print_justify_rigth(flags, &length);
-    if (flags.sharp && n != 0)
-    {
-        if (flags.type =='x')
-            length += ft_putstr("0x", 1);
-        if (flags.type =='X')
-            length += ft_putstr("0X", 1);
-    }
-    if ((flags.precision - number_length) > 0)
-        print_precision(flags, &length, flags.precision - number_length);
-    print_padding(flags, &length);
-    ft_putnbr_base(n, base);
-    print_justify_left(flags, &length);
-    return (length);
-};
+	count = 0;
+	base_length = ft_strlen(base);
+	if (base_length < 2)
+		return (0);
+	if (n >= base_length)
+		count += ft_putnbrlen_base(n / base_length, base);
+	count++;
+	return (count);
+}
+
+int	print_u_x_upperx(t_format flag, unsigned long n, char *base)
+{
+	int	length;
+	int	number_length;
+
+	number_length = ft_putnbrlen_base(n, base);
+	length = number_length;
+	print_justify_rigth(flag, &length);
+	if (flag.sharp && n != 0)
+	{
+		if (flag.type == 'x')
+			length += ft_putstr("0x", 1);
+		if (flag.type == 'X')
+			length += ft_putstr("0X", 1);
+	}
+	if ((flag.precision - number_length) > 0)
+		print_precision(flag, &length, flag.precision - number_length);
+	print_padding(flag, &length);
+	ft_putnbr_base(n, base);
+	print_justify_left(flag, &length);
+	return (length);
+}

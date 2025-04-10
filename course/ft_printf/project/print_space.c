@@ -1,25 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   print_p.c                                          :+:      :+:    :+:   */
+/*   print_space.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/10 10:02:04 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/10 10:40:20 by bde-albu         ###   ########.fr       */
+/*   Created: 2025/04/10 10:05:00 by bde-albu          #+#    #+#             */
+/*   Updated: 2025/04/10 10:19:14 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int	print_p(t_format flag, void *ptr)
+void	print_space(t_format flag, int num, int *length)
 {
-	int	length;
-
-	length = 2;
-	print_justify_rigth(flag, &length);
-	print_padding(flag, &length);
-	length = ft_putptr_hexa(ptr);
-	print_justify_left(flag, &length);
-	return (length);
+	if (flag.space && num >= 0)
+	{
+		ft_putchar(' ', 1);
+		(*length)++;
+	}
 }
