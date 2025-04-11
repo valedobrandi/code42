@@ -9,6 +9,10 @@
 		"algorithm": "c",
 		"format": "c",
 		"sstream": "c",
-		"random": "c"
+		"random": "c",
+		"cstdlib": "c",
+		"stdlib.h": "c",
+		"get_next_line.h": "c",
+		"fcntl.h": "c"
 	}
 }
