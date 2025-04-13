@@ -2,6 +2,8 @@
 
 # Array of different BUFFER_SIZE values
 BUFFER_SIZES=(1 42 64 128 1024 9999)
+
+# All Tests
 ALL_TESTS=(
     test_empty_file
     test_invalid_fd
