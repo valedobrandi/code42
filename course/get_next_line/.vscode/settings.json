@@ -1,18 +1,10 @@
 {
-	"files.associations": {
-		"array": "c",
-		"string": "c",
-		"string_view": "c",
-		"span": "c",
-		"chrono": "c",
-		"variant": "c",
-		"algorithm": "c",
-		"format": "c",
-		"sstream": "c",
-		"random": "c",
-		"cstdlib": "c",
-		"stdlib.h": "c",
-		"get_next_line.h": "c",
-		"fcntl.h": "c"
-	}
+    "files.associations": {
+        "stddef.h": "c",
+        "get_next_line.h": "c",
+        "stdio.h": "c",
+        "stdlib.h": "c",
+        "string.h": "c",
+        "assert.h": "c"
+    }
 }

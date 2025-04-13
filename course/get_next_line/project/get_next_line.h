@@ -11,19 +11,32 @@
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
-# define GET_NEXT_LINE_H
+#define GET_NEXT_LINE_H
 
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <stddef.h>
 
-# ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 42
+#ifndef BUFFER_SIZE
+#define BUFFER_SIZE 42
 #endif
 
-char	*get_next_line(int fd);
-char	*buffer_line(char *buffer, int bsize);
-char	*ft_strncpy(char *dest, char *src, int n);
-char	*ft_strdup(const char *s);
+typedef struct s_get_next_line
+{
+    char buffer[BUFFER_SIZE];
+    int index;
+    int bytes_read;
+    int total_buffer;
+    char *line;
+    char *buff;
+} t_get_next_line;
 
-# endif
+char *get_next_line(int fd);
+int ft_findchr(char *s, int c);
+size_t ft_strlen(const char *s);
+size_t ft_strlcpy(char *dst, char *src, size_t dsize);
+size_t findchr(char *str, int c, size_t n);
+void *ft_memcpy(void *dest, void *src, size_t n);
+
+#endif

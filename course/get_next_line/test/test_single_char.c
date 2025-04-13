@@ -2,7 +2,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
+#include <sys/stat.h>
 #include "../project/get_next_line.h"
+
+void generate_single_char_file()
+{
+    const char *path = "test/files/single_char.txt";
+    struct stat buffer;
+
+    if (stat(path, &buffer) != 0)
+    {
+
+        FILE *file = fopen(path, "w");
+        if (file == NULL)
+        {
+            perror("Failed to create single_char.txt");
+            exit(1);
+        }
+        fprintf(file, "A");
+        fclose(file);
+        printf("Generated: %s\n", path);
+    }
+}
 
 int main(void)
 {
@@ -10,8 +32,7 @@ int main(void)
     char *line;
     int result = 0;
 
-    printf("==== Single Character File Test ====\n");
-
+    generate_single_char_file();
     fd = open("test/files/single_char.txt", O_RDONLY);
     if (fd < 0)
     {
@@ -20,18 +41,9 @@ int main(void)
     }
 
     line = get_next_line(fd);
-    if (line != NULL)
-    {
-        printf("Read line: \"%s\"\n", line);
-        free(line);
-    }
-    else
-    {
-        printf("❌ Expected a line but got NULL\n");
-        result = 1;
-    }
-
+    assert(strcmp(line, "A") == 0);
+    free(line);
     close(fd);
-    printf(result == 0 ? "Test passed!\n" : "Test failed!\n");
+    printf("\033[0;32mOK\033[0m ");
     return result;
 }

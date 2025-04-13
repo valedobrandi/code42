@@ -12,48 +12,77 @@
 
 #include "get_next_line.h"
 
-char	*buffer_line(char *buffer, int bsize)
+int ft_findchr(char *s, int c)
 {
-	char	*str;
+    size_t  count;
 
-	str = (char *)malloc((bsize + 1) * sizeof(char));
-	if (str == NULL)
-		return (NULL);
-	ft_strncpy(str, buffer, bsize);
-	return (str);
+    count = 0;
+	while (*s != '\0')
+	{
+		if (*s == c)
+			return (count);
+		s++;
+        count++;
+	}
+	if (c == '\0')
+		return (0);
+	return (0);
 }
 
-char	*ft_strncpy(char *dest, char *src, int n)
+size_t	ft_strlcpy(char *dst, char * src, size_t dsize)
 {
-	int	index;
+	size_t	i;
+	size_t	j;
+
+	i = 0;
+	while (src[i] != '\0')
+		i++;
+	if (dsize == 0)
+		return (i);
+	j = 0;
+	while (j < (dsize - 1) && src[j] != '\0')
+	{
+		dst[j] = src[j];
+		j++;
+	}
+	dst[j] = '\0';
+	return (i);
+}
+
+size_t	ft_strlen(const char *s)
+{
+	int	count;
+
+	count = 0;
+	while (s[count] != '\0')
+		count++;
+	return (count);
+}
+
+size_t findchr(char *str, int c, size_t n)
+{
+	size_t  index;
 
 	index = 0;
-	while (src[index] != '\0' && index < n)
+	while (n > 0)
 	{
-		dest[index] = src[index];
-		index++;
+        index++;
+		if ((unsigned char)c == *str)
+			return (index);
+		str++;
+		n--;
 	}
-	dest[index] = '\0';
+	return (-1);
+}
+
+void	*ft_memcpy(void *dest, void *src, size_t n)
+{
+	unsigned char	*d;
+	unsigned char	*s;
+
+	d = (unsigned char *)dest;
+	s = (unsigned char *)src;
+	while (n--)
+		*d++ = *s++;
 	return (dest);
-}
-
-char	*ft_strdup(const char *s)
-{
-	char	*ptr;
-	size_t	index;
-
-	index = 0;
-	while (s[index])
-		index++;
-	ptr = (char *)malloc((index + 1) * sizeof(char));
-	if (!ptr)
-		return (NULL);
-	index = 0;
-	while (s[index] != '\0')
-	{
-		ptr[index] = s[index];
-		index++;
-	}
-	ptr[index] = '\0';
-	return (ptr);
 }
