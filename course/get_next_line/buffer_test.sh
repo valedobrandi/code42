@@ -40,7 +40,7 @@ for TEST in "${TESTS[@]}"; do
     done
 done
 echo -e
-make fclean clean
+
 
 
 
