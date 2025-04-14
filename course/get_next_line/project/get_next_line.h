@@ -6,37 +6,49 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 13:23:17 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/11 13:04:18 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/04/14 17:47:34 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
-#define GET_NEXT_LINE_H
+# define GET_NEXT_LINE_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stddef.h>
+# include <stddef.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
 
-#ifndef BUFFER_SIZE
-#define BUFFER_SIZE 42
-#endif
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 42
+# endif
 
-typedef struct s_get_next_line
+typedef struct s_get_next_line_static
 {
-    char buffer[BUFFER_SIZE];
-    int index;
-    int bytes_read;
-    int total_buffer;
-    char *line;
-    char *buff;
-} t_get_next_line;
+	int		index;
+	char	buffer[BUFFER_SIZE];
+	/* 	int		bytes_read;
+		int	total_buffer;
+		char	*buff; */
+}			t_get_next_line_static;
 
-char *get_next_line(int fd);
-int ft_findchr(char *s, int c);
-size_t ft_strlen(const char *s);
-size_t ft_strlcpy(char *dst, char *src, size_t dsize);
-size_t findchr(char *str, int c, size_t n);
-void *ft_memcpy(void *dest, void *src, size_t n);
+typedef struct s_get_next_line_vars
+{
+	int		bytes_read;
+	char	*line;
+	char	line_buffer;
+	int		total_buffer;
+}			t_get_next_line_vars;
+
+char		*get_next_line(int fd);
+int			read_file(int fd, t_get_next_line_static file,
+				t_get_next_line_vars vars);
+char		*append_line(t_get_next_line_static file,
+				t_get_next_line_vars vars);
+
+/* int			init_struct(t_get_next_line **file);
+int			read_file(int fd, t_get_next_line *file);
+void		copy_line_to_buffer(char *line, t_get_next_line *file);
+int			callback_new_line(t_get_next_line *file);
+char	*append_line(t_get_next_line *file, char *line); */
 
 #endif

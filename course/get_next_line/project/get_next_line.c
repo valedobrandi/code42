@@ -6,81 +6,55 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 13:15:50 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/11 15:09:39 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/04/14 17:45:30 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char *get_next_line(int fd)
+char	*get_next_line(int fd)
 {
-  static t_get_next_line *r;
-  char *result;
-  int index;
-  int b;
+	static t_get_next_line_static	file;
+	t_get_next_line_vars			vars;
 
-  if (!r)
-  {
-    r = malloc(sizeof(t_get_next_line));
-    if (r == NULL)
-      return (NULL);
-    r->index = 0;
-    r->bytes_read = 0;
-  }
-    r->total_buffer = 0;
-    r->line = NULL;
-    r->buff = NULL;
-  while (1)
-  {
-
-    if (r->index >= r->bytes_read)
-    {
-      r->bytes_read = read(fd, r->buffer, BUFFER_SIZE);
-      if (r->bytes_read <= 0)
-      {
-        if (r->line && r->line[0] != '\0')
-        {
-          result = r->line;
-          free(r);
-          return (result);
-        }
-        if (r->line) 
-            free(r->line);
-        free(r);
-        r = NULL;
-        return (NULL);
-      }
-      r->index = 0;
-    }
-    index = 0;
-    while (r->index < r->bytes_read)
-    {
-      r->buff = malloc(r->total_buffer + 2);
-      if (!r->buff)
-        return (NULL);
-      if (r->line)
-      {
-        b = 0;
-        while (b < r->total_buffer)
-        {
-          r->buff[b] = r->line[b];
-          b++;
-        }
-        free(r->line);
-      }
-      r->buff[r->total_buffer] = r->buffer[r->index];
-      r->buff[r->total_buffer + 1] = '\0';
-      r->line = r->buff;
-      r->total_buffer++;
-      index++;
-      if (r->buffer[r->index] == '\n')
-      {
-        r->index++;
-        return (r->line);
-      }
-      r->index++;
-    }
-  }
-
-  return (NULL);
+	if (fd < 0 || BUFFER_SIZE <= 0)
+		return (NULL);
+	file.index = 0;
+	vars.bytes_read = 0;
+	while (1)
+	{
+		vars.bytes_read = read_file(fd, file, vars);
+		while (file.index < vars.bytes_read)
+		{
+			vars.line = malloc(vars.total_buffer + 2);
+			if (!vars.line)
+				return (NULL);
+			vars.line = append_line(file, vars);
+		}
+	}
 }
+
+/* 	static t_get_next_line	*file;
+	if (fd < 0 || BUFFER_SIZE <= 0 || init_struct(&file))
+		return (NULL);
+	line = NULL;
+	while (1)
+	{
+		check = read_file(fd, file);
+		if (check == -1 || (check == 0 && !line))
+		{
+			free(file);
+			file = NULL;
+			return(NULL);
+		}
+		if (check == 0 && line)
+			return (line);
+		while (file->index < file->bytes_read)
+		{
+			line = append_line(file, line);
+			if (callback_new_line(file))
+				return (line);
+			file->index++;
+		}
+	}
+	return (NULL); */

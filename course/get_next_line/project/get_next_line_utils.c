@@ -6,83 +6,87 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 14:02:18 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/11 13:04:02 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/04/14 17:46:29 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int ft_findchr(char *s, int c)
+int	init_struct(t_get_next_line **file)
 {
-    size_t  count;
-
-    count = 0;
-	while (*s != '\0')
+	if (*file == NULL)
 	{
-		if (*s == c)
-			return (count);
-		s++;
-        count++;
+		*file = malloc(sizeof(t_get_next_line));
+		if (*file == NULL)
+			return (1);
+		(*file)->index = 0;
+		(*file)->bytes_read = 0;
 	}
-	if (c == '\0')
-		return (0);
+	(*file)->total_buffer = 0;
+	(*file)->buff = NULL;
 	return (0);
 }
 
-size_t	ft_strlcpy(char *dst, char * src, size_t dsize)
+int	read_file(int fd, t_get_next_line_static file, t_get_next_line_vars vars)
 {
-	size_t	i;
-	size_t	j;
-
-	i = 0;
-	while (src[i] != '\0')
-		i++;
-	if (dsize == 0)
-		return (i);
-	j = 0;
-	while (j < (dsize - 1) && src[j] != '\0')
-	{
-		dst[j] = src[j];
-		j++;
-	}
-	dst[j] = '\0';
-	return (i);
+	if (file.index >= vars.bytes_read)
+		vars.bytes_read = read(fd, file.buffer, BUFFER_SIZE);
+	return (vars.bytes_read);
 }
 
-size_t	ft_strlen(const char *s)
+void	copy_line_to_buffer(char *line, t_get_next_line *file)
 {
-	int	count;
-
-	count = 0;
-	while (s[count] != '\0')
-		count++;
-	return (count);
-}
-
-size_t findchr(char *str, int c, size_t n)
-{
-	size_t  index;
+	int	index;
 
 	index = 0;
-	while (n > 0)
+	if (line)
 	{
-        index++;
-		if ((unsigned char)c == *str)
-			return (index);
-		str++;
-		n--;
+		while (index < file->total_buffer)
+		{
+			file->buff[index] = line[index];
+			index++;
+		}
+		free(line);
 	}
-	return (-1);
 }
 
-void	*ft_memcpy(void *dest, void *src, size_t n)
+int	callback_new_line(t_get_next_line *file)
 {
-	unsigned char	*d;
-	unsigned char	*s;
-
-	d = (unsigned char *)dest;
-	s = (unsigned char *)src;
-	while (n--)
-		*d++ = *s++;
-	return (dest);
+	if (file->buffer[file->index] == '\n')
+	{
+		file->index++;
+		return (1);
+	}
+	return (0);
 }
+
+char	*append_line(t_get_next_line_static file, t_get_next_line_vars vars)
+{
+	copy_line_to_buffer(line, file);
+	file->buff[file->total_buffer] = file->buffer[file->index];
+	file->buff[file->total_buffer + 1] = '\0';
+	line = file->buff;
+	file->total_buffer++;
+	return (line);
+}
+
+/* 	char	*new_buff;
+	int		i;
+
+	new_buff = malloc(file->total_buffer + 2);
+	if (!new_buff)
+		return (NULL);
+	i = 0;
+	if (line)
+	{
+		while (i < file->total_buffer)
+		{
+			new_buff[i] = line[i];
+			i++;
+		}
+		free(line);
+	}
+	new_buff[i++] = file->buffer[file->index];
+	new_buff[i] = '\0';
+	file->total_buffer++;
+	return (line); */
