@@ -37,7 +37,7 @@ int main(void)
         "\n",
         "\n",
         "Second Line\n",
-        "\n", // empty line
+        "\n",
         "Third Line\n",
         NULL};
 
