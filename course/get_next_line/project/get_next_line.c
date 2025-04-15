@@ -12,49 +12,72 @@
 
 #include "get_next_line.h"
 
-char	*get_next_line(int fd)
+int reader(int fd, t_get_next_line_static *file, int *bytes_read)
 {
-	static t_get_next_line_static	file;
-	t_get_next_line_vars			vars;
-
-	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (NULL);
-	file.index = 0;
-	vars.bytes_read = 0;
-	while (1)
-	{
-		vars.bytes_read = read_file(fd, file, vars);
-		while (file.index < vars.bytes_read)
-		{
-			vars.line = malloc(vars.total_buffer + 2);
-			if (!vars.line)
-				return (NULL);
-			vars.line = append_line(file, vars);
-		}
-	}
+    if (file->index >= *bytes_read)
+    {
+        *bytes_read = read(fd, file->buffer, BUFFER_SIZE);
+        file->index = 0;
+    }
+    return (*bytes_read);
 }
 
-/* 	static t_get_next_line	*file;
-	if (fd < 0 || BUFFER_SIZE <= 0 || init_struct(&file))
-		return (NULL);
-	line = NULL;
-	while (1)
-	{
-		check = read_file(fd, file);
-		if (check == -1 || (check == 0 && !line))
-		{
-			free(file);
-			file = NULL;
-			return(NULL);
-		}
-		if (check == 0 && line)
-			return (line);
-		while (file->index < file->bytes_read)
-		{
-			line = append_line(file, line);
-			if (callback_new_line(file))
-				return (line);
-			file->index++;
-		}
-	}
-	return (NULL); */
+
+int init(int *index, int *buff, char **line)
+{
+    *index = 0;
+    *buff = 12;
+    *line = (char *)malloc(*buff * (sizeof(char)));
+    if (*line == NULL)
+        return (1);
+    return (0);
+}
+
+int allocate_line(t_get_next_line_vars *vars)
+{
+    if (vars->index + 1 > vars->buff)
+    {
+        vars->line = ft_relloc(vars->line, vars->buff * 2, vars->index);
+        if (vars->line == NULL)
+            return (1);
+    }
+    return (0);
+}
+
+int get_line(char *buffer, int *file_index, t_get_next_line_vars *vars)
+{
+    if (allocate_line(vars))
+        return (1);
+    vars->line[vars->index] = buffer[*file_index];
+    vars->line[vars->index + 1] = '\0';
+    (*file_index)++;
+    return (0);
+}
+
+char *get_next_line(int fd)
+{
+    static t_get_next_line_static file;
+    t_get_next_line_vars vars;
+
+    if (fd < 0 || BUFFER_SIZE <= 0)
+        return (NULL);
+    if (init(&vars.index, &vars.buff, &vars.line))
+        return (NULL);
+    while (1)
+    {
+        if (reader(fd, &file, &vars.bytes_read) == 0)
+            break;
+        while (file.index < vars.bytes_read)
+        {
+            if (get_line(file.buffer, &file.index, &vars))
+                return (NULL);
+            if (file.buffer[file.index - 1] == '\n')
+                return (vars.line);
+            vars.index++;
+        }
+    }
+    if (vars.index > 0)
+        return (vars.line);
+    free(vars.line);
+    return (NULL);
+}
