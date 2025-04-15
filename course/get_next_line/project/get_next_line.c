@@ -6,81 +6,78 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 13:15:50 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/11 15:09:39 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/04/14 17:45:30 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
+int reader(int fd, t_get_next_line_static *file, int *bytes_read)
+{
+    if (file->index >= *bytes_read)
+    {
+        *bytes_read = read(fd, file->buffer, BUFFER_SIZE);
+        file->index = 0;
+    }
+    return (*bytes_read);
+}
+
+
+int init(int *index, int *buff, char **line)
+{
+    *index = 0;
+    *buff = 12;
+    *line = (char *)malloc(*buff * (sizeof(char)));
+    if (*line == NULL)
+        return (1);
+    return (0);
+}
+
+int allocate_line(t_get_next_line_vars *vars)
+{
+    if (vars->index + 1 > vars->buff)
+    {
+        vars->line = ft_relloc(vars->line, vars->buff * 2, vars->index);
+        if (vars->line == NULL)
+            return (1);
+    }
+    return (0);
+}
+
+int get_line(char *buffer, int *file_index, t_get_next_line_vars *vars)
+{
+    if (allocate_line(vars))
+        return (1);
+    vars->line[vars->index] = buffer[*file_index];
+    vars->line[vars->index + 1] = '\0';
+    (*file_index)++;
+    return (0);
+}
+
 char *get_next_line(int fd)
 {
-  static t_get_next_line *r;
-  char *result;
-  int index;
-  int b;
+    static t_get_next_line_static file;
+    t_get_next_line_vars vars;
 
-  if (!r)
-  {
-    r = malloc(sizeof(t_get_next_line));
-    if (r == NULL)
-      return (NULL);
-    r->index = 0;
-    r->bytes_read = 0;
-  }
-    r->total_buffer = 0;
-    r->line = NULL;
-    r->buff = NULL;
-  while (1)
-  {
-
-    if (r->index >= r->bytes_read)
-    {
-      r->bytes_read = read(fd, r->buffer, BUFFER_SIZE);
-      if (r->bytes_read <= 0)
-      {
-        if (r->line && r->line[0] != '\0')
-        {
-          result = r->line;
-          free(r);
-          return (result);
-        }
-        if (r->line) 
-            free(r->line);
-        free(r);
-        r = NULL;
+    if (fd < 0 || BUFFER_SIZE <= 0)
         return (NULL);
-      }
-      r->index = 0;
-    }
-    index = 0;
-    while (r->index < r->bytes_read)
-    {
-      r->buff = malloc(r->total_buffer + 2);
-      if (!r->buff)
+    if (init(&vars.index, &vars.buff, &vars.line))
         return (NULL);
-      if (r->line)
-      {
-        b = 0;
-        while (b < r->total_buffer)
+    while (1)
+    {
+        if (reader(fd, &file, &vars.bytes_read) == 0)
+            break;
+        while (file.index < vars.bytes_read)
         {
-          r->buff[b] = r->line[b];
-          b++;
+            if (get_line(file.buffer, &file.index, &vars))
+                return (NULL);
+            if (file.buffer[file.index - 1] == '\n')
+                return (vars.line);
+            vars.index++;
         }
-        free(r->line);
-      }
-      r->buff[r->total_buffer] = r->buffer[r->index];
-      r->buff[r->total_buffer + 1] = '\0';
-      r->line = r->buff;
-      r->total_buffer++;
-      index++;
-      if (r->buffer[r->index] == '\n')
-      {
-        r->index++;
-        return (r->line);
-      }
-      r->index++;
     }
-  }
-
-  return (NULL);
+    if (vars.index > 0)
+        return (vars.line);
+    free(vars.line);
+    return (NULL);
 }
