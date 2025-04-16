@@ -6,23 +6,20 @@
 #include <sys/stat.h>
 #include "get_next_line.h"
 
-void generate_multiple_lines_file()
+const char	*path = "test/files/test_file.txt";
+void	generate_file(void)
 {
-    const char *path = "test/files/multiple_lines.txt";
-    struct stat buffer;
+	FILE	*file;
 
-    if (stat(path, &buffer) != 0)
-    {
-        FILE *file = fopen(path, "w");
-        if (file == NULL)
-        {
-            perror("Failed to create multiple_lines.txt");
-            exit(1);
-        }
-        fprintf(file, "Line 1\nLine 2\nLine 3\nLine 4\n");
-        fclose(file);
-        printf("Generated: %s\n", path);
-    }
+	remove(path);
+	file = fopen(path, "w");
+	if (file == NULL)
+	{
+		perror("Failed to create file");
+		exit(EXIT_FAILURE);
+	}
+	fprintf(file, "Line 1\nLine 2\nLine 3\nLine 4\n");
+	fclose(file);
 }
 
 int main(void)
@@ -34,9 +31,9 @@ int main(void)
         "Line 2\n",
         "Line 3\n",
         "Line 4\n"};
-    generate_multiple_lines_file();
+	generate_file();
     int index = 0;
-    fd = open("test/files/multiple_lines.txt", O_RDONLY);
+    fd = open(path, O_RDONLY);
     if (fd < 0)
     {
         perror("open");

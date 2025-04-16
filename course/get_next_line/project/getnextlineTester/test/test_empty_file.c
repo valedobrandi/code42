@@ -6,30 +6,26 @@
 #include <sys/stat.h>
 #include "get_next_line.h"
 
-void generate_empty_file()
+const char *path = "test/files/test_file.txt";
+void generate_file()
 {
-  struct stat buffer;
-  const char *path = "test/files/test_empty_file.txt";
-
-  if (stat(path, &buffer) != 0)
-  {
+    remove(path);
     FILE *file = fopen(path, "w");
     if (file == NULL)
     {
-      perror("Failed to create test_empty_file.txt");
-      exit(EXIT_FAILURE);
+        perror("Failed to create file");
+        exit(EXIT_FAILURE);
     }
+
     fclose(file);
-    printf("Generated: %s\n", path);
-  }
 }
 
 int main(void)
 {
   int fd;
   char *line;
-  generate_empty_file();
-  fd = open("test/files/test_empty_file.txt", O_RDONLY);
+  generate_file();
+  fd = open(path, O_RDONLY);
   if (fd < 0)
   {
     perror("open");

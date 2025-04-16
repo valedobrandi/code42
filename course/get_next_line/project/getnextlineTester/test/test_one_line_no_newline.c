@@ -6,34 +6,29 @@
 #include <sys/stat.h>
 #include "get_next_line.h"
 
-void generate_one_line_no_newline_file()
+const char	*path = "test/files/test_file.txt";
+void	generate_file(void)
 {
-    const char *path = "test/files/one_line_no_newline.txt";
-    struct stat buffer;
+	FILE	*file;
 
-    if (stat(path, &buffer) != 0)
-    {
-
-        FILE *file = fopen(path, "w");
-        if (file == NULL)
-        {
-            perror("Failed to create one_line_no_newline.txt");
-            exit(1);
-        }
-        fprintf(file, "HelloWorld");
-        fclose(file);
-        printf("Generated: %s\n", path);
-    }
+	remove(path);
+	file = fopen(path, "w");
+	if (file == NULL)
+	{
+		perror("Failed to create file");
+		exit(EXIT_FAILURE);
+	}
+	fprintf(file, "HelloWorld");
+	fclose(file);
 }
-
 int main(void)
 {
     int fd;
     char *line;
     char *result = "HelloWorld";
 
-    generate_one_line_no_newline_file();
-    fd = open("test/files/one_line_no_newline.txt", O_RDONLY);
+    generate_file();
+    fd = open(path, O_RDONLY);
     if (fd < 0)
     {
         perror("open");

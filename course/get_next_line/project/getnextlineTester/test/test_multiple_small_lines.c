@@ -18,9 +18,9 @@ void	generate_file(void)
 		perror("Failed to create file");
 		exit(EXIT_FAILURE);
 	}
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 1000; i++)
 	{
-		fprintf(file, "\n");
+		fprintf(file, "A\n");
 	}
 	fclose(file);
 }
@@ -29,8 +29,8 @@ int	main(void)
 {
 	int			fd;
 	char		*line;
+	const char	*expected = "A\n";
 	int			line_count;
-	const char	*expected = "\n";
 
 	line_count = 0;
 	generate_file();
@@ -47,7 +47,7 @@ int	main(void)
 		line_count++;
 	}
 	close(fd);
-	assert(line_count == 5);
-	printf("\033[0;32mOK \033[0m");
+	assert(line_count == 1000); // Expecting 1000 lines of "A\n"
+	printf("\033[0;32mOK\033[0m ");
 	return (0);
 }

@@ -17,7 +17,12 @@ TEST_BINS = \
 	$(TEST_DIR)/test_multiple_newlines \
 	$(TEST_DIR)/test_one_line_no_newline \
 	$(TEST_DIR)/test_only_newlines \
-	$(TEST_DIR)/test_single_char
+	$(TEST_DIR)/test_single_char \
+	$(TEST_DIR)/test_large_line \
+	$(TEST_DIR)/test_no_newline_end \
+	$(TEST_DIR)/test_multiple_consecutive_new_lines \
+	$(TEST_DIR)/test_very_larger_line \
+	$(TEST_DIR)/test_multiple_small_lines
 
 ifeq ($(origin BUFFER_SIZE), undefined)
     # BUFFER_SIZE is not defined, no -D BUFFER_SIZE flag
@@ -41,7 +46,6 @@ $(OBJ_DIR)/%.o: $(TEST_DIR)/%.c
 $(TEST_DIR)/%: $(OBJ_DIR)/%.o $(LIBRARY)
 	@$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -I$(SRC_DIR) $^ -o $@
 
-
 test_empty_file: $(TEST_DIR)/test_empty_file
 	-$(VALGRID) ./$< 2> logs.txt
 
@@ -51,10 +55,22 @@ test_invalid_fd: $(TEST_DIR)/test_invalid_fd
 test_large_file: $(TEST_DIR)/test_large_file
 	-$(VALGRID) ./$< 2> logs.txt
 
+test_large_line: $(TEST_DIR)/test_large_line
+	-$(VALGRID) ./$< 2> logs.txt
+
+test_multiple_consecutive_new_lines: $(TEST_DIR)/test_multiple_consecutive_new_lines
+	-$(VALGRID) ./$< 2> logs.txt
+
 test_multiple_lines: $(TEST_DIR)/test_multiple_lines
 	-$(VALGRID) ./$< 2> logs.txt
 
 test_multiple_newlines: $(TEST_DIR)/test_multiple_newlines
+	-$(VALGRID) ./$< 2> logs.txt
+
+test_multiple_small_lines: $(TEST_DIR)/test_multiple_small_lines
+	-$(VALGRID) ./$< 2> logs.txt
+
+test_no_newline_end: $(TEST_DIR)/test_no_newline_end
 	-$(VALGRID) ./$< 2> logs.txt
 
 test_one_line_no_newline: $(TEST_DIR)/test_one_line_no_newline
@@ -64,6 +80,9 @@ test_only_newlines: $(TEST_DIR)/test_only_newlines
 	-$(VALGRID) ./$< 2> logs.txt
 
 test_single_char: $(TEST_DIR)/test_single_char
+	-$(VALGRID) ./$< 2> logs.txt
+
+test_very_larger_line: $(TEST_DIR)/test_very_larger_line
 	-$(VALGRID) ./$< 2> logs.txt
 
 all: $(TEST_OBJECTS) $(TEST_BINS)
@@ -82,7 +101,9 @@ fclean: clean
 re: fclean all
 
 .PHONY: all clean fclean re \
-	test_empty_file test_invalid_fd test_large_file test_multiple_lines \
-	test_multiple_newlines test_one_line_no_newline test_only_newlines test_single_char
+	test_empty_file test_invalid_fd test_large_file test_multiple_lines test_large_line \
+	test_multiple_newlines test_one_line_no_newline test_only_newlines test_single_char \
+	test_no_newline_end test_multiple_consecutive_new_lines test_very_larger_line
+
 
 

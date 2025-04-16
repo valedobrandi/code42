@@ -18,36 +18,35 @@ void	generate_file(void)
 		perror("Failed to create file");
 		exit(EXIT_FAILURE);
 	}
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 1000; i++)
 	{
-		fprintf(file, "\n");
+		fprintf(file, "A");
 	}
+	fprintf(file, "\n");
 	fclose(file);
 }
 
 int	main(void)
 {
-	int			fd;
-	char		*line;
-	int			line_count;
-	const char	*expected = "\n";
+	int		fd;
+	char	*line;
+	char	expected[1001];
+	int		result;
 
-	line_count = 0;
+	result = 0;
 	generate_file();
+	memset(expected, 'A', 1000);
+	expected[1000] = '\n';
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
 	{
 		perror("open");
 		return (1);
 	}
-	while ((line = get_next_line(fd)) != NULL)
-	{
-		assert(strcmp(line, expected) == 0);
-		free(line);
-		line_count++;
-	}
+	line = get_next_line(fd);
+	assert(strcmp(line, expected) == 0);
+	free(line);
 	close(fd);
-	assert(line_count == 5);
-	printf("\033[0;32mOK \033[0m");
-	return (0);
+	printf("\033[0;32mOK\033[0m ");
+	return (result);
 }

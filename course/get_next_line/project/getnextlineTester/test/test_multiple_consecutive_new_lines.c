@@ -18,10 +18,7 @@ void	generate_file(void)
 		perror("Failed to create file");
 		exit(EXIT_FAILURE);
 	}
-	for (int i = 0; i < 5; i++)
-	{
-		fprintf(file, "\n");
-	}
+	fprintf(file, "\n\n\n"); // Multiple newlines
 	fclose(file);
 }
 
@@ -29,10 +26,10 @@ int	main(void)
 {
 	int			fd;
 	char		*line;
-	int			line_count;
-	const char	*expected = "\n";
+	const char	*expected[] = {"\n", "\n", "\n"};
+	int			line_number;
 
-	line_count = 0;
+	line_number = 0;
 	generate_file();
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
@@ -42,12 +39,12 @@ int	main(void)
 	}
 	while ((line = get_next_line(fd)) != NULL)
 	{
-		assert(strcmp(line, expected) == 0);
+		assert(strcmp(line, expected[line_number]) == 0);
 		free(line);
-		line_count++;
+		line_number++;
 	}
 	close(fd);
-	assert(line_count == 5);
-	printf("\033[0;32mOK \033[0m");
+	assert(line_number == 3);
+	printf("\033[0;32mOK\033[0m ");
 	return (0);
 }
