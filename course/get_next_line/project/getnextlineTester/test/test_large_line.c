@@ -18,34 +18,34 @@ void	generate_file(void)
 		perror("Failed to create file");
 		exit(EXIT_FAILURE);
 	}
-	fprintf(file,
-		"01010101010101010101010101010101010101010101010101010101010101010101010101");
+	for (int i = 0; i < 2000; i++)
+	{
+		fprintf(file, "A");
+	}
 	fclose(file);
 }
 
 int	main(void)
 {
-	int			fd;
-	char		*line;
-	const char	*expected[] = {"01010101010101010101010101010101010101010101010101010101010101010101010101"};
-	int			index;
+	int		fd;
+	char	*line;
+	char	expected[2000];
+	int		result;
 
+	result = 0;
 	generate_file();
-	index = 0;
+    expected[2000] = '\0';
+	memset(expected, 'A', 2000);
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
 	{
 		perror("open");
 		return (1);
 	}
-	while ((line = get_next_line(fd)) != NULL)
-	{
-		assert(strcmp(line, expected[index]) == 0);
-		free(line);
-		index++;
-	}
+	line = get_next_line(fd);
+	assert(strcmp(line, expected) == 0);
+	free(line);
 	close(fd);
-	assert(index == 1);
 	printf("\033[0;32mOK\033[0m ");
-	return (0);
+	return (result);
 }

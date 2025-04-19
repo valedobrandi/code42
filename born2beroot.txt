@@ -1,0 +1,27 @@
+virsh list --all	Show all VMs (running or not)
+virsh start <vm-name>	Start a VM
+virsh shutdown <vm-name>	Gracefully shut down a VM
+virsh destroy <vm-name>	Force-stop a VM (like unplugging power)
+virsh edit <vm-name>	Open the XML config of a VM in an editor (usually vi)
+virsh define <xml-file>	Define a new VM from an XML file
+virsh undefine <vm-name>	Remove VM definition (does not delete disk)
+virsh console <vm-name>	Access VM console (if configured)
+
+INSTALL:
+qemu-system-x86_64 \
+  -enable-kvm \
+  -m 1024 \
+  -hda /path/to/your/debian_disk.qcow2 \
+  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
+  -device e1000,netdev=net0 \
+  -vga virtio
+
+  RUN:
+  qemu-system-x86_64 \
+  -enable-kvm \
+  -smp 1 \
+  -m 1024 \
+  -hda born2beroot.qcow2 \
+  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
+  -device e1000,netdev=net0 \
+  -vga virtio

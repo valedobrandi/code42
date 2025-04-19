@@ -1,0 +1,173 @@
+virsh list --all	Show all VMs (running or not)
+virsh start <vm-name>	Start a VM
+virsh shutdown <vm-name>	Gracefully shut down a VM
+virsh destroy <vm-name>	Force-stop a VM (like unplugging power)
+virsh edit <vm-name>	Open the XML config of a VM in an editor (usually vi)
+virsh define <xml-file>	Define a new VM from an XML file
+virsh undefine <vm-name>	Remove VM definition (does not delete disk)
+virsh console <vm-name>	Access VM console (if configured)
+sudo shutdown now
+
+INSTALL:
+qemu-system-x86_64 \
+  -enable-kvm \
+  -m 1024 \
+  -hda /path/to/your/debian_disk.qcow2 \
+  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
+  -device e1000,netdev=net0 \
+  -vga virtio
+
+  RUN:
+  qemu-system-x86_64 \
+  -enable-kvm \
+  -smp 1 \
+  -m 1024 \
+  -hda bor2beroot.qcow2 \
+  -netdev user,id=net0,hostfwd=tcp::2222-:22 \
+  -device e1000,netdev=net0 \
+  -vga virtio
+
+sudo apt install ufw
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 4242/tcp
+sudo ufw deny in to any port 68 proto udp
+
+sudo hostnamectl set-hostname bernardo42
+sudo nano /etc/hostname
+sudo nano /etc/hosts
+
+sudo adduser bernardo
+sudo groupadd user42
+sudo usermod -aG user42,sudo bernardo
+
+sudo apt install libpam-pwquality
+sudo nano /etc/login.defs
+PASS_MAX_DAYS   30
+PASS_MIN_DAYS   2
+PASS_WARN_AGE   7
+sudo nano /etc/pam.d/common-password
+password requisite pam_pwquality.so retry=3 minlen=10 ucredit=-1 lcredit=-1 dcredit=-1 maxrepeat=3 reject_username difok=7
+pyThon2025
+bornTo2025
+
+sudo visudo
+Defaults        passwd_tries=3
+Defaults        badpass_message="🔥 Accès refusé. Vérifiez votre mot de passe !"
+Defaults        logfile="/var/log/sudo/sudo.log"
+Defaults        log_input,log_output
+Defaults        requiretty
+Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+
+sudo mkdir -p /var/log/sudo/
+sudo touch /var/log/sudo/sudo.log
+sudo chmod 600 /var/log/sudo/sudo.log
+sudo chown root:root /var/log/sudo/sudo.log
+
+Expiration du mot de passe	chage -l user
+sudo -k
+cat /var/log/sudo/sudo.log
+
+#!/bin/bash
+
+# Ensure no errors are printed
+exec 2>/dev/null
+
+# Gather information
+ARCHITECTURE=$(uname -a)
+PHYSICAL_CPUS=$(lscpu | grep "Socket(s):" | awk '{print $2}')
+VIRTUAL_CPUS=$(nproc)
+MEMORY_USED=$(free -m | awk '/Mem:/ {print $3}')
+MEMORY_TOTAL=$(free -m | awk '/Mem:/ {print $2}')
+MEMORY_PERCENT=$(awk "BEGIN {printf \"%.2f\", ($MEMORY_USED/$MEMORY_TOTAL)*100}")
+DISK_USED=$(df -BM --total | grep total | awk '{print $3}' | sed 's/M//')
+DISK_TOTAL=$(df -BM --total | grep total | awk '{print $2}' | sed 's/M//')
+DISK_PERCENT=$(awk "BEGIN {printf \"%.2f\", ($DISK_USED/$DISK_TOTAL)*100}")
+CPU_LOAD=$(top -bn1 | grep "Cpu(s)" | awk '{print 100 - $8}')
+LAST_BOOT=$(who -b | awk '{print $3 " " $4}')
+LVM=$(lsblk | grep -q "lvm" && echo "yes" || echo "no")
+TCP_CONNECTIONS=$(ss -s | grep "TCP" | awk '{print $4}' | cut -d',' -f1)
+USER_COUNT=$(users | wc -w)
+IP=$(hostname -I | awk '{print $1}')
+MAC=$(ip link show | awk '/ether/ {print $2}' | head -n 1)
+SUDO_CMDS=$(grep -c 'COMMAND=' /var/log/sudo/sudo.log)
+
+sudo crontab -e
+
+script:
+
+user {
+remove -> sudo deluser --remove-home username
+remove group -> sudo deluser username groupname
+}
+
+ufw {
+  status -> sudo ufw status
+  system -> systemctl status ufw
+}
+
+hostname {
+  show -> hostnamectl
+  change -> hostnamectl
+}
+
+groups {
+show -> getent group
+delete -> sudo groupdel groupname
+users -> grep groupname /etc/group
+}
+delete group -> 
+
+evaluation {
+  systel -> head -n 2 /etc/os-release
+  ss -tunlp | grep 4242
+
+  hostname {
+  show -> hostnamectl
+  change -> hostnamectl set-hostname new_hostname
+  restart
+  edit -> sudo nano /etc/hosts
+  }
+
+  ufw {
+  status -> sudo ufw status
+  system -> systemctl status ufw
+  allow -> sudo ufw allow
+  deny -> sudo ufw deny
+  enumerate -> sudo ufw status numbered
+  delete -> sudo ufw delete
+  }
+
+  passwor {
+    cat /etc/login.defs | grep PASS
+    sudo cat /etc/pam.d/common-password
+    sudo chage -l tonuser
+  }
+
+  users {
+    id tonuser
+    groups tonuser
+    sudo adduser nouveauuser
+    groups testuser
+    sudo usermod -aG user42 nouveauuser
+    getent group user42
+  }
+
+  sudo {
+    sudo cat /var/log/sudo/sudo.log | tail
+  }
+
+  storage {
+    lsblk
+    sudo cryptsetup status NOM_DU_LUKS
+  }
+
+  AppArmor {
+    sudo aa-status
+  }
+
+  crontab {
+    sudo crontab -u root -e
+  }
+
+}
