@@ -1,0 +1,4 @@
+
+[0;33mtest_main[0m
+BUFFER_SIZE...
+42:test_main: test/test_main.c:29: int main(void): Assertion `strcmp(line, "01234567890123456789012345678901234567890\n") == 0' failed.

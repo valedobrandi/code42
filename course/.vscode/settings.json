@@ -1,13 +1,16 @@
 {
     "files.associations": {
-        "stdlib.h": "c",
-        "stddef.h": "c",
-        "functional": "c",
-        "variant": "c",
-        "source_location": "c",
-        "*.tcc": "c",
-        "string": "c",
-        "unordered_map": "c",
-        "string_view": "c"
-    }
+		"stdlib.h": "c",
+		"stddef.h": "c",
+		"functional": "c",
+		"variant": "c",
+		"source_location": "c",
+		"*.tcc": "c",
+		"string": "c",
+		"unordered_map": "c",
+		"string_view": "c",
+		"chrono": "c",
+		"random": "c",
+		"limits": "c"
+	}
 }
