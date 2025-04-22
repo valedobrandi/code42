@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/10 13:23:17 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/22 14:47:05 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/04/22 16:02:47 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,5 +38,5 @@ typedef struct s_get_next_line_vars
 char		*get_next_line(int fd);
 void		*ft_memcpy(void *dest, const void *src, size_t n);
 char		*ft_relloc(char *line, int buff, int index);
-int			ft_strlen(char *s);
+char		*ft_strjoin(char const *s1, char const *s2);
 #endif

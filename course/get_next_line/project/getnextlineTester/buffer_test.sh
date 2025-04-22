@@ -18,6 +18,7 @@ ALL_TESTS=(
 	test_only_newlines
     test_single_char
 	test_very_larger_line
+	test_main
 )
 
 # Pass a test as params ex: ./buffer_test.sh test_single_char

@@ -36,5 +36,8 @@ int main(void)
   printf("\033[0;32mOK\033[0m ");
   free(line);
   close(fd);
+  line = get_next_line(1000);
+  assert(line == NULL);
+  printf("\033[0;32mOK\033[0m ");
   return 0;
 }
