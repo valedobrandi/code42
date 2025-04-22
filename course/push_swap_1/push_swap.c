@@ -113,7 +113,7 @@ void sort_a(Stack *from, Stack *to, int *sorted)
 
     while (from->top > -1)
     {
-        target = sorted[index];
+        target = sorted[99 - index];
         position = best_move(from, target);
         if (position > ((from->top + 1) / 2))
             while (from->arr[from->top] != target)
@@ -134,7 +134,7 @@ void push_chuncks(Stack *from, Stack *to, int *sorted)
     int min = 80;
     int index;
 
-    while (from->top >= 0)
+    while (from->top >= 80)
     {
         index = 0;
         while (index < chunk_size)

@@ -153,7 +153,6 @@ void sort_a(Stack *from, Stack *to, int *sorted)
             target = best_move(to, sorted[current - 1]);
             best_rotate(to, target, sorted[current - 1]);
         }
-
         pa(from, to);
         index++;
     }
