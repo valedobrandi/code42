@@ -12,89 +12,51 @@
 
 #include "get_next_line.h"
 
-int	reader_file(int fd, char *buffer, int bytes_reader)
+char *store_buffer(int fd, char *buffer, int bytes_reader)
 {
-	char	*stash;
+    char *temp_buffer;
 
-	stash = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	;
-	if (!stash)
-		return (NULL);
-	while (bytes_reader > 0 && !ft_strchr(stash, '\n'))
-	{
-		bytes_reader = read(fd, buffer, BUFFER_SIZE);
-		if (bytes_reader == -1)
-		{
-			free(buffer);
-			free(stash);
-			return (NULL);
-		}
-		buffer[bytes_reader] = '\0';
-		stash = ft_strjoin(stash, buffer);
-		if (!stash)
-		{
-			free(buffer);
-			return (NULL);
-		}
-	}
-	free(buffer);
-	return (stash);
+    temp_buffer = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+    if (!temp_buffer)
+        return (NULL);
+    while (bytes_reader > 0 && !ft_strchr(buffer, '\n'))
+    {
+        bytes_reader = read(fd, temp_buffer, BUFFER_SIZE);
+        if (bytes_reader == -1)
+        {
+            free(buffer);
+            free(temp_buffer);
+            return (NULL);
+        }
+        buffer[bytes_reader] = '\0';
+        temp_buffer = ft_strjoin(buffer, temp_buffer);
+        if (!temp_buffer)
+        {
+            free(buffer);
+            return (NULL);
+        }
+    }
+    free(temp_buffer);
+    return (buffer);
 }
 
-char	*get_line(char *buffer)
+char *get_line(char *buffer)
 {
-	char	*line;
-	int		index;
-
-	if (!buffer || !buffer[0])
-		return (NULL);
-	index = 0;
-	while (buffer[index] && buffer[index] != '\n')
-		index++;
-	if (buffer[index] == '\n')
-		index++;
-	line = malloc((index + 1) * sizeof(char));
-	if (!line)
-		return (NULL);
-	index = 0;
-	while (buffer[index] && buffer[index] != '\n')
-	{
-		line[index] = buffer[index];
-		index++;
-	}
-	if (buffer[index] == '\n')
-		line[index++] = '\n';
-	line[index] = '\0';
-	return (line);
+    if (!buffer || buffer[0] == '\0')
+        return (NULL);
 }
 
-char	*update(char *buffer)
+char *get_next_line(int fd)
 {
-	int		index;
-	char	*resize;
+    static char *buffer;
+    int bytes_reader;
+    char *line;
 
-	index = 0;
-	while (buffer[index] && buffer[index] != '\n')
-		index++;
-	if (!buffer[index])
-	{
-		free(buffer);
-		return (NULL);
-	}
-	index++;
-	resize = malloc()
-}
-
-char	*get_next_line(int fd)
-{
-	static char	*buffer;
-	int			bytes_reader;
-	char		*line;
-
-	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (NULL);
-	bytes_reader = 1;
-	buffer = reader_file(fd, buffer, bytes_reader);
-	line = get_line(buffer);
-	buffer = update(buffer);
+    if (fd < 0 || BUFFER_SIZE <= 0)
+        return (NULL);
+    bytes_reader = 1;
+    buffer = store_buffer(fd, buffer, bytes_reader);
+    line = get_line(buffer);
+    buffer = update_buffer(buffer);
+    return (line);
 }
