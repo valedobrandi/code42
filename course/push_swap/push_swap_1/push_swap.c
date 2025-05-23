@@ -92,7 +92,7 @@ int best_move(Stack *stack, int target)
     return (index);
 }
 
-int find_chunk(Stack *from, int *sorted, int max, int min, int chunk)
+int greedy_search(Stack *from, int *sorted, int max, int min, int chunk)
 {
     int index = from->top;
     while (index >= 0)
@@ -105,7 +105,7 @@ int find_chunk(Stack *from, int *sorted, int max, int min, int chunk)
     return (index);
 }
 
-void sort_a(Stack *from, Stack *to, int *sorted)
+void sorte_back(Stack *from, Stack *to, int *sorted)
 {
     int target = 0;
     int position = 0;
@@ -139,7 +139,7 @@ void push_chuncks(Stack *from, Stack *to, int *sorted)
         index = 0;
         while (index < chunk_size)
         {
-            int chunck_value = find_chunk(from, sorted, max, min, chunk);
+            int chunck_value = greedy_search(from, sorted, max, min, chunk);
             if (from->arr[from->top] <= sorted[max - chunk - 1] &&
                 from->arr[from->top] >= sorted[min - chunk])
             {
@@ -183,7 +183,7 @@ int main(void)
     for (int i = 0; i < 100; i++)
         printf("[B][%d] - %d\n", i, temp.arr[i]);
     printf("-----\n");
-    sort_a(&temp, &stack, sorted);
+    sorte_back(&temp, &stack, sorted);
     for (int i = 0; i < 100; i++)
         printf("[A][%d] - %d\n", i, temp.arr[i]);
     printf("\nTotal operations: %d\n", operation_count);

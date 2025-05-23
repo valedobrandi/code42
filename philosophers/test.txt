@@ -1,0 +1,27 @@
+Test Case 1: Quick Death
+./philosophers 2 100 200 50
+Death message should appear within ~100ms
+
+Test Case 2: Barely Surviving
+./philosophers 2 500 400 100
+Should see several eating cycles before potential death
+
+Test Case 3: Comfortable Survival
+./philosophers 2 1000 200 200
+Should see continuous eating/sleeping cycles
+
+Test Case 4: Edge Case - Exact Timing
+./philosophers 2 300 300 0
+No sleeping time, immediate next cycle
+
+Test Case 5: Classic Setup
+./philosophers 5 800 200 200
+Reasonable timing balance
+
+Test Case 6: Guaranteed Death
+./philosophers 3 200 500 100
+Death within ~200ms
+
+Test Case 7: Single Philosopher
+./philosophers 1 1000 200 200
+Can eat whenever needed

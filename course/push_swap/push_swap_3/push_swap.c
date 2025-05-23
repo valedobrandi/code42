@@ -128,7 +128,7 @@ void best_rotate(Stack *stack, int target, int current)
             rotate_bottom(stack);
 }
 
-void sort_a(Stack *from, Stack *to, int *sorted)
+void sorte_back(Stack *from, Stack *to, int *sorted)
 {
     int current = 0;
     int next_move = 0;
@@ -216,7 +216,7 @@ int main(void)
         printf("[B][%d] - %d\n", i, temp.arr[i]);
     printf("\nTotal operations: %d\n", operation_count);
     printf("-----\n");
-    sort_a(&temp, &stack, sorted);
+    sorte_back(&temp, &stack, sorted);
     for (int i = 0; i < 100; i++)
         printf("[A][%d] - %d\n", i, temp.arr[i]);
     printf("\nTotal operations: %d\n", operation_count);

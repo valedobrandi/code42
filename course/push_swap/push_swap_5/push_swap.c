@@ -13,7 +13,7 @@ int validate(Stack *stack)
     index = 0;
     while (index < stack->top)
     {
-        if (stack->arr[stack->top].value < stack->arr[index].value)
+        if (stack->arr[stack->top] < stack->arr[index])
             return (0);
         index++;
     }
@@ -27,7 +27,7 @@ int best_move(Stack *stack, int target)
     index = stack->top;
     while (index >= 0)
     {
-        if (stack->arr[index].value == target)
+        if (stack->arr[index] == target)
             break;
         index--;
     }
@@ -40,16 +40,14 @@ Greedy greedy_search(Stack *from, int *sorted, int max, int min, int chunk)
     Greedy get;
 
     get.position = -1;
-    get.target.value = -1;
-    get.target.index = -1;
+    get.target = -1;
     while (index > 0)
     {
-        if (from->arr[index].value <= sorted[max - chunk] &&
-            from->arr[index].value >= sorted[min - chunk])
+        if (from->arr[index] <= sorted[max - chunk] &&
+            from->arr[index] >= sorted[min - chunk])
         {
             get.position = index;
-            get.target.value = from->arr[index].value;
-            get.target.index = from->arr->index;
+            get.target = from->arr[index];
             return (get);
         }
         index--;
@@ -68,10 +66,10 @@ void sorte_back(Stack *from, Stack *to, int *sorted)
         target = sorted[99 - index];
         position = best_move(from, target);
         if (position > ((from->top + 1) / 2))
-            while (from->arr[from->top].value != target)
+            while (from->arr[from->top] != target)
                 rotate_top_b(from);
         else
-            while (from->arr[from->top].value != target)
+            while (from->arr[from->top] != target)
                 rotate_bottom_b(from);
         push_b(from, to);
         index++;
@@ -85,8 +83,8 @@ int max_stack_value(Stack *stack, int *sorted)
 
     while (index >= 0)
     {
-        if (target < stack->arr[index].value)
-            target = stack->arr[index].value;
+        if (target < stack->arr[index])
+            target = stack->arr[index];
         index--;
     }
     return (target);
@@ -99,42 +97,19 @@ int min_stack_value(Stack *stack, int *sorted)
 
     while (index >= 0)
     {
-        if (target > stack->arr[index].value)
-            target = stack->arr[index].value;
+        if (target > stack->arr[index])
+            target = stack->arr[index];
         index--;
     }
     return (target);
 }
 
-void insert_position(Stack *stack, Node target)
+
+void insert_position(Stack *stack, Node *sorted, int target)
 {
     int index = 0;
-    int min_diff = 100;
-    int current_diff = 0;
-    int next_position = -1;
-    int next_target = 0;
-
-    while (index <= stack->top)
-    {
-        if (target.index > stack->arr[index].index)
-            current_diff = target.index - stack->arr[index].index;
-        else
-            current_diff = stack->arr[index].index - target.index;
-
-        if (current_diff < min_diff)
-        {
-            min_diff = current_diff;
-            next_position = index;
-        }
-        index++;
-    }
-    next_target = stack->arr[next_position].value;
-    if (next_position > ((stack->top + 1) / 2))
-        while (stack->arr[stack->top].value != next_target)
-            rotate_top_a(stack);
-    else
-        while (stack->arr[stack->top].value != next_target)
-            rotate_bottom_a(stack);
+    
+    
 }
 
 int push_chuncks(Stack *from, Stack *to, int *sorted, int max, int chunk)
@@ -147,18 +122,21 @@ int push_chuncks(Stack *from, Stack *to, int *sorted, int max, int chunk)
     while (index < chunck_size && from->top > 0)
     {
         get = greedy_search(from, sorted, max, max - chunck_size, chunk);
-        //printf("greedy %d\n", get.target);
+        printf("greedy %d\n", get.target);
         if (get.position > ((from->top + 1) / 2))
-            while (from->arr[from->top].value != get.target.value)
+            while (from->arr[from->top] != get.target)
                 rotate_top_a(from);
         else
-            while (from->arr[from->top].value != get.target.value)
+            while (from->arr[from->top] != get.target)
                 rotate_bottom_a(from);
-        if (to->top > 0)
-            insert_position(to, get.target);
+        int is_max = get.target > max_stack_value(to, sorted);
+        int is_min = get.target < min_stack_value(to, sorted);
+        if (to->top >= 0 && !is_max & !is_min)
+            insert_position(to, sorted, get.target);
         push_a(from, to);
         index++;
-
+        if (is_max & !is_min)
+            rotate_bottom_b(to);
         if (from->top == 0)
             push_a(from, to);
     }

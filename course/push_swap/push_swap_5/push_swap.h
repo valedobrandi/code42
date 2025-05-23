@@ -17,7 +17,7 @@ typedef struct
 
 typedef struct
 {
-    Node target;
+    int target;
     int position;
 } Greedy;
 
