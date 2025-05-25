@@ -10,18 +10,18 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME = philosopher
+NAME = philosophers
 
-CFLAGS = -Wall -Wextra -Werror -g
-CC = cc
+CFLAGS = -Wall -Wextra -Werror -fsanitize=thread -g
+CC = clang
 
 DEPS = philo.h
 
 SRC_DIR = src
 OBJ_DIR = obj
 
-SRCS = main.c ft_atoi.c ft_memset.c stack.c
-OBJS = main.o ft_atoi.o ft_memset.o stack.o
+SRCS = main.c ft_atoi.c ft_memset.c
+OBJS = main.o ft_atoi.o ft_memset.o
 
 SRC_FILES = $(addprefix $(SRC_DIR)/, $(SRCS))
 OBJ_FILES = $(addprefix $(OBJ_DIR)/, $(OBJS))
@@ -43,8 +43,6 @@ $(OBJ_DIR)/ft_atoi.o: $(SRC_DIR)/ft_atoi.c $(DEPS)
 $(OBJ_DIR)/ft_memset.o: $(SRC_DIR)/ft_memset.c $(DEPS)
 	$(CC) $(CFLAGS) -c $(SRC_DIR)/ft_memset.c -o $(OBJ_DIR)/ft_memset.o
 
-$(OBJ_DIR)/stack.o: $(SRC_DIR)/stack.c $(DEPS)
-	$(CC) $(CFLAGS) -c $(SRC_DIR)/stack.c -o $(OBJ_DIR)/stack.o
 
 clean:
 	rm -rf $(OBJ_DIR)

@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/philosopher",  // Path to your binary
-			"args":["2", "100", "200", "50"],
+			"args":["2", "700", "400", "100"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
