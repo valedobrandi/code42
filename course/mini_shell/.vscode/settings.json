@@ -1,6 +1,32 @@
 {
 	"files.associations": {
 		"stddef.h": "c",
-		"readline.h": "c"
+		"readline.h": "c",
+		"stdio.h": "c",
+		"signal.h": "c",
+		"minishell.h": "c",
+		"random": "c",
+		"parse_defs.h": "c",
+		"libft.h": "c",
+		"sstream": "c",
+		"string_view": "c",
+		"charconv": "c",
+		"optional": "c",
+		"ratio": "c",
+		"system_error": "c",
+		"array": "c",
+		"functional": "c",
+		"tuple": "c",
+		"type_traits": "c",
+		"utility": "c",
+		"initializer_list": "c",
+		"variant": "c",
+		"compare": "c",
+		"complex": "c",
+		"parse_def.h": "c",
+		"cstdlib": "c",
+		"bitset": "c",
+		"format": "c",
+		"span": "c"
 	}
 }
