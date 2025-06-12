@@ -1,0 +1,12 @@
+a
+get_files.bash
+GUIDE.C
+include
+libft
+Makefile
+minishell
+minishell_tester
+obj
+src
+test
+valgrind.sh
