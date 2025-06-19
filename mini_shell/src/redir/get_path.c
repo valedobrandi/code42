@@ -6,14 +6,14 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 11:46:42 by ajolivie          #+#    #+#             */
-/*   Updated: 2025/06/11 11:08:22 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/18 16:38:25 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "../include/minishell.h"
-# include "libft.h"
-# include <unistd.h>
-# include <stdlib.h>
+#include "../include/minishell.h"
+#include "libft.h"
+#include <stdlib.h>
+#include <unistd.h>
 
 static char	**get_paths(char **envp)
 {
@@ -60,7 +60,7 @@ char	*get_path(char *cmd, char **envp)
 	char	*path;
 
 	if (!cmd || *cmd == '\0')
-    	return (NULL);
+		return (NULL);
 	if (access(cmd, X_OK) == 0)
 		return (ft_strdup(cmd));
 	paths = get_paths(envp);
@@ -77,7 +77,6 @@ void	free_split(char **array)
 
 	if (!array)
 		return ;
-
 	i = 0;
 	while (array[i])
 		free(array[i++]);

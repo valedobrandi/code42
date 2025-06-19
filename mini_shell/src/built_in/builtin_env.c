@@ -3,22 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_env.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/10 09:49:19 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/10 14:07:34 by bde-albu         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   builtin_export.c                                   :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/06 08:58:29 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/06 15:03:59 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/18 10:17:37 by ajolivie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +22,8 @@ void	print_env(t_list *env_list, char c)
 	while (current)
 	{
 		env = (t_init_env *)current->content;
-		if (env->key && env->key[0] == c && env->value && env->export)
+		if (env->key && env->key[0] == c
+			&& env->value && env->export)
 			print(current->content);
 		current = current->next;
 	}
@@ -54,13 +43,13 @@ int	builtin_env(char **args, t_list **env_list)
 	{
 		while (args[i])
 		{
-			if (update_env_list(args[i], env_list) == 1)
+			if (update_env_list(args[i], &copy) == 1)
 				return (1);
 			i++;
 		}
-		free_env_list(env_list);
+		free_env_list(&copy);
 	}
 	else
-		print_alphabetic_order(*env_list, print_env);
+		print_alphabetic_order(copy, print_env);
 	return (0);
 }

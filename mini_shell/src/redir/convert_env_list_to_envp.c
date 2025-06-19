@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   convert_env_list_to_envp.c                          :+:      :+:    :+:   */
+/*   convert_env_list_to_envp.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/10 12:00:00 by ajolivie          #+#    #+#             */
-/*   Updated: 2025/06/10 12:00:00 by ajolivie         ###   ########.fr       */
+/*   Created: 2025/06/18 16:03:38 by bde-albu          #+#    #+#             */
+/*   Updated: 2025/06/18 16:03:40 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdlib.h>
 #include "libft.h"
+#include <stdlib.h>
 
 char	**convert_env_list_to_envp(t_list *env_list)
 {
@@ -33,8 +33,7 @@ char	**convert_env_list_to_envp(t_list *env_list)
 		{
 			while (i > 0)
 				free(envp[--i]);
-			free(envp);
-			return (NULL);
+			return (free(envp), NULL);
 		}
 		tmp = tmp->next;
 		i++;

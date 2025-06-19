@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   print_env.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/10 10:17:31 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/10 12:57:22 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/18 11:37:07 by ajolivie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,20 +24,21 @@ void	print(void *content)
 	ft_putstr_fd(env->key, 1);
 	ft_putstr_fd("=", 1);
 	ft_putendl_fd(env->value, 1);
-	return ;
 }
-void	print_alphabetic_order(t_list *env_list, void (*print)(t_list *env_list, char c))
+
+void	print_alphabetic_order(t_list *env_list,
+		void (*print)(t_list *env_list, char c))
 {
 	char	c;
 
-	c = 'A';
-	while (c++ <= 'Z')
+	c = 'A' - 1;
+	while (++c <= 'Z')
 		print(env_list, c);
-	c = 'a';
-	while (c++ <= 'a')
+	c = 'a' - 1;
+	while (++c <= 'z')
 		print(env_list, c);
-	c = '0';
-	while (c++ <= '9')
+	c = '0' - 1;
+	while (++c <= '9')
 		print(env_list, c);
 	print(env_list, '_');
 }

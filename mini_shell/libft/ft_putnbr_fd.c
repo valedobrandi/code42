@@ -12,7 +12,7 @@
 
 #include <unistd.h>
 
-void	print(long n, int fd)
+static void	print(long n, int fd)
 {
 	char	num;
 

@@ -3,14 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   read_env.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 10:52:29 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/06 10:52:30 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/18 11:27:50 by ajolivie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
+#include "minishell.h"
 #include <stdlib.h>
 
 static int	is_valid(char c)
@@ -18,28 +19,51 @@ static int	is_valid(char c)
 	return (ft_isalnum(c) || c == '_');
 }
 
-int	ft_env_length(char *env)
+int	var_length(char *input)
 {
-	int	i;
+	int	len;
 
-	i = 0;
-	while (env[i] && is_valid(env[i]))
-		i++;
-	return (i);
+	len = 0;
+	while (input && input[len] && is_valid(input[len]))
+		len++;
+	return (len);
 }
 
-char	*get_variable(char *env)
+char	*extract(char *input)
 {
-	int length;
-	char *input;
+	char	*var;
+	int		len;
 
-	length = ft_env_length(env);
-	input = malloc((length + 1) * sizeof(char));
-	if (input == NULL)
+	len = var_length(input);
+	var = malloc(len + 1);
+	if (!var)
+		return (NULL);
+	ft_strlcpy(var, input, len + 1);
+	return (var);
+}
+
+char	*get_variable(char *input, t_list *envp)
+{
+	int			length;
+	char		*output;
+	char		*var;
+	t_init_env	*find;
+
+	var = extract(input);
+	if (!var)
+		return (NULL);
+	find = find_varible(envp, var);
+	free(var);
+	if (find == NULL)
 		return (ft_strdup(""));
-	ft_strncpy(input, env, length);
-
-	/*  IMPLEMENT THE GET TO THE ACTUAL ENV ----> getenv(input)*/
-
-	return (input);
+	if (find->value)
+		length = ft_strlen(find->value);
+	else
+		length = 0;
+	output = malloc(length + 1);
+	if (output == NULL)
+		return (ft_strdup(""));
+	ft_strncpy(output, find->value, length);
+	output[length] = '\0';
+	return (output);
 }

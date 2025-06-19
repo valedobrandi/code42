@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   validate_token.c                                   :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/18 17:06:16 by bde-albu          #+#    #+#             */
+/*   Updated: 2025/06/18 17:06:17 by bde-albu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "libft.h"
 #include "minishell.h"
-#include "parse_def.h"
+#include "parsedef.h"
 
 int	is_redirection(t_token_type type)
 {
@@ -8,12 +20,10 @@ int	is_redirection(t_token_type type)
 		|| type == TOKEN_REDIRECT_APPEND || type == TOKEN_HEREDOC);
 }
 
-int	token_word(t_token_list *token_list, int i)
+int	next_token(t_token_list *token_list, int i)
 {
 	if (i == 0 || i == token_list->size - 1)
 		return (print_prompt("Error: pipe at invalid position", 2), 1);
-	if (is_redirection(token_list->tokens[i + 1].type))
-		return (print_prompt("Error: invalid token after pipe", 2), 1);
 	if (ft_strcmp("|", token_list->tokens[i].value) != 0)
 		return (print_prompt("Error: invalid double pipe", 2), 1);
 	return (0);
@@ -56,23 +66,19 @@ int	token_validation(t_token_list *token_list)
 	{
 		if (!token_list->tokens[i].value)
 			return (print_prompt("Error: null token value", 2), 1);
-
 		current_token = token_list->tokens[i].type;
-
 		if (current_token == TOKEN_PIPE)
 		{
-			if (token_word(token_list, i))
+			if (next_token(token_list, i))
 				return (1);
 		}
 		else if (is_redirection(current_token))
 		{
 			if (!is_operator_valid(current_token, token_list->tokens[i].value))
-				return (print_prompt("Error: invalid redirection operator", 2), 1);
-
+				return (print_prompt("invalid redirection operator", 2), 1);
 			if (!is_valid_redirection_target(token_list, i))
-				return (print_prompt("Error: invalid redirection syntax", 2), 1);
+				return (print_prompt("invalid redirection syntax", 2), 1);
 		}
-
 		i++;
 	}
 	return (0);

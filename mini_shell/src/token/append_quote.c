@@ -6,13 +6,13 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 12:03:31 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/04 11:25:57 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/18 16:30:33 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/minishell.h"
 #include "libft.h"
-#include "parse_def.h"
+#include "parsedef.h"
 
 void	single_quote(t_get_token *t)
 {
@@ -27,24 +27,25 @@ void	single_quote(t_get_token *t)
 		t->i++;
 }
 
-static int	is_dollar_mark(char cur, char next)
+static int	variable_expand(char cur, char next)
 {
-	return (cur == DOLLAR && next == '?');
+	return (cur == DOLLAR && next != '?' && next != SPACE && next != '\0'
+		&& next != DOUBLE_QUOTE);
 }
 
-int	double_quote(t_get_token *t)
+int	double_quote(t_get_token *t, t_list *env_list)
 {
 	t->i++;
 	while (t->str[t->i] != DOUBLE_QUOTE)
 	{
-		if (t->str[t->i] == '$' && t->str[t->i + 1] != '?')
+		if (variable_expand(t->str[t->i], t->str[t->i + 1]))
 		{
 			t->i++;
-			t->tmp = append(t);
+			t->tmp = append(t, env_list);
 			if (t->tmp == NULL)
 				return (1);
 		}
-		else if (is_dollar_mark(t->str[t->i], t->str[t->i + 1]))
+		else if (t->str[t->i] == DOLLAR && t->str[t->i + 1] == '?')
 		{
 			t->tmp[t->n++] = '\x1F';
 			t->i += 2;
@@ -57,16 +58,16 @@ int	double_quote(t_get_token *t)
 	return (0);
 }
 
-int	no_quote(t_get_token *t)
+int	no_quote(t_get_token *t, t_list *env_list)
 {
-	if (t->str[t->i] == '$' && t->str[t->i + 1] != '?')
+	if (variable_expand(t->str[t->i], t->str[t->i + 1]))
 	{
 		t->i++;
-		t->tmp = append(t);
+		t->tmp = append(t, env_list);
 		if (t->tmp == NULL)
 			return (-1);
 	}
-	else if (is_dollar_mark(t->str[t->i], t->str[t->i + 1]))
+	else if (t->str[t->i] == DOLLAR && t->str[t->i + 1] == '?')
 	{
 		t->tmp[t->n++] = '\x1F';
 		t->i += 2;

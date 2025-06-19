@@ -5,7 +5,7 @@
             "name": "Run my compiled binary",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/philosophers",  // Path to your binary
+            "program": "${workspaceFolder}/push_swap",  // Path to your binary
 			"args":["1", "800", "200", "200"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

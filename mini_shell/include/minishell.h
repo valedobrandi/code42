@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 10:34:27 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/12 11:13:41 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/19 11:36:50 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,22 @@
 # define MINISHELL_H
 
 # include <stdbool.h>
+# include <sys/types.h>
 
-extern int				g_data;
+extern int				g_sigint_received;
 
 typedef struct s_list	t_list;
+
+typedef struct s_exec_pipe
+{
+	int					i;
+	pid_t				last_pid;
+	int					pipe_fd[2];
+	int					prev_fd;
+	pid_t				pid;
+	int exit_return ;
+
+}						t_exec_pipe;
 
 typedef enum e_redir_type
 {
@@ -82,21 +94,34 @@ typedef struct s_command
 
 typedef struct s_pipeline
 {
-	t_command			*cmd;
+	t_command			*cmds;
 	int					cmd_count;
 }						t_pipeline;
 
-int						init_signal(void);
+/* parse */
 
 char					**parse_prompt(char *prompt);
 
+char					**parse(char *prompt, char **strs, int *p);
+
+int						pipe_handle(char **strs, int *p);
+
+/* signal */
+int						init_signal(void);
+
+void					disable_echoctl(void);
+
+void					enable_echoctl(void);
+
 /* helper */
 
-char					**linkedList_to_arr(t_list *env_list);
+char					**linkedlist_to_arr(t_list *env_list);
 
-void					update(t_init_env *new_env, t_init_env **list_env);
+int						is_path(char *path);
 
-t_init_env				*find_varible(t_list **env_list, char *arg);
+void					update(t_init_env *new_env, t_init_env *list_env);
+
+t_init_env				*find_varible(t_list *env_list, char *arg);
 
 int						update_env_list(char *arg, t_list **env_list);
 
@@ -123,7 +148,7 @@ int						quote_error(char *prompt);
 
 int						is_redirection(t_token_type type);
 
-t_token_list			*build_tokens(char **strs);
+t_token_list			*build_tokens(char **strs, t_list *envp);
 
 t_pipeline				*build_pipeline(t_token_list *token_list);
 
@@ -141,7 +166,9 @@ int						builtin_cd(char **args);
 
 int						builtin_echo(char **args);
 
-int						builtin_export(char **args, t_list *env_list);
+int						builtin_exit(char **args, int is_child_process);
+
+int						builtin_export(char **args, t_list **env_list);
 
 int						builtin_unset(char **args, t_list **env_list);
 
@@ -149,28 +176,37 @@ int						builtin_env(char **args, t_list **env_list);
 
 /* execute */
 
-int						execute_command(t_pipeline *pipeline,
-							t_list **env_list);
+int						execute_command(t_pipeline *pipeline, t_list **env_list,
+							int *exit_code);
+
+void					execute_execve(char **args, char *cmd, char *bin_path,
+							char **env);
+
+void					execute_redirects(t_command cmd, char **env);
+
+void					validate_path(char *cmd, char *bin_path, char **env);
 
 /* env */
-char					*get_variable(char *env);
+char					*get_variable(char *env, t_list *env_list);
 
-int						ft_env_length(char *env);
+int						var_length(char *input);
 
 t_list					*init_env(char **envp);
+
+int						expand_system_return(int sys, char **args);
 
 /* token */
 void					single_quote(t_get_token *t);
 
-int						double_quote(t_get_token *t);
+int						double_quote(t_get_token *t, t_list *env_list);
 
-int						no_quote(t_get_token *t);
+int						no_quote(t_get_token *t, t_list *env_list);
 
-char					*append(t_get_token *t);
+char					*append(t_get_token *t, t_list *env_list);
 
 int						token_validation(t_token_list *token_list);
 
-int						apply_redirections(t_redir **redir, int fd);
+int						apply_redirections(t_redir **redir);
 
 /* redir */
 char					**convert_env_list_to_envp(t_list *env_list);
@@ -178,5 +214,50 @@ char					**convert_env_list_to_envp(t_list *env_list);
 char					*get_path(char *cmd, char **envp);
 
 void					free_split(char **array);
+
+int						apply_redirections(t_redir **redirs);
+
+int						redirect_input(const char *filename);
+
+int						redirect_output(const char *filename);
+
+int						redirect_output_append(const char *filename);
+
+/* exec_pipeline */
+int						exec_pipeline(t_pipeline *pipeline, t_list **env_list,
+							int *exit_code, char **env);
+
+int						exec_builtin(char *cmd, char **args, t_list **env_list);
+
+int						is_builtin(char *cmd);
+
+void					wait_children_process_exit(pid_t last_pid,
+							int *exit_code);
+
+void					child_pipeline_process(t_pipeline *pipeline,
+							t_exec_pipe *t, t_list **envp_list, char **env);
+
+/* exec_command*/
+
+int						exec_command(t_pipeline *pipeline, t_list **envp_list,
+							int *exit_code, char **env);
+
+int						builtins_cmd(t_pipeline *pipeline, t_list **envp_list,
+							int *exit_code);
+
+void					exit_cleanup(char **env, char *bin_path, int code);
+
+/* pipeline */
+
+t_pipeline				*init_pipeline(void);
+
+int						init_commands(t_pipeline *pipeline, int size);
+
+int						build_commmand(t_token_list *token_list, t_command *cmd,
+							int token_size, int *index);
+
+int						count_pipe(t_token_list *token_list);
+
+t_redir_type			get_type(t_token_type token);
 
 #endif

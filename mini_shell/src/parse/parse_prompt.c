@@ -1,14 +1,28 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parse_prompt.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/19 09:16:06 by bde-albu          #+#    #+#             */
+/*   Updated: 2025/06/19 09:28:28 by bde-albu         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../gnl/get_next_line.h"
 #include "libft.h"
-#include "../../include/minishell.h"
-#include "parse_def.h"
+#include "minishell.h"
+#include "parsedef.h"
 #include <stdlib.h>
 
 static int	get_operator(char *prompt, int *i, int *p, char **strs)
 {
-	int length;
+	int	length;
 
 	length = 1;
-	while (prompt[*i + length] == IN || prompt[*i + length] == OUT || prompt[*i + length] == PIPE)
+	while (prompt[*i + length] == IN || prompt[*i + length] == OUT || prompt[*i
+			+ length] == PIPE)
 		length++;
 	strs[*p] = malloc((length + 1) * sizeof(char));
 	if (strs[*p] == NULL)
@@ -35,13 +49,16 @@ static int	get_word_length(char *prompt)
 		else if (prompt[i] == DOUBLE_QUOTE && single_quote == 0)
 			double_quote = !double_quote;
 		else if (single_quote == 0 && double_quote == 0)
+		{
 			if (prompt[i] == IN || prompt[i] == OUT || prompt[i] == SPACE
-				|| prompt[i] == TAB)
+				|| prompt[i] == TAB || prompt[i] == PIPE)
 				break ;
+		}
 		i++;
 	}
 	return (i);
 }
+
 static int	get_word(char *prompt, int *i, int *p, char **strs)
 {
 	int	length;
@@ -56,13 +73,11 @@ static int	get_word(char *prompt, int *i, int *p, char **strs)
 	return (0);
 }
 
-static char	**parse(char *prompt, char **strs)
+char	**parse(char *prompt, char **strs, int *p)
 {
 	int	i;
-	int	p;
 
 	i = 0;
-	p = 0;
 	while (prompt[i])
 	{
 		while (prompt[i] == SPACE || prompt[i] == TAB)
@@ -71,27 +86,31 @@ static char	**parse(char *prompt, char **strs)
 			break ;
 		if (prompt[i] == IN || prompt[i] == OUT || prompt[i] == PIPE)
 		{
-			if (get_operator(prompt, &i, &p, strs))
+			if (get_operator(prompt, &i, p, strs))
 				return (free_array(strs), NULL);
 		}
 		else
 		{
-			if (get_word(prompt, &i, &p, strs))
+			if (get_word(prompt, &i, p, strs))
 				return (free_array(strs), NULL);
 		}
 	}
-	strs[p] = NULL;
+	strs[*p] = NULL;
 	return (strs);
 }
 
 char	**parse_prompt(char *prompt)
 {
 	char	**strs;
+	int		p;
 
+	p = 0;
 	strs = malloc(sizeof(char *) * 1024);
 	if (!strs)
 		return (NULL);
-	if (parse(prompt, strs) == NULL)
+	if (parse(prompt, strs, &p) == NULL)
+		return (NULL);
+	if (pipe_handle(strs, &p))
 		return (NULL);
 	return (strs);
 }

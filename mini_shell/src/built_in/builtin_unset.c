@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_unset.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 14:53:12 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/10 09:15:18 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/18 10:22:07 by ajolivie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void	del(void *content)
 	free(env->value);
 	free(env);
 }
+
 void	remove(char *arg, t_list **env_list)
 {
 	t_list		*node;

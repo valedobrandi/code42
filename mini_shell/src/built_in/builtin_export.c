@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_export.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 08:58:29 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/11 12:46:21 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/18 10:19:34 by ajolivie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,21 +27,22 @@ void	print_export(t_list *env_list, char c)
 		current = current->next;
 	}
 }
-int	builtin_export(char **args, t_list *env_list)
+
+int	builtin_export(char **args, t_list **env_list)
 {
-	int i;
+	int	i;
 
 	i = 1;
 	if (args[1] != NULL)
 	{
 		while (args[i])
 		{
-			if (update_env_list(args[i], &env_list) == 1)
+			if (update_env_list(args[i], env_list) == 1)
 				return (1);
 			i++;
 		}
 	}
 	else
-		print_alphabetic_order(env_list, print_export);
+		print_alphabetic_order(*env_list, print_export);
 	return (0);
 }

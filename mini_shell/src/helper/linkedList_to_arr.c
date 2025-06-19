@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   linkedList_to_arr.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/11 08:12:16 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/11 10:28:06 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/18 11:39:08 by ajolivie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,19 +14,21 @@
 #include "minishell.h"
 #include <stdlib.h>
 
-char	*allocate_string(void *content)
+static char	*allocate_string(void *content)
 {
 	t_init_env	*env;
 	int			size;
 	char		*str;
 
 	env = (t_init_env *)content;
-	size = ft_strlen(env->key);
+	size = 0;
+	if (env->key)
+		size += ft_strlen(env->key);
 	if (env->sing)
 		size++;
 	if (env->value)
 		size += ft_strlen(env->value);
-	str = malloc((size + 1));
+	str = malloc(sizeof(char) * (size + 1));
 	if (!str)
 		return (NULL);
 	str[0] = '\0';
@@ -39,7 +41,7 @@ char	*allocate_string(void *content)
 	return (str);
 }
 
-int	get_list(t_list *env_list, char **envp)
+static int	get_list(t_list *env_list, char **envp)
 {
 	t_list	*current;
 	int		i;
@@ -50,7 +52,10 @@ int	get_list(t_list *env_list, char **envp)
 	{
 		envp[i] = allocate_string(current->content);
 		if (!envp[i])
-			return (free_array(envp), 1);
+		{
+			free_array(envp);
+			return (1);
+		}
 		i++;
 		current = current->next;
 	}
@@ -58,13 +63,13 @@ int	get_list(t_list *env_list, char **envp)
 	return (0);
 }
 
-char	**linkedList_to_arr(t_list *env_list)
+char	**linkedlist_to_arr(t_list *env_list)
 {
 	char	**envp;
 	int		size;
 
 	size = ft_lstsize(env_list);
-	envp = malloc((size + 1) * sizeof(char *));
+	envp = malloc(sizeof(char *) * (size + 1));
 	if (!envp)
 		return (NULL);
 	if (get_list(env_list, envp))

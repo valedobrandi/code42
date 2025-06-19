@@ -6,16 +6,16 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/03 11:45:34 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/11 14:30:32 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/19 10:28:00 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
 #include "libft.h"
-#include "parse_def.h"
+#include "minishell.h"
+#include "parsedef.h"
 #include <stdlib.h>
 
-static char	*get_token(char *str, char *tmp, int size)
+static char	*get_token(char *str, char *tmp, int size, t_list *env_list)
 {
 	t_get_token	t;
 
@@ -28,15 +28,15 @@ static char	*get_token(char *str, char *tmp, int size)
 		if (t.str[t.i] == SINGLE_QUOTE)
 			single_quote(&t);
 		else if (t.str[t.i] == DOUBLE_QUOTE)
-			double_quote(&t);
+			double_quote(&t, env_list);
 		else
-			no_quote(&t);
+			no_quote(&t, env_list);
 	}
 	t.tmp[t.n] = '\0';
 	return (t.tmp);
 }
 
-static t_token_type	get_type(char *str)
+static t_token_type	get_token_type(char *str)
 {
 	if (str[0] == '>' && str[1] == '>')
 		return (TOKEN_REDIRECT_APPEND);
@@ -52,10 +52,11 @@ static t_token_type	get_type(char *str)
 		return (TOKEN_WORD);
 }
 
-static int	create_token_list(int size, char **strs, t_token_list *token_list)
+static int	create_token_list(int size, char **strs, t_token_list *token_list,
+		t_list *env_list)
 {
 	char	*tmp;
-	int length;
+	int		length;
 	int		i;
 
 	i = 0;
@@ -63,21 +64,22 @@ static int	create_token_list(int size, char **strs, t_token_list *token_list)
 	{
 		if (strs[i] != NULL)
 		{
-			token_list->tokens[i].type = get_type(strs[i]);
+			token_list->tokens[i].type = get_token_type(strs[i]);
 			length = ft_strlen(strs[i]);
 			tmp = malloc((length + 1) * sizeof(char));
 			if (tmp == NULL)
 				return (1);
-			token_list->tokens[i].value = get_token(strs[i], tmp, length);
+			token_list->tokens[i].value = get_token(strs[i], tmp, length,
+					env_list);
 			if (token_list->tokens[i].value == NULL)
 				return (1);
-			token_list->size++;
 		}
 		i++;
 	}
 	return (0);
 }
-t_token_list	*build_tokens(char **strs)
+
+t_token_list	*build_tokens(char **strs, t_list *env_list)
 {
 	t_token_list	*token_list;
 	int				size;
@@ -92,7 +94,8 @@ t_token_list	*build_tokens(char **strs)
 	token_list->tokens = malloc(sizeof(t_token) * size);
 	if (token_list->tokens == NULL)
 		return (free(token_list), NULL);
-	if (create_token_list(size, strs, token_list) == 1)
+	if (create_token_list(size, strs, token_list, env_list) == 1)
 		return (free_token_list(token_list), NULL);
+	token_list->size = size;
 	return (token_list);
 }

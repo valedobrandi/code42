@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 09:39:05 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/11 09:50:10 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/19 10:35:19 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,76 +16,87 @@
 #include <readline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
-int	g_data = 0;
+static t_list	*init_shell(char **envp, int *exit_code)
+{
+	init_signal();
+	disable_echoctl();
+	*exit_code = 0;
+	return (init_env(envp));
+}
+
+static char	*handle_input_line(void)
+{
+	char	*line;
+	char	*prompt;
+
+	line = readline("minishell% ");
+	if (!line)
+	{
+		ft_putendl_fd("exit", 1);
+		rl_clear_history();
+		return (NULL);
+	}
+	if (*line)
+		add_history(line);
+	prompt = ft_strtrim(line, " ");
+	free(line);
+	return (prompt);
+}
+
+static int	process_prompt(char *prompt, t_list **env_list, int *exit_code)
+{
+	char			**strs;
+	t_token_list	*token_list;
+	t_pipeline		*pipeline;
+	int				res;
+
+	if (quote_error(prompt))
+		return (print_prompt("> error", 2), 0);
+	if (ft_strcmp(prompt, "") == 0)
+		return (print_prompt(NULL, 1), 0);
+	strs = parse_prompt(prompt);
+	free(prompt);
+	if (!strs)
+		return (0);
+	token_list = build_tokens(strs, *env_list);
+	free_array(strs);
+	if (!token_list)
+		return (0);
+	if (token_validation(token_list) != 0)
+		return (free_token_list(token_list), 0);
+	pipeline = build_pipeline(token_list);
+	free_token_list(token_list);
+	if (!pipeline)
+		return (0);
+	res = execute_command(pipeline, env_list, exit_code);
+	return (free_pipeline(pipeline), res);
+}
 
 int	main(int ac, char **av, char **envp)
 {
-	t_list			*env_list;
-	t_token_list	*token_list;
-	t_pipeline		*pipeline;
-	char			*temp;
-	char			*prompt;
-	char			**strs;
+	t_list	*env_list;
+	char	*prompt;
+	int		exit_code;
 
 	(void)ac;
 	(void)av;
-
-	init_signal();
-
-	env_list = init_env(envp);
-	if (env_list == NULL)
-		return (ft_putstr_fd("fail to laod environament list", 2), 1);
-
+	env_list = init_shell(envp, &exit_code);
+	if (!env_list)
+		return (ft_putstr_fd("fail to load environment list\n", 2), 1);
 	while (1)
 	{
-		pipeline = NULL; // ✅ IMPORTANT
-		temp = readline("minishell% ");
-		if (temp && *temp)
-			add_history(temp);
-		else if (temp == NULL)
-		{
-			ft_putendl_fd("exit", 1);
-			break;
-		}
-		prompt = ft_strtrim(temp, " ");
-		free(temp); // ✅ évite leak
-		if (prompt == NULL)
-			return (1);
-		if (quote_error(prompt))
-			print_prompt("> error", 2);
-		if (ft_strcmp(prompt, "") != 0)
-		{
-			strs = parse_prompt(prompt);
-			free(prompt);
-			if (strs != NULL)
-			{
-				token_list = build_tokens(strs);
-				free_split(strs); // ✅ évite leak
-				if (token_list != NULL)
-				{
-					if (token_validation(token_list) == 0)
-					{
-						pipeline = build_pipeline(token_list);
-						free_token_list(token_list);
-						token_list = NULL;
-						if (pipeline != NULL)
-							if (execute_command(pipeline, &env_list) == 1)
-								break;
-					}
-					if (token_list)
-						free_token_list(token_list);
-					free_pipeline(pipeline);
-				}
-			}
-		}
-		else
-			print_prompt(NULL, 1);
-
+		prompt = handle_input_line();
+		if (!prompt)
+			break ;
+		if (process_prompt(prompt, &env_list, &exit_code))
+			break ;
+		g_sigint_received = 0;
 	}
-	if (pipeline)
-		free_pipeline(pipeline);
 	free_env_list(&env_list);
 	rl_clear_history();
-	return (0);
+	rl_deprep_terminal();
+	enable_echoctl();
+	return (exit_code);
 }

@@ -14,13 +14,13 @@ Test(create_pipeline, basic_command) {
     cr_assert_not_null(pipeline);
     cr_assert_eq(pipeline->cmd_count, 2);
 
-    t_command *cmd = &pipeline->cmd[0];
-    cr_assert_str_eq(cmd->cmd, "ls");
+    t_pipeline *cmd = &pipeline->cmds[0];
+    cr_assert_str_eq(cmd->cmds, "ls");
     cr_assert_str_eq(cmd->args[0], "ls");
     cr_assert_null(cmd->args[1]);
 
-	t_command *cmd2 = &pipeline->cmd[1];
-    cr_assert_str_eq(cmd2->cmd, "grep");
+	t_pipeline *cmd2 = &pipeline->cmds[1];
+    cr_assert_str_eq(cmd2->cmds, "grep");
     cr_assert_str_eq(cmd2->args[0], "grep");
     cr_assert_str_eq(cmd2->args[1], "txt");
     cr_assert_null(cmd2->args[2]);
@@ -39,8 +39,8 @@ Test(create_pipeline, basic_command_operator) {
     cr_assert_not_null(pipeline);
     cr_assert_eq(pipeline->cmd_count, 1);
 
-    t_command *cmd = &pipeline->cmd[0];
-    cr_assert_str_eq(cmd->cmd, "ls");
+    t_pipeline *cmd = &pipeline->cmds[0];
+    cr_assert_str_eq(cmd->cmds, "ls");
     cr_assert_str_eq(cmd->args[0], "ls");
 	cr_assert_str_eq(cmd->redirs[0]->file, "a");
     cr_assert_null(cmd->args[1]);

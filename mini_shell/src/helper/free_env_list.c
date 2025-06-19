@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   free_env_list.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/10 08:19:43 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/11 09:33:23 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/18 11:34:19 by ajolivie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void	free_env(void *content)
 	free(env);
 }
 
-void free_env_list(t_list **env_list)
+void	free_env_list(t_list **env_list)
 {
 	ft_lstclear(env_list, free_env);
 	*env_list = NULL;
