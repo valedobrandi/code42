@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_env.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/10 09:49:19 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/18 10:17:37 by ajolivie         ###   ########.fr       */
+/*   Updated: 2025/06/20 10:48:44 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 #include "minishell.h"
 
-void	print_env(t_list *env_list, char c)
+static void	print_env_list(t_list *env_list)
 {
 	t_list		*current;
 	t_init_env	*env;
@@ -22,9 +22,8 @@ void	print_env(t_list *env_list, char c)
 	while (current)
 	{
 		env = (t_init_env *)current->content;
-		if (env->key && env->key[0] == c
-			&& env->value && env->export)
-			print(current->content);
+		if (env->key && env->value && env->export)
+			print(current->content, 0);
 		current = current->next;
 	}
 }
@@ -50,6 +49,6 @@ int	builtin_env(char **args, t_list **env_list)
 		free_env_list(&copy);
 	}
 	else
-		print_alphabetic_order(copy, print_env);
+		print_env_list(copy);
 	return (0);
 }

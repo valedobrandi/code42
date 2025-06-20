@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/18 17:06:16 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/18 17:06:17 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/20 15:20:16 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,14 @@ int	is_redirection(t_token_type type)
 		|| type == TOKEN_REDIRECT_APPEND || type == TOKEN_HEREDOC);
 }
 
-int	next_token(t_token_list *token_list, int i)
+int	next_token(t_token_list *token_list, int i, int *exit_code)
 {
 	if (i == 0 || i == token_list->size - 1)
-		return (print_prompt("Error: pipe at invalid position", 2), 1);
-	if (ft_strcmp("|", token_list->tokens[i].value) != 0)
-		return (print_prompt("Error: invalid double pipe", 2), 1);
+	{
+		*exit_code = 2;
+		return (print_prompt("Error: syntax error near unexpected token `|'",
+				2), 1);
+	}
 	return (0);
 }
 
@@ -56,7 +58,7 @@ int	is_valid_redirection_target(t_token_list *list, int i)
 	return (1);
 }
 
-int	token_validation(t_token_list *token_list)
+int	token_validation(t_token_list *token_list, int *exit_code)
 {
 	int	current_token;
 	int	i;
@@ -69,16 +71,15 @@ int	token_validation(t_token_list *token_list)
 		current_token = token_list->tokens[i].type;
 		if (current_token == TOKEN_PIPE)
 		{
-			if (next_token(token_list, i))
+			if (next_token(token_list, i, exit_code))
 				return (1);
 		}
-		else if (is_redirection(current_token))
-		{
-			if (!is_operator_valid(current_token, token_list->tokens[i].value))
-				return (print_prompt("invalid redirection operator", 2), 1);
-			if (!is_valid_redirection_target(token_list, i))
-				return (print_prompt("invalid redirection syntax", 2), 1);
-		}
+		if (is_redirection(current_token) && validate_directions(current_token,
+				token_list, i))
+				{
+					*exit_code = 2;
+					return (1);
+				}
 		i++;
 	}
 	return (0);

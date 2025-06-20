@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_export.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/06 08:58:29 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/18 10:19:34 by ajolivie         ###   ########.fr       */
+/*   Updated: 2025/06/20 10:48:22 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	print_export(t_list *env_list, char c)
 	{
 		env = (t_init_env *)current->content;
 		if (env->key && env->key[0] == c && env->export)
-			print(current->content);
+			print(current->content, 1);
 		current = current->next;
 	}
 }

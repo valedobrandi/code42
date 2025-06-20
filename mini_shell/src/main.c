@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 09:39:05 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/19 10:35:19 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/20 14:54:48 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 static t_list	*init_shell(char **envp, int *exit_code)
 {
 	init_signal();
-	disable_echoctl();
 	*exit_code = 0;
 	return (init_env(envp));
 }
@@ -56,7 +55,7 @@ static int	process_prompt(char *prompt, t_list **env_list, int *exit_code)
 		return (print_prompt("> error", 2), 0);
 	if (ft_strcmp(prompt, "") == 0)
 		return (print_prompt(NULL, 1), 0);
-	strs = parse_prompt(prompt);
+	strs = parse_prompt(prompt, exit_code);
 	free(prompt);
 	if (!strs)
 		return (0);
@@ -64,7 +63,7 @@ static int	process_prompt(char *prompt, t_list **env_list, int *exit_code)
 	free_array(strs);
 	if (!token_list)
 		return (0);
-	if (token_validation(token_list) != 0)
+	if (token_validation(token_list, exit_code) != 0)
 		return (free_token_list(token_list), 0);
 	pipeline = build_pipeline(token_list);
 	free_token_list(token_list);
@@ -97,6 +96,5 @@ int	main(int ac, char **av, char **envp)
 	free_env_list(&env_list);
 	rl_clear_history();
 	rl_deprep_terminal();
-	enable_echoctl();
 	return (exit_code);
 }

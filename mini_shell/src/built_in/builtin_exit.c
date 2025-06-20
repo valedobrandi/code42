@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_exit.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/18 10:17:47 by ajolivie          #+#    #+#             */
-/*   Updated: 2025/06/18 10:19:02 by ajolivie         ###   ########.fr       */
+/*   Updated: 2025/06/20 11:04:32 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,13 @@ int	builtin_exit(char **args, int is_child_process)
 
 	exit_value = 0;
 	if (!args[1])
+	{
+		ft_putendl_fd("exit", 2);
 		return (return_process(is_child_process, 0));
+	}
 	if (validate_exit_arg(args[1]))
 	{
-		ft_putstr_fd("exit: numeric argument required", 2);
+		ft_putendl_fd("exit: numeric argument required", 2);
 		return (return_process(is_child_process, 2));
 	}
 	if (args[2])

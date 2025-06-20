@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsedef.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
+/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 11:07:15 by ajolivie          #+#    #+#             */
-/*   Updated: 2025/06/19 11:08:24 by ajolivie         ###   ########.fr       */
+/*   Updated: 2025/06/20 15:29:07 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,5 +21,5 @@
 # define PIPE '|'
 # define IN '<'
 # define OUT '>'
-
+# define error_token_newline "minishell: syntax error near unexpected token `newline'"
 #endif

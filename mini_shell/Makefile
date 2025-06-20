@@ -6,7 +6,7 @@
 #    By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/05/27 09:25:09 by bde-albu          #+#    #+#              #
-#    Updated: 2025/06/19 09:14:48 by bde-albu         ###   ########.fr        #
+#    Updated: 2025/06/20 15:12:52 by bde-albu         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -69,7 +69,9 @@ validate_path.c \
 execute_execve.c \
 child_pipeline_process.c \
 apply_redirections.c \
-pipe_handle.c
+pipe_handle.c \
+validate_parse.c \
+validate_directions.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -121,6 +123,9 @@ $(OBJ_DR)/quote_error.o: $(SRC_DR)/parse/quote_error.c $(DEPS) $(PARSE_DPES)
 $(OBJ_DR)/pipe_handle.o: $(SRC_DR)/parse/pipe_handle.c $(DEPS) $(PARSE_DPES)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/parse/pipe_handle.c -o $(OBJ_DR)/pipe_handle.o
 
+$(OBJ_DR)/validate_parse.o: $(SRC_DR)/parse/validate_parse.c $(DEPS) $(PARSE_DPES)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/parse/validate_parse.c -o $(OBJ_DR)/validate_parse.o
+
 # Token
 $(OBJ_DR)/validate_token.o: $(SRC_DR)/token/validate_token.c $(DEPS) $(PARSE_DPES)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/token/validate_token.c -o $(OBJ_DR)/validate_token.o
@@ -133,6 +138,9 @@ $(OBJ_DR)/append_variable.o: $(SRC_DR)/token/append_variable.c $(DEPS) $(PARSE_D
 
 $(OBJ_DR)/append_quote.o: $(SRC_DR)/token/append_quote.c $(DEPS) $(PARSE_DPES)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/token/append_quote.c -o $(OBJ_DR)/append_quote.o
+
+$(OBJ_DR)/validate_directions.o: $(SRC_DR)/token/validate_directions.c $(DEPS) $(PARSE_DPES)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/token/validate_directions.c -o $(OBJ_DR)/validate_directions.o
 
 # Pipeline
 $(OBJ_DR)/build_pipeline.o: $(SRC_DR)/pipeline/build_pipeline.c $(DEPS) $(PARSE_DPES)

@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/10 08:16:27 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/19 10:04:47 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/20 09:46:49 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static void	free_args(t_command *cmd)
 	int	i;
 
 	i = 0;
-    if (!cmd->args)
+	if (!cmd->args)
 		return ;
 	while (cmd->args[i])
 	{
@@ -42,7 +42,7 @@ static void	free_redirs(t_command *cmd)
 
 void	free_pipeline(t_pipeline *pipeline)
 {
-	int			i;
+	int	i;
 
 	if (!pipeline)
 		return ;
@@ -55,6 +55,6 @@ void	free_pipeline(t_pipeline *pipeline)
 		free_redirs(&pipeline->cmds[i]);
 		i++;
 	}
-    free(pipeline->cmds);
+	free(pipeline->cmds);
 	free(pipeline);
 }

@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/18 15:27:38 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/19 11:35:09 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/20 14:33:11 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ static char	*resolve_bin_path_pipeline(t_pipeline *pipeline, int index,
 	if (!bin_path || !pipeline->cmds[index].args
 		|| !pipeline->cmds[index].args[0])
 	{
-		ft_putstr_fd("path: command not found\n", 2);
+		ft_putstr_fd(pipeline->cmds[index].cmd, 2);
+		ft_putstr_fd(": command not found\n", 2);
 		if (bin_path && bin_path != pipeline->cmds[index].cmd)
 			free(bin_path);
 		return (NULL);

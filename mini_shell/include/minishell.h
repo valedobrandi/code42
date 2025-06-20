@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/27 10:34:27 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/19 11:36:50 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/20 15:18:21 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@ typedef struct s_exec_pipe
 	pid_t				last_pid;
 	int					pipe_fd[2];
 	int					prev_fd;
-	pid_t				pid;
 	int exit_return ;
+	pid_t				pid;
 
 }						t_exec_pipe;
 
@@ -100,11 +100,13 @@ typedef struct s_pipeline
 
 /* parse */
 
-char					**parse_prompt(char *prompt);
+char					**parse_prompt(char *prompt, int *exit_code);
 
 char					**parse(char *prompt, char **strs, int *p);
 
 int						pipe_handle(char **strs, int *p);
+
+int						validate_parse(char **strs, int *exit_code);
 
 /* signal */
 int						init_signal(void);
@@ -121,7 +123,7 @@ int						is_path(char *path);
 
 void					update(t_init_env *new_env, t_init_env *list_env);
 
-t_init_env				*find_varible(t_list *env_list, char *arg);
+t_init_env				*find_variable(t_list *env_list, char *arg);
 
 int						update_env_list(char *arg, t_list **env_list);
 
@@ -132,7 +134,7 @@ t_init_env				allocate_env(char *envp, bool export);
 void					print_alphabetic_order(t_list *env_list,
 							void (*print)(t_list *env_list, char c));
 
-void					print(void *content);
+void					print(void *content, int type);
 
 void					free_env(void *content);
 
@@ -189,7 +191,7 @@ void					validate_path(char *cmd, char *bin_path, char **env);
 /* env */
 char					*get_variable(char *env, t_list *env_list);
 
-int						var_length(char *input);
+int						env_length(char *input);
 
 t_list					*init_env(char **envp);
 
@@ -204,7 +206,15 @@ int						no_quote(t_get_token *t, t_list *env_list);
 
 char					*append(t_get_token *t, t_list *env_list);
 
-int						token_validation(t_token_list *token_list);
+int						token_validation(t_token_list *token_list,
+							int *exit_code);
+
+int						is_operator_valid(t_token_type type, char *value);
+
+int						is_valid_redirection_target(t_token_list *list, int i);
+
+int						validate_directions(int current_token,
+							t_token_list *token_list, int i);
 
 int						apply_redirections(t_redir **redir);
 

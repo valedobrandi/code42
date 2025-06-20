@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/10 12:49:54 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/19 09:30:46 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/20 11:38:24 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	update(t_init_env *new_env, t_init_env *list_env)
 		list_env->export = true;
 }
 
-t_init_env	*find_varible(t_list *env_list, char *key)
+t_init_env	*find_variable(t_list *env_list, char *key)
 {
 	t_list		*current;
 	t_init_env	*env;
@@ -75,7 +75,7 @@ int	update_env_list(char *arg, t_list **env_list)
 		free_env(arg_env);
 		return (1);
 	}
-	list_env = find_varible(*env_list, arg_env->key);
+	list_env = find_variable(*env_list, arg_env->key);
 	if (list_env)
 	{
 		update(arg_env, list_env);

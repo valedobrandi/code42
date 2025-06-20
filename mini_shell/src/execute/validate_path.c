@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/18 13:45:29 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/18 16:39:01 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/20 14:33:14 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,8 @@ void	validate_path(char *cmd, char *bin_path, char **env)
 	}
 	if (S_ISDIR(st.st_mode))
 	{
-		ft_putendl_fd("path: command not found", 2);
+		ft_putstr_fd(cmd, 2);
+		ft_putendl_fd(": command not found", 2);
 		if (bin_path != cmd)
 			free(bin_path);
 		free_array(env);

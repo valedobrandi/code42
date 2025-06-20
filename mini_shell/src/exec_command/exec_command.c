@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/18 11:56:45 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/06/19 11:36:24 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/06/20 14:33:07 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,8 @@ static char	*resolve_bin_path(char *cmd, char **env)
 	path = get_path(cmd, env);
 	if (!path)
 	{
-		ft_putstr_fd("path: command not found\n", 2);
+		ft_putstr_fd(cmd, 2);
+		ft_putstr_fd(": command not found\n", 2);
 		free_array(env);
 		exit(127);
 	}
@@ -82,7 +83,8 @@ int	exec_command(t_pipeline *pipeline, t_list **envp_list, int *exit_code,
 
 	expand_system_return(*exit_code, pipeline->cmds[0].args);
 	if (is_builtin(pipeline->cmds[0].cmd))
-		return (free_array(env), handle_builtin(pipeline, envp_list, exit_code));
+		return (free_array(env), handle_builtin(pipeline, envp_list,
+				exit_code));
 	pid = fork();
 	if (pid < 0)
 		return (free_array(env), perror("fork"), 1);
