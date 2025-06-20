@@ -34,8 +34,7 @@ t_pipeline	*build_pipeline(t_token_list *token_list)
 		if (build_commmand(token_list, &pipeline->cmds[cmd_index],
 				token_list->size, &index))
 			return (NULL);
-		if (token_list->tokens[index - 1].type == TOKEN_PIPE)
-			cmd_index++;
+		cmd_index++;
 	}
 	return (pipeline);
 }

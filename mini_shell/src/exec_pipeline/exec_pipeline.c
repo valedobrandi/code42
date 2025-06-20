@@ -53,10 +53,8 @@ int	exec_pipeline(t_pipeline *pipeline, t_list **envp_list, int *exit_code,
 		char **env)
 {
 	t_exec_pipe	t;
-	char		*bin_path;
 
 	init_exec_pipe(&t);
-	bin_path = NULL;
 	while (t.i < pipeline->cmd_count)
 	{
 		if (!pipeline->cmds[t.i].cmd)

@@ -63,16 +63,15 @@ static void	child_process(t_pipeline *pipeline, char **env)
 		ft_putstr_fd("not a valid identifier\n", 2);
 		exit_cleanup(env, bin_path, 1);
 	}
-	execve(bin_path, pipeline->cmds[0].args, env);
 	execute_execve(pipeline->cmds[0].args, pipeline->cmds[0].cmd, bin_path,
 		env);
 }
 
 static int	handle_builtin(t_pipeline *pipeline, t_list **envp_list,
-		int *exit_code, char **env)
+		int *exit_code)
 {
 	if (builtins_cmd(pipeline, envp_list, exit_code))
-		return (free_array(env), 1);
+		return (1);
 	return (0);
 }
 
@@ -83,7 +82,7 @@ int	exec_command(t_pipeline *pipeline, t_list **envp_list, int *exit_code,
 
 	expand_system_return(*exit_code, pipeline->cmds[0].args);
 	if (is_builtin(pipeline->cmds[0].cmd))
-		return (free_array(env), handle_builtin(pipeline, envp_list, exit_code, env));
+		return (free_array(env), handle_builtin(pipeline, envp_list, exit_code));
 	pid = fork();
 	if (pid < 0)
 		return (free_array(env), perror("fork"), 1);

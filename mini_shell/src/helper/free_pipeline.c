@@ -18,7 +18,9 @@ static void	free_args(t_command *cmd)
 	int	i;
 
 	i = 0;
-	while (cmd->args && cmd->args[i])
+    if (!cmd->args)
+		return ;
+	while (cmd->args[i])
 	{
 		free(cmd->args[i]);
 		i++;
@@ -33,13 +35,13 @@ static void	free_redirs(t_command *cmd)
 	while (cmd->redirs[i])
 	{
 		free(cmd->redirs[i]->file);
+		free(cmd->redirs[i]);
 		i++;
 	}
 }
 
 void	free_pipeline(t_pipeline *pipeline)
 {
-	t_command	*cmd;
 	int			i;
 
 	if (!pipeline)
@@ -47,13 +49,12 @@ void	free_pipeline(t_pipeline *pipeline)
 	i = 0;
 	while (i < pipeline->cmd_count)
 	{
-		cmd = &pipeline->cmds[i];
-		free(cmd->cmd);
-		free_args(cmd);
-		free(cmd->args);
-		free_redirs(cmd);
-		free(cmd);
+		free(pipeline->cmds[i].cmd);
+		free_args(&pipeline->cmds[i]);
+		free(pipeline->cmds[i].args);
+		free_redirs(&pipeline->cmds[i]);
 		i++;
 	}
+    free(pipeline->cmds);
 	free(pipeline);
 }

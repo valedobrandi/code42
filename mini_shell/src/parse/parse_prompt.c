@@ -73,6 +73,21 @@ static int	get_word(char *prompt, int *i, int *p, char **strs)
 	return (0);
 }
 
+static int parse_validate(char **strs)
+{
+    int i = 0;
+    while (strs[i])
+    {
+        if (ft_strcmp(strs[i], "|") == 0)
+        {
+            if (strs[i + 1] && (ft_strcmp(strs[i + 1], "|") == 0))
+                return (ft_putendl_fd("minishell: error syntax", 2), 1);
+        }
+        i++;
+    }
+    return (0);
+}
+
 char	**parse(char *prompt, char **strs, int *p)
 {
 	int	i;
@@ -110,7 +125,11 @@ char	**parse_prompt(char *prompt)
 		return (NULL);
 	if (parse(prompt, strs, &p) == NULL)
 		return (NULL);
+    if (parse_validate(strs))
+    {
+        return (free_array(strs), NULL);
+    }
 	if (pipe_handle(strs, &p))
-		return (NULL);
+        return (NULL);
 	return (strs);
 }
