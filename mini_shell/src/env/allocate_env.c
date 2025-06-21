@@ -23,7 +23,7 @@ t_init_env	allocate_env(char *arg, bool export)
 	{
 		t.k_len = t.sing - arg;
 		t.key = ft_substr(arg, 0, t.k_len);
-		t.value = ft_strdup(t.sing + 1);
+		t.value = ft_strtrim(t.sing + 1, " \t\r\n");
 	}
 	else
 	{

@@ -67,13 +67,12 @@ int	update_env_list(char *arg, t_list **env_list)
 
 	arg_env = malloc(sizeof(t_init_env));
 	if (!arg_env)
-		return (1);
+		return (0);
 	*arg_env = allocate_env(arg, true);
 	if (validate_exit_arg(arg_env->key))
 	{
 		ft_putendl_fd("export: not a valid identifier", 2);
-		free_env(arg_env);
-		return (1);
+		return (free_env(arg_env), 1);
 	}
 	list_env = find_variable(*env_list, arg_env->key);
 	if (list_env)

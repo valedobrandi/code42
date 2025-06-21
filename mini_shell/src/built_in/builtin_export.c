@@ -31,18 +31,23 @@ void	print_export(t_list *env_list, char c)
 int	builtin_export(char **args, t_list **env_list)
 {
 	int	i;
+    int ret;
+    int exit_code;
 
 	i = 1;
+    ret = 0;
+    exit_code = ret;
 	if (args[1] != NULL)
 	{
 		while (args[i])
 		{
-			if (update_env_list(args[i], env_list) == 1)
-				return (1);
+            ret = update_env_list(args[i], env_list);
+            if (ret)
+                exit_code = ret;
 			i++;
 		}
 	}
 	else
 		print_alphabetic_order(*env_list, print_export);
-	return (0);
+	return (exit_code);
 }

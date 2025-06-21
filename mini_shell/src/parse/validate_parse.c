@@ -12,28 +12,34 @@
 
 #include "libft.h"
 
-static int token_pipe(char **strs, int i)
+static int is_redirect(char *value)
 {
-	return ((strs[i + 1] && (ft_strcmp(strs[i + 1], "|") == 0))
-	|| (i == 0 && (ft_strcmp(strs[i], "|") == 0) && strs[i + 1] == NULL));
+    if (!value)
+        return (0);
+    return (!ft_strcmp(value, "<") || !ft_strcmp(value, "<<") || !ft_strcmp(value, ">>") || !ft_strcmp(value, ">>"));
 }
 
-int	validate_parse(char **strs, int *exit_code)
+static int pipe_double_error(char **strs, int i)
 {
-	int	i;
+    return ((strs[i + 1] && (ft_strcmp(strs[i + 1], "|") == 0)) || (i == 0 && (ft_strcmp(strs[i], "|") == 0) && strs[i + 1] == NULL));
+}
 
-	i = 0;
-	while (strs[i])
-	{
-		if (ft_strcmp(strs[i], "|") == 0)
-		{
-			if (token_pipe(strs, i))
-			{
-				*exit_code = 2;
-				return (ft_putendl_fd("Error: syntax error near unexpected token `|'", 2), 1);
-			}
-		}
-		i++;
-	}
-	return (0);
+int validate_parse(char **strs, int *exit_code)
+{
+    int i;
+
+    i = 0;
+    while (strs[i])
+    {
+        if (ft_strcmp(strs[i], "|") == 0)
+        {
+            if (pipe_double_error(strs, i) || is_redirect(strs[i + 1]))
+            {
+                *exit_code = 2;
+                return (ft_putendl_fd("Error: syntax error near unexpected token `|'", 2), 1);
+            }
+        }
+        i++;
+    }
+    return (0);
 }

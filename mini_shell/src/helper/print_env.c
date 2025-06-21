@@ -13,6 +13,7 @@
 #include "minishell.h"
 #include "libft.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 void	print(void *content, int type)
 {
@@ -22,10 +23,19 @@ void	print(void *content, int type)
 		return ;
 	env = (t_init_env *)content;
 	if (type)
-		ft_putstr_fd("declare -x ", 1);
-	ft_putstr_fd(env->key, 1);
-	ft_putstr_fd("=", 1);
-	ft_putendl_fd(env->value, 1);
+	{
+		if (env->value)
+			printf("declare -x %s=\"%s\"\n", env->key, env->value);
+		else
+			printf("declare -x %s\n", env->key);
+	}
+	else
+	{
+		if (env->value)
+			printf("%s=%s\n", env->key, env->value);
+		else
+			printf("%s=\n", env->key);
+	}
 }
 
 void	print_alphabetic_order(t_list *env_list,

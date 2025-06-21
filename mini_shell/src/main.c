@@ -51,8 +51,8 @@ static int	process_prompt(char *prompt, t_list **env_list, int *exit_code)
 	t_pipeline		*pipeline;
 	int				res;
 
-	if (quote_error(prompt))
-		return (print_prompt("> error", 2), 0);
+	if (quote_error(prompt, exit_code))
+		return (0);
 	if (ft_strcmp(prompt, "") == 0)
 		return (print_prompt(NULL, 1), 0);
 	strs = parse_prompt(prompt, exit_code);

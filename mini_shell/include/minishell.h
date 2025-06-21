@@ -146,7 +146,7 @@ void					free_pipeline(t_pipeline *pipeline);
 
 void					free_token_list(t_token_list *token_list);
 
-int						quote_error(char *prompt);
+int						quote_error(char *prompt, int *exit_code);
 
 int						is_redirection(t_token_type type);
 
@@ -195,7 +195,7 @@ int						env_length(char *input);
 
 t_list					*init_env(char **envp);
 
-int						expand_system_return(int sys, char **args);
+int						expand_system_return(int sys, char **args, char **cmd);
 
 /* token */
 void					single_quote(t_get_token *t);

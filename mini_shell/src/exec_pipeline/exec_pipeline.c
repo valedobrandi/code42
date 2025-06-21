@@ -33,7 +33,7 @@ static void	parent_process(t_exec_pipe *t, t_pipeline *pipeline)
 static int	prepare_command(t_exec_pipe *t, t_pipeline *pipeline,
 		int *exit_code)
 {
-	expand_system_return(*exit_code, pipeline->cmds[t->i].args);
+	expand_system_return(*exit_code, pipeline->cmds[t->i].args, &pipeline->cmds[t->i].cmd);
 	if (t->i < pipeline->cmd_count - 1)
 	{
 		if (pipe(t->pipe_fd) < 0)
