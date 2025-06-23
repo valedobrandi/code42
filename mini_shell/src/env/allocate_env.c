@@ -16,14 +16,17 @@
 t_init_env	allocate_env(char *arg, bool export)
 {
 	t_init_env	t;
+    char *has_sing;
 
+	t.sing = '\0';
 	ft_memset(&t, 0, sizeof(t_init_env));
-	t.sing = ft_strchr(arg, '=');
-	if (t.sing)
+    has_sing = ft_strchr(arg, '=');
+	if (has_sing)
 	{
-		t.k_len = t.sing - arg;
+		t.k_len = has_sing- arg;
 		t.key = ft_substr(arg, 0, t.k_len);
-		t.value = ft_strtrim(t.sing + 1, " \t\r\n");
+		t.value = ft_strtrim(has_sing + 1, " \t\r\n");
+        t.sing = '=';
 	}
 	else
 	{

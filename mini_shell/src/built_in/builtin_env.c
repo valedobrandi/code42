@@ -43,12 +43,12 @@ int	builtin_env(char **args, t_list **env_list)
 		while (args[i])
 		{
 			if (update_env_list(args[i], &copy) == 1)
-				return (1);
+				return (free_env_list(&copy), 1);
 			i++;
 		}
-		free_env_list(&copy);
 	}
 	else
 		print_env_list(copy);
+	free_env_list(&copy);
 	return (0);
 }

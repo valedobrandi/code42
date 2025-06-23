@@ -52,7 +52,7 @@ static void child_process(t_pipeline *pipeline, char **env)
     char *bin_path;
 
     signal(SIGINT, SIG_DFL);
-    signal(SIGQUIT, SIG_IGN);
+    signal(SIGQUIT, SIG_DFL);
     if (apply_redirections(pipeline->cmds[0].redirs))
         exit_cleanup(env, NULL, 1);
     execute_redirects(pipeline->cmds[0], env);

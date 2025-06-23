@@ -24,7 +24,7 @@ int	is_builtin(char *cmd)
 int	exec_builtin(char *cmd, char **args, t_list **env_list)
 {
 	if (ft_strcmp("cd", cmd) == 0)
-		return (builtin_cd(args));
+		return (builtin_cd(args, env_list));
 	else if (ft_strcmp("echo", cmd) == 0)
 		return (builtin_echo(args));
 	else if (ft_strcmp("env", cmd) == 0)

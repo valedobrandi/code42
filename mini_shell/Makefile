@@ -71,7 +71,8 @@ child_pipeline_process.c \
 apply_redirections.c \
 pipe_handle.c \
 validate_parse.c \
-validate_directions.c
+validate_directions.c \
+expand_env.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -215,6 +216,9 @@ $(OBJ_DR)/linkedList_to_arr.o: $(SRC_DR)/helper/linkedList_to_arr.c $(DEPS) $(PA
 $(OBJ_DR)/is_path.o: $(SRC_DR)/helper/is_path.c $(DEPS) $(PARSE_DPES)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/helper/is_path.c -o $(OBJ_DR)/is_path.o
 
+$(OBJ_DR)/expand_env.o: $(SRC_DR)/helper/expand_env.c $(DEPS) $(PARSE_DPES)
+	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/helper/expand_env.c -o $(OBJ_DR)/expand_env.o
+
 # Env
 $(OBJ_DR)/read_env.o: $(SRC_DR)/env/read_env.c $(DEPS) $(PARSE_DPES)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/env/read_env.c -o $(OBJ_DR)/read_env.o
@@ -247,8 +251,8 @@ $(OBJ_DR)/get_path.o: $(SRC_DR)/redir/get_path.c $(DEPS)
 
 $(OBJ_DR)/apply_redirections.o: $(SRC_DR)/redir/apply_redirections.c $(DEPS)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/redir/apply_redirections.c -o $(OBJ_DR)/apply_redirections.o
-# exec_pipelone
 
+# exec_pipelone
 $(OBJ_DR)/exec_pipeline.o: $(SRC_DR)/exec_pipeline/exec_pipeline.c $(DEPS)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/exec_pipeline/exec_pipeline.c -o $(OBJ_DR)/exec_pipeline.o
 

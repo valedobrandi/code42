@@ -24,17 +24,15 @@ static char	*allocate_string(void *content)
 	size = 0;
 	if (env->key)
 		size += ft_strlen(env->key);
-	if (env->sing)
-		size++;
 	if (env->value)
-		size += ft_strlen(env->value);
+		size += 1 + ft_strlen(env->value);
 	str = malloc(sizeof(char) * (size + 1));
 	if (!str)
 		return (NULL);
 	str[0] = '\0';
 	if (env->key)
 		ft_strcat(str, env->key);
-	if (env->sing && *(env->sing) == '=')
+	if (env->sing)
 		ft_strcat(str, "=");
 	if (env->value)
 		ft_strcat(str, env->value);

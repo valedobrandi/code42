@@ -39,7 +39,7 @@ static char	*handle_input_line(void)
 	}
 	if (*line)
 		add_history(line);
-	prompt = ft_strtrim(line, " ");
+	prompt = ft_strtrim(line, " \t\n\v\f\r");
 	free(line);
 	return (prompt);
 }
@@ -52,9 +52,9 @@ static int	process_prompt(char *prompt, t_list **env_list, int *exit_code)
 	int				res;
 
 	if (quote_error(prompt, exit_code))
-		return (0);
+		return (free(prompt), 0);
 	if (ft_strcmp(prompt, "") == 0)
-		return (print_prompt(NULL, 1), 0);
+		return (free(prompt), 0);
 	strs = parse_prompt(prompt, exit_code);
 	free(prompt);
 	if (!strs)

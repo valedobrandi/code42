@@ -22,7 +22,7 @@ void	free_env(void *content)
 	if (env->key)
 		free(env->key);
 	if (env->sing)
-		env->sing = NULL;
+		env->sing = '\0';
 	if (env->value)
 		free(env->value);
 	free(env);

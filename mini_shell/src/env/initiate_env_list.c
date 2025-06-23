@@ -14,9 +14,21 @@
 #include "libft.h"
 #include <stdlib.h>
 
+static t_init_env *create_oldpw()
+{
+    t_init_env	*env;
+
+    env = malloc(sizeof(t_init_env));
+		if (!env)
+			return (NULL);
+    *env = allocate_env("OLDPWD=", 1);
+    return (env);
+}
+
 t_list	*init_env(char **envp)
 {
 	t_init_env	*env;
+    t_init_env	*oldpwd;
 	t_list		*env_list;
 	int			i;
 
@@ -28,11 +40,15 @@ t_list	*init_env(char **envp)
 		if (!env)
 			return (NULL);
 		*env = allocate_env(envp[i], 1);
-		if (env->sing != NULL)
+		if (env->sing)
 			ft_lsadd_front(&env_list, ft_lstnew(env));
 		else
 			free(env);
 		i++;
 	}
+    oldpwd = create_oldpw();
+    if (!oldpwd)
+        return (NULL);
+    ft_lsadd_front(&env_list, ft_lstnew(oldpwd));
 	return (env_list);
 }

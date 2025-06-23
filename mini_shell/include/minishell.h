@@ -48,7 +48,7 @@ typedef struct s_redir
 typedef struct s_init_env
 {
 	int					k_len;
-	char				*sing;
+	char				sing;
 	char				*key;
 	char				*value;
 	bool				export;
@@ -117,11 +117,13 @@ void					enable_echoctl(void);
 
 /* helper */
 
+char                    *expand_env(char *arg, t_list **env_list);
+
 char					**linkedlist_to_arr(t_list *env_list);
 
 int						is_path(char *path);
 
-void					update(t_init_env *new_env, t_init_env *list_env);
+void					update_env(t_init_env *new_env, t_init_env *list_env);
 
 t_init_env				*find_variable(t_list *env_list, char *arg);
 
@@ -156,15 +158,11 @@ t_pipeline				*build_pipeline(t_token_list *token_list);
 
 void					print_prompt(char *message, int std);
 
-void					print_newnl_prompt(void);
-
-void					print_new_prompt(void);
-
 /* builtin */
 
 int						builtin_pwd(void);
 
-int						builtin_cd(char **args);
+int						builtin_cd(char **args, t_list **env_list);
 
 int						builtin_echo(char **args);
 

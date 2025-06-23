@@ -68,7 +68,7 @@ void	child_pipeline_process(t_pipeline *pipeline, t_exec_pipe *t,
 
 	bin_path = NULL;
 	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_IGN);
+	signal(SIGQUIT, SIG_DFL);
 	validate_dup(pipeline->cmd_count, t);
 	execute_redirects(pipeline->cmds[t->i], env);
 	if (is_builtin(pipeline->cmds[t->i].cmd))

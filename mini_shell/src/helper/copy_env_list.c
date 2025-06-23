@@ -16,9 +16,10 @@
 
 static int	duplicate_fields(t_init_env *dest, const t_init_env *src)
 {
+    dest->sing = '\0';
 	if (src->sing)
 	{
-		dest->sing = ft_strdup(src->sing);
+		dest->sing = src->sing;
 		if (!dest->sing)
 			return (1);
 	}
@@ -26,17 +27,13 @@ static int	duplicate_fields(t_init_env *dest, const t_init_env *src)
 	{
 		dest->key = ft_strdup(src->key);
 		if (!dest->key)
-			return (free(dest->sing), 1);
+			return (1);
 	}
 	if (src->value)
 	{
 		dest->value = ft_strdup(src->value);
 		if (!dest->value)
-		{
-			free(dest->sing);
-			free(dest->key);
-			return (1);
-		}
+			return (free(dest->key), 1);
 	}
 	return (0);
 }

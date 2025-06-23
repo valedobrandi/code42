@@ -14,7 +14,7 @@
 #include "minishell.h"
 #include <stdlib.h>
 
-void	update(t_init_env *new_env, t_init_env *list_env)
+void	update_env(t_init_env *new_env, t_init_env *list_env)
 {
 	if (new_env->sing && list_env->sing)
 	{
@@ -77,7 +77,7 @@ int	update_env_list(char *arg, t_list **env_list)
 	list_env = find_variable(*env_list, arg_env->key);
 	if (list_env)
 	{
-		update(arg_env, list_env);
+		update_env(arg_env, list_env);
 		free_env(arg_env);
 	}
 	else
