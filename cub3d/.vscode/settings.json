@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "string": "c",
+        "unordered_map": "c",
+        "string_view": "c",
+        "complex": "c",
+        "random": "c",
+        "stdio.h": "c",
+        "parse_map.C": "cpp",
+        "cub3d.h": "c",
+        "stdlib.h": "c",
+        "cstdlib": "c"
+    }
+}
