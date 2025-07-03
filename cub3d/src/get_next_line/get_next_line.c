@@ -3,125 +3,75 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ajolivie <ajolivie@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/10 13:15:50 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/04/25 14:52:04 by bde-albu         ###   ########.fr       */
+/*   Created: 2025/04/10 13:47:23 by ajolivie          #+#    #+#             */
+/*   Updated: 2025/04/24 12:03:25 by ajolivie         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_strdup(const char *s)
+static char	*extract_line(char **storage)
 {
-	char	*ptr;
-	size_t	index;
-
-	index = 0;
-    if (s == NULL)
-        return (NULL);
-    while (s[index])
-		index++;
-	ptr = (char *)malloc((index + 1) * sizeof(char));
-	if (!ptr)
-		return (NULL);
-	index = 0;
-	while (s[index] != '\0')
-	{
-		ptr[index] = s[index];
-		index++;
-	}
-	ptr[index] = '\0';
-	return (ptr);
-}
-
-char	*store_buffer(int fd, char *buffer, int bytes_reader)
-{
-	char	*buffer_t;
-
-	buffer_t = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!buffer_t)
-		return (NULL);
-	while (bytes_reader > 0 && !ft_strchr(buffer, '\n'))
-	{
-		bytes_reader = read(fd, buffer_t, BUFFER_SIZE);
-		if (bytes_reader == -1)
-		{
-			free(buffer);
-			free(buffer_t);
-			return (NULL);
-		}
-		buffer_t[bytes_reader] = '\0';
-		buffer = static_ft_strjoin(buffer, buffer_t);
-		if (!buffer)
-		{
-			free(buffer_t);
-			return (NULL);
-		}
-	}
-	free(buffer_t);
-	return (buffer);
-}
-
-char	*get_line(char *buffer)
-{
-	int		index;
+	char	*newline;
 	char	*line;
+	char	*rest;
 
-	index = 0;
-	while (buffer[index] && buffer[index] != '\n')
-		index++;
-	if (buffer[index] == '\n')
-		index++;
-    if (index == 0)
-    {
-        return (NULL);
-    }
-	line = malloc((index + 1) * sizeof(char));
-	if (line == NULL)
-        return (NULL);
-	*line = '\0';
-	ft_strlcat(line, buffer, index + 1);
-	return (line);
+	newline = ft_strchr(*storage, '\n');
+	if (newline)
+	{
+		line = ft_substr(*storage, 0, newline - *storage + 1);
+		rest = ft_strdup(newline + 1);
+		free(*storage);
+		*storage = rest;
+		return (line);
+	}
+	else if (**storage)
+	{
+		line = ft_strdup(*storage);
+		free(*storage);
+		*storage = NULL;
+		return (line);
+	}
+	free(*storage);
+	*storage = NULL;
+	return (NULL);
 }
 
-char	*update_buffer(char *buffer)
+static char	*read_and_store(char *st, int fd)
 {
-	char	*line;
-	int		index;
+	char	*buf;
+	ssize_t	r;
+	char	*tmp;
 
-	index = 0;
-	while (buffer[index] && buffer[index] != '\n')
-		index++;
-	if (buffer[index] == '\0')
+	buf = malloc(BUFFER_SIZE + 1);
+	if (!buf)
+		return (NULL);
+	r = 1;
+	while (!ft_strchr(st, '\n') && r > 0)
 	{
-		free(buffer);
-		return (NULL);
+		r = read(fd, buf, BUFFER_SIZE);
+		if (r <= 0)
+			break ;
+		buf[r] = '\0';
+		tmp = ft_strjoin_gnl(st, buf);
+		if (!tmp)
+			return (free(buf), NULL);
+		st = tmp;
 	}
-	if (buffer[index] == '\n')
-		index++;
-	line = ft_strdup(buffer + index);
-	if (line == NULL)
-		return (NULL);
-	free(buffer);
-	return (line);
+	free(buf);
+	return (st);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
-	char		*line;
-	int			bytes_reader;
+	static char	*st = NULL;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
-	bytes_reader = 1;
-	buffer = store_buffer(fd, buffer, bytes_reader);
-	if (!buffer)
-		return (NULL);
-	if (buffer[0] == '\0')
-		return (free(buffer), NULL);
-	line = get_line(buffer);
-	buffer = update_buffer(buffer);
-	return (line);
+	st = read_and_store(st, fd);
+	if (!st || !*st)
+		return (free(st), st = NULL, NULL);
+	return (extract_line(&st));
 }

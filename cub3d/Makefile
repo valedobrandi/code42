@@ -14,6 +14,7 @@ extract_map.c \
 validate_rgb.c \
 is_space.c \
 validate_schema.c \
+fill_check.c \
 get_next_line.c \
 get_next_line_utils.c \
 free_array.c \
@@ -57,6 +58,8 @@ $(OBJ_DR)/extract_map.o: $(SRC_DR)/parse/extract_map.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/parse/extract_map.c -o $(OBJ_DR)/extract_map.o
 $(OBJ_DR)/validate_schema.o: $(SRC_DR)/parse/validate_schema.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/parse/validate_schema.c -o $(OBJ_DR)/validate_schema.o
+$(OBJ_DR)/fill_check.o: $(SRC_DR)/parse/fill_check.c
+	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/parse/fill_check.c -o $(OBJ_DR)/fill_check.o
 #get_next_line
 $(OBJ_DR)/get_next_line.o: $(SRC_DR)/get_next_line/get_next_line.c $(GNL_DEP)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/get_next_line/get_next_line.c -o $(OBJ_DR)/get_next_line.o
