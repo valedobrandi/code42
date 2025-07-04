@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 09:48:42 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/03 09:48:45 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/04 15:25:51 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,10 @@ static int	get_validate_player(char *pixel, int x, int y, t_player *player)
 	if (pixel[x] == 'N' || pixel[x] == 'S' || pixel[x] == 'W'
 		|| pixel[x] == 'O')
 	{
-		if ((*player).cord_y != -1 || (*player).cord_x != -1)
+		if ((int) (*player).pos_y != -1 || (int) (*player).pos_x != -1)
 			return (ft_putendl_fd("Error: too many players", 2), 1);
-		(*player).cord_y = y;
-		(*player).cord_x = x;
+		(*player).pos_y = y;
+		(*player).pos_x = x;
 	}
 	return (0);
 }
@@ -34,7 +34,7 @@ static int	validate_character(char *pixel, int x)
 	return (0);
 }
 
-int	validate_schema(t_map *schema, t_player *player)
+int	validate_scheme(t_map *schema, t_player *player)
 {
 	int	y;
 	int	x;
@@ -52,7 +52,7 @@ int	validate_schema(t_map *schema, t_player *player)
 		}
 		y++;
 	}
-	if (player->cord_x == -1 || player->cord_y == -1)
+	if (player->pos_x == -1 || player->pos_y == -1)
 		return (ft_putendl_fd("Error: no player", 2), 1);
 	return (0);
 }

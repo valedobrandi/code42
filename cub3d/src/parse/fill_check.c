@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 12:14:27 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/03 15:15:36 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/04 15:21:42 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,13 +46,27 @@ int	ft_fill_flood(t_map *schema, int height, int width, char checker)
 	return (0);
 }
 
+static void	init(int *dest, const int *src, int size)
+{
+	int	i;
+
+	i = 0;
+	while (i < size)
+	{
+		dest[i] = src[i];
+		i++;
+	}
+}
+
 int	flood(t_map *schema, int y, int x, char curr)
 {
-	int	dx[8] = {0, 0, 1, -1, 1, -1, 1, -1};
-	int	dy[8] = {1, -1, 0, 0, 1, 1, -1, -1};
+	int	dx[8];
+	int	dy[8];
 	int	index;
 
 	index = 0;
+	init(dx, (int []){0, 0, 1, -1, 1, -1, 1, -1}, 8);
+	init(dy, (int []){1, -1, 0, 0, 1, 1, -1, -1}, 8);
 	while (index < 8)
 	{
 		if (ft_fill_flood(schema, y + dy[index], x + dx[index], curr))
@@ -68,7 +82,7 @@ int	fill_check(t_map *schema, t_player player)
 	int	x;
 
 	y = 0;
-	schema->map[player.cord_y].path[player.cord_x] = '0';
+	schema->map[(int) player.pos_y].path[(int) player.pos_x] = '0';
 	while (y < schema->height)
 	{
 		x = 0;
@@ -76,7 +90,7 @@ int	fill_check(t_map *schema, t_player player)
 		{
 			if (schema->map[y].path[x] == '0')
 				if (ft_fill_flood(schema, y, x, '0'))
-					return (printf("Error: mapping not closed\n"), 1);
+					return (1);
 			x++;
 		}
 		y++;

@@ -1,7 +1,7 @@
 #include "cub3d.h"
 #include <stdlib.h>
 
-void free_schema(t_map *schema)
+void free_scheme(t_map *schema)
 {
     int i;
 

@@ -1,0 +1,13 @@
+{
+	"files.associations": {
+		"array": "c",
+		"string_view": "c",
+		"format": "c",
+		"initializer_list": "c",
+		"span": "c",
+		"time.h": "c",
+		"unistd.h": "c",
+		"cstdlib": "c",
+		"stdlib.h": "c"
+	}
+}

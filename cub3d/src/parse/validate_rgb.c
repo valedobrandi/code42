@@ -55,7 +55,7 @@ int validate_rgb(t_list *lst)
         if (content->type && content->path)
         {
             if (parse_rgb(content->type, content->path))
-                return (ft_putendl_fd("Error: bad rgb format", 2), 1);
+                return (1);
         }
         else
             return (1);

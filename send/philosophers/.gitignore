@@ -1,0 +1,30 @@
+# Compiled object files
+*.o
+
+# Executable binary
+cub3d
+
+# Object and binary directories
+obj/
+bin/
+
+# Dependency libraries (optional if you fetch/build them manually)
+lib/libft/libft.a
+lib/minilibx-linux/libmlx.a
+
+# Editor/IDE files
+*.swp
+*.swo
+*.bak
+*.tmp
+*~
+.vscode/
+.idea/
+
+# macOS/Linux specific files
+.DS_Store
+Thumbs.db
+
+# Build logs or debug
+*.log
+*.gch

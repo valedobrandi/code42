@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/libft",
-                "${workspaceFolder}/include"
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/lib/minilibx-linux"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
