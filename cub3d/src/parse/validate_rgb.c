@@ -4,8 +4,10 @@
 static int validate_rbg_format(char *RGB, int *i, char stop)
 {
     int count;
+    int start;
 
     count = 0;
+    start = *i;
     while (RGB[*i] && RGB[*i] != stop)
     {
         while (RGB[*i] == ' ' || RGB[*i] == '\t' || RGB[*i] == '\r')
@@ -20,7 +22,7 @@ static int validate_rbg_format(char *RGB, int *i, char stop)
         while (RGB[*i] == ' ' || RGB[*i] == '\t' || RGB[*i] == '\r')
             (*i)++;
     }
-    return (count > 0 && count < 4);
+    return (count > 0 && count < 4 && ft_atoi(RGB + start) <= 255 && ft_atoi(RGB + start) >= 0);
 }
 
 static int parse_rgb(char *type, char *RGB)

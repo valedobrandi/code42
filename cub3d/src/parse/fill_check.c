@@ -82,7 +82,7 @@ int	fill_check(t_map *schema, t_player player)
 	int	x;
 
 	y = 0;
-	schema->map[(int) player.pos_y].path[(int) player.pos_x] = '0';
+	schema->map[(int) player.py].path[(int) player.px] = '0';
 	while (y < schema->height)
 	{
 		x = 0;

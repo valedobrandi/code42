@@ -13,8 +13,6 @@
 #include "cub3d.h"
 #include <mlx.h>
 
-#define TILE_SIZE 5
-
 void	draw_pixel(int height, int width, t_settings *st, unsigned int color)
 {
 	int	screen_x;
@@ -27,42 +25,9 @@ void	draw_pixel(int height, int width, t_settings *st, unsigned int color)
 		{
 			screen_x = width * TILE_SIZE + px;
 			screen_y = height * TILE_SIZE + py;
-			offset = (screen_y * st->addr.line_len) + (screen_x * (st->addr.bpp
-						/ 8));
+			offset = (screen_y * st->addr.line_len) + (screen_x * (st->addr.bpp / 8));
 			*(unsigned int *)(st->img_data + offset) = color;
 		}
-	}
-}
-
-void draw_single_pixel(int x, int y, t_settings *st, unsigned int color)
-{
-    int offset = y * st->addr.line_len + x * (st->addr.bpp / 8);
-    *(unsigned int *)(st->img_data + offset) = color;
-}
-void	castray(t_settings *st)
-{
-	double	t;
-	double	step;
-	double	max_distance;
-	double	ray_x;
-	double	ray_y;
-
-	t = 0;
-	step = 0.01;
-	max_distance = 15.0;
-	while (t < max_distance)
-	{
-		ray_x = st->player.pos_x + st->player.dir_x * t;
-		ray_y = st->player.pos_y + st->player.dir_y * t;
-		// Check if ray hits a wall
-		if (st->scheme->map[(int)ray_y].path[(int)ray_x] == '1')
-			break ;
-		int pixel_x = (int)(ray_x * TILE_SIZE);
-		int pixel_y = (int)(ray_y * TILE_SIZE);
-		// Draw pixel at ray position
-		draw_single_pixel(pixel_x, pixel_y, st, 0x00FF00);
-		// cyan color for the ray
-		t += step;
 	}
 }
 
@@ -84,10 +49,13 @@ void	set_pixels(t_settings *st)
 		height++;
 	}
 }
+
 void	init_window(t_settings *st)
 {
-	set_pixels(st);
-	draw_pixel((int) st->player.pos_y, (int) st->player.pos_x, st, 0xFF0000);
-	castray(st);
+	/* set_pixels(st);
+	draw_pixel((int) st->player.py, (int) st->player.px, st, 0xFF0000);
+	drawrays3d(st); */
+
+    render3d(&st);
 	mlx_put_image_to_window(st->mlx, st->mlx_win, st->img, 0, 0);
 }

@@ -32,7 +32,10 @@ free_entries.c \
 free_schema.c \
 allocate_scheme.c \
 key_hook.c \
-draw_map.c
+set_hook.c \
+move_hook.c \
+draw_map.c \
+cast_raytrace.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -86,11 +89,17 @@ $(OBJ_DR)/free_schema.o: $(SRC_DR)/helpers/free_schema.c $(CUB3D_DEPS)
 $(OBJ_DR)/allocate_scheme.o: $(SRC_DR)/helpers/allocate_scheme.c $(CUB3D_DEPS)
 	$(CC) $(CFLAGS) $(INCLUDES) -c $(SRC_DR)/helpers/allocate_scheme.c -o $(OBJ_DR)/allocate_scheme.o
 #mlx_hook
-obj/key_hook.o: src/mlx_hooks/key_hook.c
+obj/key_hook.o: src/mlx_hooks/key_hook.c include/cub3d.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c src/mlx_hooks/key_hook.c -o obj/key_hook.o
+obj/move_hook.o: src/mlx_hooks/move_hook.c include/cub3d.h
+	$(CC) $(CFLAGS) $(INCLUDES) -c src/mlx_hooks/move_hook.c -o obj/move_hook.o
+obj/set_hook.o: src/mlx_hooks/set_hook.c include/cub3d.h
+	$(CC) $(CFLAGS) $(INCLUDES) -c src/mlx_hooks/set_hook.c -o obj/set_hook.o
 #draw
-obj/draw_map.o: src/draw/draw_map.c
+obj/draw_map.o: src/draw/draw_map.c include/cub3d.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c src/draw/draw_map.c -o obj/draw_map.o
+obj/cast_raytrace.o: src/draw/cast_raytrace.c include/cub3d.h
+	$(CC) $(CFLAGS) $(INCLUDES) -c src/draw/cast_raytrace.c -o obj/cast_raytrace.o
 
 clean:
 	rm -rf $(OBJ_DR)

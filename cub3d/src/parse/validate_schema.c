@@ -18,10 +18,10 @@ static int	get_validate_player(char *pixel, int x, int y, t_player *player)
 	if (pixel[x] == 'N' || pixel[x] == 'S' || pixel[x] == 'W'
 		|| pixel[x] == 'O')
 	{
-		if ((int) (*player).pos_y != -1 || (int) (*player).pos_x != -1)
+		if ((int) (*player).py != -1 || (int) (*player).px != -1)
 			return (ft_putendl_fd("Error: too many players", 2), 1);
-		(*player).pos_y = y;
-		(*player).pos_x = x;
+		(*player).py = y;
+		(*player).px = x;
 	}
 	return (0);
 }
@@ -52,7 +52,7 @@ int	validate_scheme(t_map *schema, t_player *player)
 		}
 		y++;
 	}
-	if (player->pos_x == -1 || player->pos_y == -1)
+	if (player->px == -1 || player->py == -1)
 		return (ft_putendl_fd("Error: no player", 2), 1);
 	return (0);
 }

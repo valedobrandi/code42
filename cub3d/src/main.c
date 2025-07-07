@@ -14,39 +14,37 @@
 #include "libft.h"
 #include <mlx.h>
 #include <stdlib.h>
+#include <math.h>
 
-int	exit_game(t_settings *settings)
+int	exit_game(t_settings *st)
 {
-	ft_lstclear(&settings->rgb_texture, free_entries);
-	free_scheme(settings->scheme);
-	if (settings->mlx_win)
-		mlx_destroy_window(settings->mlx, settings->mlx_win);
-	if (settings->mlx)
-		mlx_destroy_display(settings->mlx);
+	ft_lstclear(&st->rgb_texture, free_entries);
+	free_scheme(st->scheme);
+    if (st->img) mlx_destroy_image(st->mlx, st->img);
+	if (st->mlx_win)
+		mlx_destroy_window(st->mlx, st->mlx_win);
+	if (st->mlx)
+		mlx_destroy_display(st->mlx);
 	exit(0);
 	return (0);
 }
-int	set_mlx_hooks(t_settings *settings)
-{
-	mlx_key_hook(settings->mlx_win, key_hook, settings);
-	mlx_hook(settings->mlx_win, 17, 0, exit_game, settings);
-	return (0);
-}
 
-static int	init_map(t_settings *settings, char **av)
+static int	init_map(t_settings *st, char **av)
 {
-	settings->rgb_texture = NULL;
-	settings->player.pos_x = -1.0;
-	settings->player.pos_y = -1.0;
-	settings->player.dir_x = 1.0;
-	settings->player.dir_y = 0.0;
-	if (allocate_scheme(&settings->scheme))
+	st->rgb_texture = NULL;
+    st->player.pa = 0.0;
+	st->player.px = -1.0;
+	st->player.py = -1.0;
+	st->player.pdx = cos(st->player.pa) * 5;
+	st->player.pdy = sin(st->player.pa) * 5;
+	if (allocate_scheme(&st->scheme))
 		return (ft_putendl_fd("MEM: allocate_scheme", 2), 1);
-	if (read_file(av[1], &settings->rgb_texture, settings->scheme,
-			&settings->player))
+	if (read_file(av[1], &st->rgb_texture, st->scheme,
+			&st->player))
 		return (1);
 	return (0);
 }
+
 
 int	main(int ac, char **av)
 {
@@ -57,9 +55,7 @@ int	main(int ac, char **av)
 	if (init_map(&st, av))
 		exit_game(&st);
 	st.mlx = mlx_init();
-	st.mlx_win = mlx_new_window(st.mlx,
-			st.scheme->map[0].length * 20, st.scheme->height * 20,
-			"cub3d");
+	st.mlx_win = mlx_new_window(st.mlx,800, 600, "cub3d");
 	st.img = mlx_new_image(st.mlx, 800, 600);
 	st.img_data = mlx_get_data_addr(st.img, &st.addr.bpp, &st.addr.line_len, &st.addr.endian);
 	set_mlx_hooks(&st);

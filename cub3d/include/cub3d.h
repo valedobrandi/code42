@@ -15,6 +15,16 @@
 
 # define BUFFER 1024
 
+# define TILE_SIZE 40
+
+# define PI 3.14159265358979323846
+# define FFOV (60.0 * (PI / 180.0))
+# define HFOV FFOV / 2.0 
+# define NUM_RAYS 360
+
+# define MOVE_SPEED 0.5
+# define ROTATE_SPEED 0.05
+
 # define KEY_UP 65362
 # define KEY_DOWN 65364
 # define KEY_LEFT 65361
@@ -32,10 +42,11 @@ typedef struct g_data_addr
 
 typedef struct g_player
 {
-	double					pos_y;
-	double					pos_x;
-	double				dir_y;
-	double				dir_x;
+	double				py;
+	double				px;
+	double				pdy;
+	double				pdx;
+    double              pa;
 }						t_player;
 
 typedef struct g_entries
@@ -56,6 +67,14 @@ typedef struct g_map
 	int					height;
 }						t_map;
 
+typedef struct g_keys
+{
+    int up;
+    int down;
+    int left;
+    int rigth;
+} t_keys;
+
 typedef struct g_settings
 {
 	void				*mlx;
@@ -66,7 +85,11 @@ typedef struct g_settings
 	t_list				*rgb_texture;
 	t_map				*scheme;
 	t_data_addr			addr;
+    t_keys              keys;
 }						t_settings;
+
+
+
 
 // parse
 int						read_file(char *path, t_list **rgb_texture,
@@ -88,11 +111,22 @@ int						allocate_scheme(t_map **schema);
 int						exit_game(t_settings *settings);
 // mlx_hook
 int						key_hook(int keycode, t_settings *settings);
+int	set_mlx_hooks(t_settings *settings);
+void	backward(t_settings *st);
+void	forward(t_settings *st);
+void	rotate_rigth(t_settings *st);
+void	rotate_left(t_settings *st);
+int	set_mlx_hooks(t_settings *st);
+int	key_press(int keycode, t_settings *st);
+int	key_release(int keycode, t_settings *st);
+int key_update(t_settings *st);
 // draw
 void					init_window(t_settings *settings);
 void					draw_pixel(int height, int width, t_settings *st,
 							unsigned int color);
 void					set_pixels(t_settings *st);
-void	castray(t_settings *st);
+void	                drawrays3d(t_settings *st);
+void                    render3d(t_settings **st);
+
 
 #endif
