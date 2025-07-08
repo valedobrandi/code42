@@ -1,7 +1,10 @@
 #ifndef PHONE_BOOK_CLASS_H
 # define PHONE_BOOK_CLASS_H
 
-#include "../contact_class/Contact.class.hpp"
+#include "Contact.class.hpp"
+#define CONTACT 8
+
+std::string trim(const std::string &str);
 
 class PhoneBook {
 
@@ -17,10 +20,9 @@ class PhoneBook {
 
     private:
 
-        Contact contacts[8];
+        Contact contacts[CONTACT];
         int empty;
-        
-        std::string trim(const std::string &str);
+
         void    addContact( void );
         void    searchContact( void );
 

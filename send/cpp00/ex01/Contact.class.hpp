@@ -3,6 +3,8 @@
 
 #include <string>
 
+std::string trim(const std::string &str);
+
 class Contact {
 
     public:
@@ -21,7 +23,6 @@ class Contact {
         std::string phone_number;
         std::string darkest_secret;
 
-        std::string trim(const std::string &str);
         std::string truncate(const std::string &str);
         int phone_validate(const std::string &str);
 };
