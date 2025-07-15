@@ -1,24 +1,11 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   HumanA.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/08 12:49:22 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/08 12:52:20 by bde-albu         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "HumanA.hpp"
 
-#include <iostream>
-#include "Weapon.hpp"
+HumanA::HumanA(std::string name, Weapon& weapon) : name(name), weapon(weapon) {}
 
-class HumanA {
+HumanA::~HumanA(void) {}
 
-	public:
-
-		Weapon weapon;
-
-		HumanA( std::string, Weapon );
-		~HumanA( void );
-};
+void HumanA::attack(void) const
+{
+    std::cout << this->name << " attacks with their " << weapon.getType() << std::endl;
+    return;
+}

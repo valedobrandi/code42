@@ -1,24 +1,20 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   HumanB.cpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/08 12:49:22 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/08 12:53:07 by bde-albu         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "HumanB.hpp"
 
-#include <iostream>
-#include "Weapon.hpp"
+HumanB::HumanB( std::string name ) : name( name ), weapon( NULL ) {}
 
-class HumanA {
+HumanB::~HumanB( void ) {}
 
-	public:
+void HumanB::attack( void ) const
+{
+    if (this->weapon) {
+        std::cout << this->name << " attacks with their " << this->weapon->getType() << std::endl;
+    } else {
+        std::cout << this->name << " has no weapon to attack with!" << std::endl;
+    }
+    return;
+}
 
-		Weapon weapon;
-
-		HumanA( std::string, Weapon );
-		~HumanA( void );
-};
+void HumanB::setWeapon( Weapon& weapon ) {
+    this->weapon = &weapon;
+    return;
+}
