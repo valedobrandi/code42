@@ -2,30 +2,25 @@
 #define CLAPTRAP_CLASS_H
 
 #include <iostream>
-
 class ClapTrap {
 
-    protected:
+    private:
 
         std::string _name;
         int _hitPoints;
         int _energyPoints;
         int _attackDamage;
-		std::string _type;
 
         bool status( void );
 
     public:
 
-        ClapTrap( void );
+		ClapTrap( void );
         ClapTrap( ClapTrap const & src );
-        virtual ~ClapTrap( void );
         ClapTrap & operator=( ClapTrap const & rhs );
+        ~ClapTrap( void );
 
         ClapTrap( std::string name );
-
-		std::string get_name( void ) const;
-		int get_attackDamage( void ) const;
 
         void attack( const std::string& target );
         void takeDamage( unsigned int amount );

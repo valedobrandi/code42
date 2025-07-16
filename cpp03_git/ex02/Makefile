@@ -4,7 +4,7 @@ CXX = c++
 
 CXXFLAGS = -Wall -Werror -Wextra -std=c++98
 
-SRC = main.cpp ClapTrap.cpp ScavTrap.cpp
+SRC = main.cpp ClapTrap.cpp FragTrap.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -19,8 +19,8 @@ main.o: main.cpp ClapTrap.hpp ClapTrap.hpp
 ClapTrap.o: ClapTrap.cpp ClapTrap.hpp
 	$(CXX) $(CXXFLAGS) -c  ClapTrap.cpp -o ClapTrap.o
 
-ScavTrap.o: ScavTrap.cpp ScavTrap.hpp ClapTrap.hpp
-	$(CXX) $(CXXFLAGS) -c  ScavTrap.cpp -o ScavTrap.o
+FragTrap.o: FragTrap.cpp FragTrap.hpp ClapTrap.hpp
+	$(CXX) $(CXXFLAGS) -c  FragTrap.cpp -o FragTrap.o
 
 
 clean:

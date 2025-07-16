@@ -19,7 +19,7 @@ class ClapTrap {
 
         ClapTrap( void );
         ClapTrap( ClapTrap const & src );
-        virtual ~ClapTrap( void );
+        ~ClapTrap( void );
         ClapTrap & operator=( ClapTrap const & rhs );
 
         ClapTrap( std::string name );

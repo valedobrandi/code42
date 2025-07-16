@@ -35,6 +35,11 @@ ClapTrap &ClapTrap::operator=( const ClapTrap & rhs )
     return *this;
 }
 
+ClapTrap::~ClapTrap(void)
+{
+	std::cout << "ClapTrap " <<  this->_name << " was destroyed" << std::endl;
+	return;
+}
 
 ClapTrap::ClapTrap(std::string name)
 	: _name(name), _hitPoints(10), _energyPoints(10), _attackDamage( 0 ), _type( "ClapTrap" )
@@ -43,11 +48,6 @@ ClapTrap::ClapTrap(std::string name)
     return;
 }
 
-ClapTrap::~ClapTrap(void)
-{
-    std::cout << "ClapTrap " <<  this->_name << " was destroyed" << std::endl;
-    return;
-}
 
 void ClapTrap::attack(const std::string &target)
 {

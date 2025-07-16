@@ -1,0 +1,27 @@
+#ifndef DIAMONDTRAP_CLASS_H
+#define DIAMONDTRAP_CLASS_H
+
+#include "FragTrap.hpp"
+#include "ScavTrap.hpp"
+#include <iostream>
+
+class DiamondTrap: public FragTrap, public ScavTrap {
+
+	private:
+
+		std::string _name;
+    public:
+
+        DiamondTrap( void );
+        DiamondTrap( DiamondTrap const & src );
+        ~DiamondTrap( void );
+        DiamondTrap & operator=( DiamondTrap const & rhs );
+
+        DiamondTrap( std::string name );
+
+		std::string get_name() const;
+		void attack(const std::string &target);
+		void whoAmi( void );
+	};
+
+#endif

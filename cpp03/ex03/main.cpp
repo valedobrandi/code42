@@ -1,12 +1,12 @@
-#include "ScavTrap.hpp"
+#include "DiamondTrap.hpp"
 
 int main( void ) {
 
 
-    ScavTrap one( "SCAV-3T" );
-    ScavTrap two( "SCAV-TR4" );
+    DiamondTrap one( "DIAM-3T" );
+    DiamondTrap two( "DIAM-TR4" );
 
-    one.guardGate();
+    one.highFivesGuys();
 
     one.attack( two.get_name() );
 	two.takeDamage(one.get_attackDamage());

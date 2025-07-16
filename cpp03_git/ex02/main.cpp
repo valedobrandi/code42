@@ -1,12 +1,12 @@
-#include "ScavTrap.hpp"
+#include "FragTrap.hpp"
 
 int main( void ) {
 
 
-    ScavTrap one( "SCAV-3T" );
-    ScavTrap two( "SCAV-TR4" );
+    FragTrap one( "SCAV-3T" );
+    FragTrap two( "SCAV-TR4" );
 
-    one.guardGate();
+    one.highFivesGuys();
 
     one.attack( two.get_name() );
 	two.takeDamage(one.get_attackDamage());
