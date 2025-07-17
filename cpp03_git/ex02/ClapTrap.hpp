@@ -19,13 +19,15 @@ class ClapTrap {
 
         ClapTrap( void );
         ClapTrap( ClapTrap const & src );
-        ~ClapTrap( void );
+        virtual ~ClapTrap( void );
         ClapTrap & operator=( ClapTrap const & rhs );
 
         ClapTrap( std::string name );
 
-		std::string get_name( void ) const;
-		int get_attackDamage( void ) const;
+		virtual std::string getName( void ) const;
+		int getHitPoints( void ) const;
+        int getAttackDamage( void ) const;
+        int getEnergyPoints( void ) const;
 
         void attack( const std::string& target );
         void takeDamage( unsigned int amount );
