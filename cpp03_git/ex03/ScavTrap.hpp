@@ -13,7 +13,7 @@ class ScavTrap: virtual public ClapTrap {
 
         ScavTrap( std::string name );
 
-		std::string get_name() const;
+		std::string getName() const;
         void guardGate( void );
 		void attack(const std::string &target);
 };

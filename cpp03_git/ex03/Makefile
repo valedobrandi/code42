@@ -13,7 +13,7 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJ)
 
-main.o: main.cpp ClapTrap.hpp ClapTrap.hpp
+main.o: main.cpp DiamondTrap.hpp ClapTrap.hpp FragTrap.hpp ScavTrap.hpp
 	$(CXX) $(CXXFLAGS) -c  main.cpp -o main.o
 
 ClapTrap.o: ClapTrap.cpp ClapTrap.hpp
@@ -22,7 +22,7 @@ ClapTrap.o: ClapTrap.cpp ClapTrap.hpp
 FragTrap.o: FragTrap.cpp FragTrap.hpp ClapTrap.hpp
 	$(CXX) $(CXXFLAGS) -c  FragTrap.cpp -o FragTrap.o
 
-ScavTrap.o: ScavTrap.cpp ScavTrap.hpp FragTrap.hpp ClapTrap.hpp
+ScavTrap.o: ScavTrap.cpp ScavTrap.hpp ClapTrap.hpp
 	$(CXX) $(CXXFLAGS) -c  ScavTrap.cpp -o ScavTrap.o
 
 DiamondTrap.o: DiamondTrap.cpp DiamondTrap.hpp ClapTrap.hpp FragTrap.hpp ScavTrap.hpp

@@ -20,7 +20,7 @@ ScavTrap::ScavTrap(std::string name) : ClapTrap(name)
     _attackDamage = 20;
 	_type = "ScavTrap";
 
-    std::cout << this->_type << " " << this->_name << " was created" << std::endl;
+    std::cout << this->_type << " " << this->getName() << " was created" << std::endl;
 
     return;
 }
@@ -32,7 +32,7 @@ ScavTrap::ScavTrap(const ScavTrap &other) : ClapTrap(other)
 }
 
 void ScavTrap::guardGate() {
-    std::cout << this->_type << " " << this->get_name() << " is now in Gatekeeper mode.\n";
+    std::cout << this->_type << " " << this->getName() << " is now in Gatekeeper mode.\n";
 }
 
 ScavTrap &ScavTrap::operator=(const ScavTrap &other)
@@ -44,7 +44,7 @@ ScavTrap &ScavTrap::operator=(const ScavTrap &other)
 
 ScavTrap::~ScavTrap( void )
 {
-    std::cout << "ScavTrap "  << this->_name << " was destroyed" << std::endl;
+    std::cout << "ScavTrap "  << this->getName() << " was destroyed" << std::endl;
     return;
 }
 
@@ -55,13 +55,13 @@ void ScavTrap::attack(const std::string &target)
 
     this->_energyPoints--;
 
-    std::cout << this->_type << " " << get_name() << " shoot " << target << ", causing "
+    std::cout << this->_type << " " << getName() << " shoot " << target << ", causing "
               << this->_attackDamage << " points of damage!" << std::endl;
 
     return;
 }
 
-std::string ScavTrap::get_name() const
+std::string ScavTrap::getName() const
 {
 	return this->_name;
 }

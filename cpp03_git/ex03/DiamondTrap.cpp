@@ -16,13 +16,12 @@ DiamondTrap::DiamondTrap( void )
 }
 
 DiamondTrap::DiamondTrap(std::string name)
-	: ClapTrap( name + "_clap_name"), FragTrap(), ScavTrap()
+	: ClapTrap( name + "_clap_name" ), FragTrap( ), ScavTrap(), _name( name )
 {
 	this->_hitPoints = FragTrap::_hitPoints;
     this->_energyPoints =  ScavTrap::_energyPoints;
     this->_attackDamage = FragTrap::_attackDamage;
 	this->_type = "DiamondTrap";
-	this->_name = name;
 
     std::cout << this->_type << " " << this->_name << " was created" << std::endl;
 
@@ -51,7 +50,7 @@ DiamondTrap &DiamondTrap::operator=(const DiamondTrap &other)
 
 DiamondTrap::~DiamondTrap( void )
 {
-	std::cout << "DiamondTrap "  << this->get_name() << " was destroyed" << std::endl;
+	std::cout << "DiamondTrap "  << this->getName() << " was destroyed" << std::endl;
     return;
 }
 
@@ -61,13 +60,13 @@ void DiamondTrap::attack(const std::string &target)
 	return ;
 }
 
-std::string DiamondTrap::get_name() const
+std::string DiamondTrap::getName() const
 {
 	return this->_name;
 }
 
-void DiamondTrap::whoAmi( void ) {
-	std::cout << this->get_name() << std::endl;
+void DiamondTrap::whoAmI( void ) {
+	std::cout << this->getName() << std::endl;
 	std::cout << ClapTrap::_name << std::endl;
 	return ;
 }

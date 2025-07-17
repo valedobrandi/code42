@@ -20,7 +20,7 @@ FragTrap::FragTrap(std::string name) : ClapTrap(name)
     _attackDamage = 30;
 	_type = "FragTrap";
 
-    std::cout << this->_type << " " << this->_name << " was created" << std::endl;
+    std::cout << this->_type << " " << this->getName() << " was created" << std::endl;
 
     return;
 }
@@ -40,15 +40,15 @@ FragTrap &FragTrap::operator=(const FragTrap &other)
 
 FragTrap::~FragTrap( void )
 {
-	std::cout << "FragTrap "  << this->get_name() << " was destroyed" << std::endl;
+	std::cout << "FragTrap "  << this->getName() << " was destroyed" << std::endl;
     return;
 }
 
 void FragTrap::highFivesGuys() {
-	std::cout << this->_type << " " << this->get_name() << " wants a high five.\n";
+	std::cout << this->_type << " " << this->getName() << " wants a high five.\n";
 }
 
-std::string FragTrap::get_name() const
+std::string FragTrap::getName() const
 {
 	return this->_name;
 }

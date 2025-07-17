@@ -24,8 +24,10 @@ class ClapTrap {
 
         ClapTrap( std::string name );
 
-		virtual std::string get_name( void ) const;
-		int get_attackDamage( void ) const;
+		virtual std::string getName( void ) const;
+		int getHitPoints( void ) const;
+        int getAttackDamage( void ) const;
+        int getEnergyPoints( void ) const;
 
         void attack( const std::string& target );
         void takeDamage( unsigned int amount );

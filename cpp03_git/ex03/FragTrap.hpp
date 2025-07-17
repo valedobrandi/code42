@@ -13,7 +13,7 @@ class FragTrap: virtual public ClapTrap {
 
         FragTrap( std::string name );
 
-		std::string get_name() const;
+		std::string getName() const;
         void highFivesGuys( void );
 };
 
