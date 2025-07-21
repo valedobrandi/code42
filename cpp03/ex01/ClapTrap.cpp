@@ -114,7 +114,7 @@ bool ClapTrap::status(void)
     return true;
 }
 
-std::string ClapTrap::get_name( void ) const
+std::string ClapTrap::getName()( void ) const
 {
 	return this->_name;
 }

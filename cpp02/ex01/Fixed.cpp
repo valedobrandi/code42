@@ -10,16 +10,6 @@ Fixed::Fixed( void ): raw(0) {
     return ;
 }
 
-Fixed::Fixed( int const raw ) {
-    std::cout << "Int constructor called" << std::endl;
-    this->raw = raw << 8;
-    return ;
-}
-Fixed::Fixed( float const raw ) {
-    std::cout << "Float constructor called" << std::endl;
-    this->raw = roundf(raw * 256.0f);
-    return ;
-}
 
 Fixed::Fixed( const Fixed& other ) {
     std::cout << "Copy constructor called" << std::endl;
@@ -36,6 +26,18 @@ Fixed& Fixed::operator = ( const Fixed& other ) {
 
 Fixed::~Fixed( void ) {
     std::cout << "Destructor called" << std::endl;
+    return ;
+}
+
+Fixed::Fixed( int const raw ) {
+    std::cout << "Int constructor called" << std::endl;
+    this->raw = raw << 8;
+    return ;
+}
+
+Fixed::Fixed( float const raw ) {
+    std::cout << "Float constructor called" << std::endl;
+    this->raw = roundf(raw * 256.0f);
     return ;
 }
 

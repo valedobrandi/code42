@@ -8,10 +8,10 @@ int main( void ) {
 
     one.guardGate();
 
-    one.attack( two.get_name() );
+    one.attack( two.getName() );
 	two.takeDamage(one.get_attackDamage());
 
-	two.attack( one.get_name() );
+	two.attack( one.getName() );
 	one.takeDamage(two.get_attackDamage());
 
     return 0;

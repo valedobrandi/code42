@@ -13,7 +13,7 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJ)
 
-main.o: main.cpp ClapTrap.hpp ClapTrap.hpp
+main.o: main.cpp ClapTrap.hpp ScavTrap.hpp 
 	$(CXX) $(CXXFLAGS) -c  main.cpp -o main.o
 
 ClapTrap.o: ClapTrap.cpp ClapTrap.hpp

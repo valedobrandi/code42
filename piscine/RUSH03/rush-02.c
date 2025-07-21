@@ -127,7 +127,7 @@ int get_value(char *line, int *index)
     return (0);
 }
 
-int get_name(char *line, int *index) 
+int getName()(char *line, int *index) 
 {
     int     divider;
     int     length;
@@ -185,7 +185,7 @@ int    get_line(int is_default)
                 return 1;
             get_value(str, &dict_index);
             if (is_default)
-                get_name(str, &dict_index);
+                getName()(str, &dict_index);
             printf("%s:%s\n", dict[dict_index].value, dict[dict_index].name);
             free(str);
             count = 0;
