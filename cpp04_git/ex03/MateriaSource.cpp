@@ -4,7 +4,7 @@
 
 MateriaSource::MateriaSource(void) : IMateriaSource()
 {
-	std::cout << "MateriaSource default constructor called" << std::endl;
+	//std::cout << "MateriaSource default constructor called" << std::endl;
 	for (int i = 0; i < 4; i++)
 		this->inventory[i] = NULL;
 	return ;
@@ -12,27 +12,33 @@ MateriaSource::MateriaSource(void) : IMateriaSource()
 
 MateriaSource::MateriaSource(const MateriaSource &other) : IMateriaSource(other)
 {
-	std::cout << "MateriaSource copy constructor called" << std::endl;
+	//std::cout << "MateriaSource copy constructor called" << std::endl;
 	for (int i = 0; i < 4; i++)
 	{
 		if (other.inventory[i])
-			this->inventory[i] = other.inventory[i];
+			this->inventory[i] = other.inventory[i]->clone();
+        else
+            this->inventory[i] = NULL;
 	}
 	return ;
 }
 
 MateriaSource &MateriaSource::operator=(const MateriaSource &rhs)
 {
-	std::cout << "MateriaSource copy assignment operator called" << std::endl;
 	if (this != &rhs)
 	{
-		IMateriaSource::operator=(rhs);
+        for (int i = 0; i < 4; i++) if (this->inventory[i]) delete this->inventory[i];
+
 		for (int i = 0; i < 4; i++)
 		{
 			if (rhs.inventory[i])
-				this->inventory[i] = rhs.inventory[i];
+			this->inventory[i] = rhs.inventory[i]->clone();
+            else
+                this->inventory[i] = NULL;;
 		}
 	}
+
+	//std::cout << "MateriaSource copy assignment operator called" << std::endl;
 	return (*this);
 }
 
@@ -44,22 +50,29 @@ MateriaSource::~MateriaSource(void)
 		{
 			delete this->inventory[i];
 		}
-
 	}
-	std::cout << "MateriaSource destructor called" << std::endl;
+
+	//std::cout << "MateriaSource destructor called" << std::endl;
 	return ;
 }
 
 void MateriaSource::learnMateria(AMateria *m)
 {
-	for (int i = 0; i < 4; i++)
+    if ( !m ) return;
+
+    int i = 0;
+
+	while (i < 4)
 	{
 		if (this->inventory[i] == NULL)
 		{
-			this->inventory[i] = m->clone();
-			return ;
+			this->inventory[i] = m;
+			return;
 		}
+        i++;
 	}
+
+    delete m;
 	return ;
 };
 

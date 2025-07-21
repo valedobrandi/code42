@@ -12,8 +12,6 @@ class ICharacter
 
     public:
 
-        AMateria* inventory[4];
-
         ICharacter( void );
         ICharacter( const ICharacter& other );
         ICharacter& operator=( const ICharacter& rhs );

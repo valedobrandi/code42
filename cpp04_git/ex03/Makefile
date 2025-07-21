@@ -2,7 +2,7 @@ NAME = main
 
 CXX = c++
 
-CXXFLAGS =  -std=c++98
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 SRC = \
 main.cpp \

@@ -22,8 +22,10 @@
 int main(void)
 {
 
-	std::cout << "===== Base Test =====\n" << std::endl;
+	std::cout << "\n===== Base Test =====" << std::endl;
+    
     IMateriaSource* src = new MateriaSource();
+
 	src->learnMateria(new Ice());
 	src->learnMateria(new Cure());
 
@@ -44,7 +46,7 @@ int main(void)
     delete src;
 	delete me;
 
-	std::cout << "===== Equip more than 4 Materias =====\n" << std::endl;
+	std::cout << "\n===== Equip more than 4 Materias =====" << std::endl;
 
 	ICharacter* hero = new Character("hero");
 	AMateria* ice = new Ice();
@@ -60,7 +62,7 @@ int main(void)
 	delete cure;
 	delete hero;
 
-	std::cout << "===== Unequip and reuse =====\n" << std::endl;
+	std::cout << "\n===== Unequip and reuse =====" << std::endl;
 
 	ICharacter* player = new Character("player");
 
@@ -74,23 +76,21 @@ int main(void)
 	player->unequip(5);
 
 	player->use(0, *player);
-	player->use(1, *player);
+	player->use(1, *player); 
 
-	delete mat1;
-	delete mat2;
 	delete player;
 
-	std::cout << "===== Invalid materia creation =====\n" << std::endl;
+	std::cout << "\n===== Invalid materia creation =====" << std::endl;
 
 	IMateriaSource* t = new MateriaSource();
 	t->learnMateria(new Ice());
 
 	AMateria* wrong = t->createMateria("fire");
-	if (!wrong) std::cout << "Invalid materia not created as expected\n";
+	if (!wrong) std::cout << "-> FAIL createMateria( fire )\n";
 
 	delete t;
 
-	std::cout << "=====  Deep Copy - Constructor =====\n" << std::endl;
+	std::cout << "\n=====  Deep Copy - Constructor =====" << std::endl;
 
 	Character original("Alice");
 	original.equip(new Ice());
@@ -100,12 +100,12 @@ int main(void)
 	copy.use(0, original);
 	copy.use(1, original);
 
-	original.unequip(0);
+    original.unequip(0);
 	copy.use(0, original);
 
-	std::cout << "=====  Deep Copy - Assignment Operator =====\n" << std::endl;
+	std::cout << "\n=====  Deep Copy - Assignment Operator =====" << std::endl;
 
-	/* Character a("A");
+	Character a("A");
 	a.equip(new Ice());
 
 	Character b("B");
@@ -113,18 +113,22 @@ int main(void)
 
 	a.unequip(0);
 
-	b.use(0, a); */
+	b.use(0, a);
 
-	std::cout << "=====  MateriaSource copy =====\n" << std::endl;
+	std::cout << "\n=====  MateriaSource copy =====" << std::endl;
 
-	/* MateriaSource m1;
+	MateriaSource m1;
+
 	m1.learnMateria(new Ice());
 	m1.learnMateria(new Cure());
 
 	MateriaSource m2 = m1;
 
 	AMateria* test = m2.createMateria("ice");
-	if (test) std::cout << "Clone from copied MateriaSource successful\n";
-	delete test; */
+
+	if (test) std::cout << "-> clone from copied MateriaSource successful\n";
+    
+	delete test;
+
     return 0;
 }
