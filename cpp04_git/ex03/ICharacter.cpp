@@ -1,64 +1,59 @@
 #include "ICharacter.hpp"
 #include <iostream>
 
-ICharacter::ICharacter(void) : _name(""), inventory({0})
+ICharacter::ICharacter(void) : _name("")
 {
-    std::cout << "ICharacter default constructor called" << std::endl;
-    return;
+	for (int i = 0; i < 4; i++)
+		this->inventory[i] = NULL;
+	std::cout << "ICharacter default constructor called" << std::endl;
+	return ;
 }
 
 ICharacter::ICharacter(const ICharacter &other)
 {
-    std::cout << "ICharacter copy constructor called" << std::endl;
-    return;
+	std::cout << "ICharacter copy constructor called" << std::endl;
+	this->_name = other._name;
+	for (int i = 0; i < 4; i++)
+	{
+		if (other.inventory[i])
+			this->inventory[i] = other.inventory[i];
+	}
+	return ;
 }
 
 ICharacter &ICharacter::operator=(const ICharacter &rhs)
 {
-    std::cout << "ICharacter copy assignment operator called" << std::endl;
-    if (this != &rhs)
-    {
-    }
-    return *this;
+	std::cout << "ICharacter copy assignment operator called" << std::endl;
+	if (this != &rhs)
+	{
+		this->_name = rhs._name;
+		for (int i = 0; i < 4; i++)
+		{
+			if (rhs.inventory[i])
+				this->inventory[i] = rhs.inventory[i];
+		}
+	}
+	return (*this);
 }
 
 ICharacter::~ICharacter(void)
 {
-    std::cout << "ICharacter destructor called" << std::endl;
-    return;
+	for (int i = 0; i < 4; i++)
+	{
+		if (this->inventory[i])
+		{
+			delete this->inventory[i];
+		}
+
+	}
+	std::cout << "ICharacter destructor called" << std::endl;
+	return ;
 }
 
-void ICharacter::ICharacter(std::string name)
-    : _name(name), inventory({0})
+ICharacter::ICharacter(std::string name) : _name(name)
 {
-    std::cout << "ICharacter " << this->_name << " constructor called" << std::endl;
-    return;
-}
-
-std::string const &ICharacter::getName() const
-{
-    return this->_name;
-}
-
-void ICharacter::equip(AMateria *m)
-{
-    for (int i = 0; i < 4; i++) if (this->inventory[i] == nullptr) break;
-    if (i == 4) return;
-    AMateria other = new AMateria(*m);
-    this->inventory[index] = &other;
-    index++;
-    return ;
-}
-void ICharacter::unequip(int idx)
-{
-     if (this->inventory[idx]) delete this->inventory[idx];
-     return ;
-}
-void ICharacter::use(int idx, ICharacter &target)
-{
-    if (this->inventory[idx])
-    {
-        (*this->inventory[idx]->use(target));
-    }
-    return ;
+	for (int i = 0; i < 4; i++)
+		this->inventory[i] = NULL;
+	std::cout << "ICharacter " << this->_name << " constructor called" << std::endl;
+	return ;
 }

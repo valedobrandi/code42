@@ -8,6 +8,8 @@ class IMateriaSource
 {
     public:
 
+		AMateria* inventory[4];
+
         IMateriaSource( void );
         IMateriaSource( const IMateriaSource& other );
         IMateriaSource& operator=( const IMateriaSource& rhs );

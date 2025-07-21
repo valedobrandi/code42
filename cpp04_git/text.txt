@@ -1,0 +1,39 @@
+Character &Character::operator=(const Character &rhs) {
+    std::cout << "Character copy assignment operator called" << std::endl;
+    if (this != &rhs) {
+        this->_name = rhs._name;
+
+        // Clear current inventory
+        for (int i = 0; i < 4; ++i) {
+            delete this->inventory[i];
+            this->inventory[i] = nullptr;
+        }
+
+        // Deep copy inventory
+        for (int i = 0; i < 4; ++i) {
+            if (rhs.inventory[i])
+                this->inventory[i] = rhs.inventory[i]->clone();
+        }
+
+        // Clear existing dropped list
+        while (this->dropped) {
+            t_dropped* temp = this->dropped;
+            this->dropped = this->dropped->next;
+            delete temp->drop;
+            delete temp;
+        }
+
+        // Deep copy dropped list
+        this->dropped = nullptr;
+        t_dropped* current = rhs.dropped;
+        t_dropped** ptr = &this->dropped;
+
+        while (current) {
+            *ptr = new t_dropped;
+            (*ptr)->drop = current->drop->clone();
+            (*ptr)->next = nullptr;
+            ptr = &((*ptr)->next);
+            current = current->next;
+        }
+    }
+    return *this;
