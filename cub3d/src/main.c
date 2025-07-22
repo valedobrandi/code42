@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 10:30:40 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/04 15:32:37 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/22 14:50:30 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,10 @@ int	exit_game(t_settings *st)
 	if (st->mlx_win)
 		mlx_destroy_window(st->mlx, st->mlx_win);
 	if (st->mlx)
+	{
 		mlx_destroy_display(st->mlx);
+		free(st->mlx);
+	}
 	exit(0);
 	return (0);
 }
@@ -55,7 +58,7 @@ int	main(int ac, char **av)
 	if (init_map(&st, av))
 		exit_game(&st);
 	st.mlx = mlx_init();
-	st.mlx_win = mlx_new_window(st.mlx,800, 600, "cub3d");
+	st.mlx_win = mlx_new_window(st.mlx, 800, 600, "cub3d");
 	st.img = mlx_new_image(st.mlx, 800, 600);
 	st.img_data = mlx_get_data_addr(st.img, &st.addr.bpp, &st.addr.line_len, &st.addr.endian);
 	set_mlx_hooks(&st);

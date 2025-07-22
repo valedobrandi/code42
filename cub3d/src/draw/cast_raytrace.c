@@ -2,6 +2,12 @@
 #include <mlx.h>
 #include <math.h>
 
+static void draw_texture(int x, int y, t_settings *st)
+{
+    int offset = y * st->addr.line_len + x * (st->addr.bpp / 8);
+    *(unsigned int *)(st->img_data + offset) = color;
+}
+
 static void draw_single_pixel(int x, int y, t_settings *st, unsigned int color)
 {
     int offset = y * st->addr.line_len + x * (st->addr.bpp / 8);
@@ -34,7 +40,7 @@ void render3d(t_settings **st)
                 break ;
             step += 0.01;
         }
-        
+
         double wall_distance = step * cos(angle_offset);
 
         double wall_heigth = (screen_height / wall_distance) * 0.5;
@@ -46,6 +52,7 @@ void render3d(t_settings **st)
         if (wall_end >= screen_height) wall_end = screen_height - 1;
 
         int y = 0;
+		// TEXTURE PATHS
         while (y < screen_height)
         {
             int color;
@@ -54,8 +61,9 @@ void render3d(t_settings **st)
                 color = 0x436775;
             else if (y >= wall_start && y <= wall_end)
                 color = 0x412312;
-            else 
+            else
                 color = 0x228B22;
+
             draw_single_pixel(i, y, *st, color);
             y++;
         }
@@ -63,7 +71,7 @@ void render3d(t_settings **st)
     }
 }
 
-void	drawrays3d(t_settings *st)
+/* void	drawrays3d(t_settings *st)
 {
 	double	step;
 	double	max_distance;
@@ -98,4 +106,4 @@ void	drawrays3d(t_settings *st)
         }
         i++;
     }
-}
+} */

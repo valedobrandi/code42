@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 09:31:28 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/04 09:18:20 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/22 13:38:43 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,8 @@ int	read_file(char *path, t_list **rgb_texture, t_map *scheme, t_player *player)
 		return (ft_putendl_fd("Error: bad textute/rgb", 2), 1);
 	if (validate_rgb(*rgb_texture))
 		return (ft_putendl_fd("Error: bad rgb format", 2), 1);
+	if (validate_texture(*rgb_texture))
+		return (ft_putendl_fd("Error: opening texture", 2), 1);
 	if (validate_scheme(scheme, player))
 		return (1);
 	if (fill_check(scheme, *player))
