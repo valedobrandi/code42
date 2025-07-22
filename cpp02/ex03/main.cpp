@@ -13,31 +13,31 @@ int main() {
     Point b(4, 0);
     Point c(2, 4);
 
-    test(a, b, c, Point(2, 1), "✅ Strictly Inside");
+    test(a, b, c, Point(2, 1), "");
 
-    test(a, b, c, Point(1, 1), "✅ Inside near A");
+    test(a, b, c, Point(1, 1), "");
 
-    test(a, b, c, Point(3, 1), "✅ Inside near B");
+    test(a, b, c, Point(3, 1), "");
 
-    test(a, b, c, Point(2, 3), "✅ Inside near C");
+    test(a, b, c, Point(2, 3), "");
 
-    test(a, b, c, Point(2, 2), "✅ Center-ish");
+    test(a, b, c, Point(2, 2), "");
 
-    test(a, b, c, Point(2, 0), "❌ On Edge AB");
+    test(a, b, c, Point(2, 0), "");
 
-    test(a, b, c, Point(1, 2), "❌ On Edge AC");
+    test(a, b, c, Point(1, 2), "");
 
-    test(a, b, c, Point(3, 2), "❌ On Edge BC");
+    test(a, b, c, Point(3, 2), "");
 
-    test(a, b, c, Point(0, 0), "❌ On Vertex A");
+    test(a, b, c, Point(0, 0), "");
 
-    test(a, b, c, Point(4, 0), "❌ On Vertex B");
+    test(a, b, c, Point(4, 0), "");
 
-    test(a, b, c, Point(2, 4), "❌ On Vertex C");
+    test(a, b, c, Point(2, 4), "");
 
-    test(a, b, c, Point(5, 5), "❌ Outside Far");
+    test(a, b, c, Point(5, 5), "");
 
-    test(a, b, c, Point(2, -0.01), "❌ Just Outside Below");
+    test(a, b, c, Point(2, -0.01), "");
 
     return 0;
 }

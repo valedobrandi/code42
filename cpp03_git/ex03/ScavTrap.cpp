@@ -32,6 +32,7 @@ ScavTrap::ScavTrap(const ScavTrap &other) : ClapTrap(other)
 }
 
 void ScavTrap::guardGate() {
+	if (!this->status()) return;
     std::cout << this->_type << " " << this->getName() << " is now in Gatekeeper mode.\n";
 }
 

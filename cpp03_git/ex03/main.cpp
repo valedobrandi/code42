@@ -20,12 +20,15 @@ int main(void) {
     std::cout << "=== TESTING WHOAMI ===" << std::endl;
     one.whoAmI();
     std::cout << std::endl;
-    
+
     std::cout << "=== TESTING DEAD ===" << std::endl;
     one.takeDamage(99);
     one.beRepaired(1);
     one.takeDamage(2);
     one.beRepaired(100);
+	one.takeDamage(1);
+	one.highFivesGuys();
+	one.attack("DIAM-TR4");
     std::cout << std::endl;
 
     std::cout << "=== CONSTRUCTOR ===" << std::endl;
@@ -33,10 +36,13 @@ int main(void) {
     std::cout << std::endl;
 
     std::cout << "=== TESTING ENERGY ===" << std::endl;
-    for (int i = 0; i <= 50; i++) 
+    for (int i = 0; i <= 50; i++)
     {
         two.beRepaired(1);
     }
+	two.takeDamage(1);
+	two.highFivesGuys();
+	two.attack("DIAM-3T");
     std::cout << std::endl;
     std::cout << "=== DESTRUCTOR ===" << std::endl;
 

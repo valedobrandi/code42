@@ -32,6 +32,7 @@ FragTrap::FragTrap(const FragTrap &other) : ClapTrap(other)
 }
 
 void FragTrap::highFivesGuys() {
+	if (!this->status()) return;
     std::cout << this->_type << " " << _name << " wants a high five.\n";
 }
 

@@ -40,11 +40,13 @@ FragTrap &FragTrap::operator=(const FragTrap &other)
 
 FragTrap::~FragTrap( void )
 {
+	if (!this->status()) return;
 	std::cout << "FragTrap "  << this->getName() << " was destroyed" << std::endl;
     return;
 }
 
 void FragTrap::highFivesGuys() {
+	if (!this->status()) return;
 	std::cout << this->_type << " " << this->getName() << " wants a high five.\n";
 }
 
