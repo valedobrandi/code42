@@ -59,7 +59,7 @@ void	rotate_left(t_settings *st)
 	set_pixels(st); */
     st->player.pa += ROTATE_SPEED;
     if (st->player.pa > 2*PI) st->player.pa -= 2*PI;
-    
+
 	/* theta = degrees_to_radians(radius);
 	new_dx = st->player.pdx * cos(theta) - st->player.pdy * sin(theta);
 	new_dy = st->player.pdx * sin(theta) + st->player.pdy * cos(theta); */

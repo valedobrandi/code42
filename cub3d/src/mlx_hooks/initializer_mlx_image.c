@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 12:15:15 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/22 14:48:29 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/23 15:17:06 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,26 +15,33 @@
 #include <unistd.h>
 #include "libft.h"
 
-void	*initialize(t_settings *st, char *path)
+static void	*initialize(t_settings *st, char *path)
 {
 	void	*asset;
+	void	*addr;
+	int width;
+	int height;
 
-	asset = mlx_xpm_file_to_image(st->mlx, path, st->texture_width,
-			st->texture_heigth);
+	printf("Error\nFailed to get image data for texture:  %s\n", path);
+	asset = mlx_xpm_file_to_image(st->mlx, path, &width, &height);
 	if (asset == NULL)
 		return (exit_game(st), NULL);
 	track_alloc(&st->mem_stack, asset);
-	return (asset);
+	addr = mlx_get_data_addr(asset, &st->addr.bpp, &st->addr.line_len, &st->addr.endian);
+	if (addr == NULL)
+		return (exit_game(st), NULL);
+	return (addr);
 }
 
 void	initializer_mlx_image(t_settings *st)
 {
 	t_entries *content;
+	t_list *tmp;
 
-	ft_memset(&st->mlx_texture, 0, sizeof(t_texture));
-    while (st->rgb_texture)
+	tmp = st->rgb_texture;
+    while (tmp)
     {
-        content = st->rgb_texture->content;
+        content = tmp->content;
         if (content->type && content->path)
         {
             if (!ft_strcmp(content->type, "NO"))
@@ -46,7 +53,7 @@ void	initializer_mlx_image(t_settings *st)
 			if (!ft_strcmp(content->type, "EA"))
 				st->mlx_texture.east_wall = initialize(st, content->path);
         }
-        st->rgb_texture = st->rgb_texture->next;
+        tmp = tmp->next;
     }
     return ;
 }

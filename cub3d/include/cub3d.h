@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 09:40:45 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/22 14:45:34 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/23 15:00:52 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@
 # define HFOV FFOV / 2.0
 # define NUM_RAYS 360
 
-# define MOVE_SPEED 0.2
-# define ROTATE_SPEED 0.02
+# define MOVE_SPEED 0.1
+# define ROTATE_SPEED 0.05
 
 # define KEY_UP 65362
 # define KEY_DOWN 65364
@@ -31,7 +31,17 @@
 # define KEY_RIGHT 65363
 # define KEY_ESC 65307
 
+#include <stdio.h>
+
 typedef struct s_list	t_list;
+
+typedef struct
+{
+	double				distance;
+	int					hit_wall;
+	int					wall_side;
+	double				wall_x;
+}						t_dda_result;
 
 typedef struct g_data_addr
 {

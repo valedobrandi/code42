@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 11:14:19 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/22 14:49:13 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/23 11:24:02 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,9 @@ static int	open_texture(char *type, char *path)
 			"WE") || !ft_strcmp(type, "EA"))
 	{
 		fd = open(path, O_RDONLY);
-		if (fd == -1)
+		if (fd == -1) {
 			return (1);
+		}
 		close(fd);
 	}
 	return (0);
