@@ -92,7 +92,7 @@ static int	read_texture_rgb(int fd, t_list **rgb_texture, int *entries)
 	return (0);
 }
 
-int	read_file(char *path, t_list **rgb_texture, t_map *scheme, t_player *player)
+int	read_file(char *path, t_settings *st)
 {
 	int	entries;
 	int	fd;
@@ -101,18 +101,18 @@ int	read_file(char *path, t_list **rgb_texture, t_map *scheme, t_player *player)
 	fd = open(path, O_RDONLY);
 	if (fd == -1)
 		return (ft_putendl_fd("Error: opening file", 2), 1);
-	read_texture_rgb(fd, rgb_texture, &entries);
-	read_map(fd, scheme);
+	read_texture_rgb(fd, &st->rgb_texture, &entries);
+	read_map(fd, st->scheme);
 	close(fd);
 	if (entries != 6)
 		return (ft_putendl_fd("Error: bad textute/rgb", 2), 1);
-	if (validate_rgb(*rgb_texture))
+	if (validate_rgb(st->rgb_texture))
 		return (ft_putendl_fd("Error: bad rgb format", 2), 1);
-	if (validate_texture(*rgb_texture))
+	if (validate_texture(st->rgb_texture))
 		return (ft_putendl_fd("Error: opening texture", 2), 1);
-	if (validate_scheme(scheme, player))
+	if (validate_scheme(st->scheme, st))
 		return (1);
-	if (fill_check(scheme, *player))
+	if (fill_check(st->scheme, st->player))
 		return (ft_putendl_fd("Error: spaces not closed\n", 2), 1);
 	return (0);
 }

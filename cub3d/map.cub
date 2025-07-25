@@ -1,7 +1,7 @@
-NO ./texture/wall_north480.xpm
-SO ./texture/wall_south480.xpm
-WE ./texture/wall_west480.xpm
-EA ./texture/wall_east480.xpm
+NO ./texture/gray.xpm
+EA ./texture/blue.xpm
+SO ./texture/red.xpm
+WE ./texture/green.xpm
 
 F 220,10,0
 C 55,0,255

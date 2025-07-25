@@ -1,0 +1,95 @@
+DDA Raycasting Logic Guide
+Goal:
+
+Cast a ray from the player’s position in a given direction to find the first wall it hits on a grid-based map, then use that info to render a 3D view.
+Step 1: Define the ray
+
+    You have the player’s position (px, py) and the angle of the ray ray_angle.
+
+    Calculate the ray’s direction vector components (ray_dx, ray_dy) using cosine and sine of the angle.
+
+Step 2: Identify the current grid square
+
+    The map is a 2D grid of squares (cells).
+
+    Find which cell the player currently stands in by taking the floor (integer part) of (px, py) to get (map_x, map_y).
+
+Step 3: Calculate step and initial distances
+
+    Determine how far the ray must travel along the X and Y axes to reach the next vertical and horizontal grid lines.
+
+    Calculate delta_dist_x and delta_dist_y which represent the distance between successive vertical and horizontal grid crossings.
+
+    Decide the step direction on each axis:
+
+        If the ray is pointing left, step_x = -1, else step_x = 1.
+
+        If the ray is pointing up, step_y = -1, else step_y = 1.
+
+    Calculate the initial side distances from the player’s position to the first vertical and horizontal grid intersections.
+
+Step 4: Perform the DDA loop (ray traversal)
+
+    Repeatedly step from one grid cell to the next along the ray path:
+
+        Compare side_dist_x and side_dist_y.
+
+        Move in the direction of the smaller side distance (either one step in X or Y).
+
+        Increase that side distance by its respective delta distance.
+
+        Update the current grid cell coordinates accordingly.
+
+    After each step, check if the new grid cell contains a wall (map[map_y][map_x] == wall).
+
+    Stop the loop once a wall is hit or the ray goes out of map bounds.
+
+Step 5: Calculate distance to wall hit
+
+    Once a wall cell is found, calculate the perpendicular distance from the player to the wall to avoid fish-eye distortion.
+
+    Use the formula that depends on whether the hit was on a vertical or horizontal grid line.
+
+    This distance will later determine how tall to draw the wall slice.
+
+Step 6: Find exact hit position on the wall
+
+    Calculate the exact hit point on the wall surface by using the player position, direction vector, and the distance.
+
+    Extract the fractional part of this position on the wall to know where exactly the ray hit for texture mapping.
+
+Step 7: Determine wall orientation
+
+    Based on which side (vertical or horizontal) the ray hit and the ray’s direction, determine which wall face (North, South, East, West) the ray collided with.
+
+    This will be used to select the correct wall texture.
+
+Step 8: Use distance and hit data to render
+
+    Calculate the height of the vertical wall slice to draw on screen using the inverse of the distance (farther walls appear shorter).
+
+    Use the fractional hit position to sample the correct horizontal texture coordinate.
+
+    Draw the vertical line on screen column-by-column with the correct texture slice.
+
+Summary
+
+    Cast ray from player using angle →
+
+    Find starting cell →
+
+    Calculate step sizes and initial distances →
+
+    Walk step-by-step in grid cells (DDA loop) →
+
+    Stop at wall hit →
+
+    Calculate distance & hit position →
+
+    Determine wall side for textures →
+
+    Render vertical slice based on distance & texture coordinate
+
+This is the core logic behind how 2D grid maps are “3D rendered” using raycasting and DDA.
+
+If you want, I can help explain any step in more detail!

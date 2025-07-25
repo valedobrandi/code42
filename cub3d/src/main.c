@@ -39,12 +39,11 @@ static int	init_map(t_settings *st, char **av)
     st->player.pa = 0.0;
 	st->player.px = -1.0;
 	st->player.py = -1.0;
-	st->player.pdx = cos(st->player.pa);
-	st->player.pdy = sin(st->player.pa);
+	st->player.pdx = cos(st->player.pa) * MOVE_SPEED;
+	st->player.pdy = sin(st->player.pa) * MOVE_SPEED;
 	if (allocate_scheme(&st->scheme))
 		return (ft_putendl_fd("MEM: allocate_scheme", 2), 1);
-	if (read_file(av[1], &st->rgb_texture, st->scheme,
-			&st->player))
+	if (read_file(av[1], st))
 		return (1);
 	return (0);
 }

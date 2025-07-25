@@ -13,15 +13,23 @@
 #include "cub3d.h"
 #include "libft.h"
 
-static int	get_validate_player(char *pixel, int x, int y, t_player *player)
+static int	get_validate_player(char *pixel, int x, int y, t_settings *st)
 {
 	if (pixel[x] == 'N' || pixel[x] == 'S' || pixel[x] == 'W'
 		|| pixel[x] == 'O')
 	{
-		if ((int) (*player).py != -1 || (int) (*player).px != -1)
+		if ((int)st->player.py != -1 || (int)st->player.px != -1)
 			return (ft_putendl_fd("Error: too many players", 2), 1);
-		(*player).py = y;
-		(*player).px = x;
+		st->player.py = y;
+		st->player.py = x;
+        if (pixel[x] == 'N')
+            st->player.pa = 3 * PI / 2;
+        if (pixel[x] == 'S')
+            st->player.pa = PI / 2; 
+        if (pixel[x] == 'W')
+            st->player.pa = PI; 
+        if (pixel[x] == 'O')
+            st->player.pa = 0.0; 
 	}
 	return (0);
 }
@@ -34,7 +42,7 @@ static int	validate_character(char *pixel, int x)
 	return (0);
 }
 
-int	validate_scheme(t_map *schema, t_player *player)
+int	validate_scheme(t_map *schema, t_settings *st)
 {
 	int	y;
 	int	x;
@@ -45,14 +53,14 @@ int	validate_scheme(t_map *schema, t_player *player)
 		x = 0;
 		while (x < schema->map[y].length)
 		{
-			if (get_validate_player(schema->map[y].path, x, y, player)
+			if (get_validate_player(schema->map[y].path, x, y, st)
 				|| validate_character(schema->map[y].path, x))
 				return (1);
 			x++;
 		}
 		y++;
 	}
-	if (player->px == -1 || player->py == -1)
+	if (st->player.px == -1 || st->player.py == -1)
 		return (ft_putendl_fd("Error: no player", 2), 1);
 	return (0);
 }

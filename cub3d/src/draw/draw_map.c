@@ -56,6 +56,6 @@ void	init_window(t_settings *st)
 	draw_pixel((int) st->player.py, (int) st->player.px, st, 0xFF0000);
 	drawrays3d(st); */
 
-    render3d(&st);
+    raytracer_render(&st);
 	mlx_put_image_to_window(st->mlx, st->mlx_win, st->img, 0, 0);
 }
