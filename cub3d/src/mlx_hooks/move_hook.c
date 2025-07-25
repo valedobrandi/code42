@@ -1,43 +1,62 @@
 #include "cub3d.h"
+#include "libft.h"
 #include <math.h>
 #include <mlx.h>
-#include <stdio.h>
 
-void backward(t_settings *st)
+
+int is_wall(t_settings *st, double world_x, double world_y)
 {
-    double next_py;
-    double next_px;
-    double margin;
-    
-    next_py = st->player.py + st->player.pdy;
-    next_px = st->player.px + st->player.pdx;
-    margin = 0.5;
-    if (st->scheme->map[(int)(st->player.py)].path[(int)(next_px + margin * ((st->player.pdx > 0) ? 1 : -1))] != '1')
-        st->player.px = next_px;
-    if (st->scheme->map[(int)(next_py + margin * ((st->player.pdy > 0) ? 1 : -1))].path[(int)(st->player.px)] != '1')
-        st->player.py = next_py;
-    raytracer_render(&st);
-    mlx_put_image_to_window(st->mlx, st->mlx_win, st->img, 0, 0);
+	int tile_x;
+	int tile_y;
+
+	tile_x = (int)(world_x / TILE_SIZE);
+	tile_y = (int)(world_y / TILE_SIZE);
+
+	if (st->scheme->map[tile_y].path[tile_x] == '1')
+		return (1);
+	return (0);
+}
+
+int collides(double x, double y, double margin, t_settings *st) {
+    return is_wall(st, x + margin, y) || is_wall(st, x - margin, y)
+        || is_wall(st, x, y + margin) || is_wall(st, x, y - margin);
 }
 
 void forward(t_settings *st)
 {
-    double next_py;
-    double next_px;
-    double margin;
+	double next_px;
+	double next_py;
 
-    next_py = st->player.py + st->player.pdy;
-    next_px = st->player.px + st->player.pdx;
-    margin = 0.5;
-    if (st->scheme->map[(int)(st->player.py)].path[(int)(next_px + margin * ((st->player.pdx > 0) ? 1 : -1))] != '1')
-        st->player.px = next_px;
-    if (st->scheme->map[(int)(next_py + margin * ((st->player.pdy > 0) ? 1 : -1))].path[(int)(st->player.px)] != '1')
-        st->player.py = next_py;
-    raytracer_render(&st);
-    mlx_put_image_to_window(st->mlx, st->mlx_win, st->img, 0, 0);
+	next_px = st->player.px + cos(st->player.pa) * MOVE_SPEED;
+	next_py = st->player.py + sin(st->player.pa) * MOVE_SPEED;
+
+	if (!collides(next_px, st->player.py, MARGIN, st))
+    	st->player.px = next_px;
+	if (!collides(st->player.px, next_py, MARGIN, st))
+    	st->player.py = next_py;
+
+	raytracer_render(&st);
+	mlx_put_image_to_window(st->mlx, st->mlx_win, st->img, 0, 0);
 }
 
-void rotate_rigth(t_settings *st)
+void backward(t_settings *st)
+{
+	double next_px;
+	double next_py;
+
+	next_px = st->player.px - cos(st->player.pa) * MOVE_SPEED;
+	next_py = st->player.py - sin(st->player.pa) * MOVE_SPEED;
+
+	if (!collides(next_px, st->player.py, MARGIN, st))
+    	st->player.px = next_px;
+	if (!collides(st->player.px, next_py, MARGIN, st))
+    	st->player.py = next_py;
+
+	raytracer_render(&st);
+	mlx_put_image_to_window(st->mlx, st->mlx_win, st->img, 0, 0);
+}
+
+void rotate_right(t_settings *st)
 {
     st->player.pa -= ROTATE_SPEED;
     if (st->player.pa < 0)
@@ -58,3 +77,5 @@ void rotate_left(t_settings *st)
     raytracer_render(&st);
     mlx_put_image_to_window(st->mlx, st->mlx_win, st->img, 0, 0);
 }
+
+

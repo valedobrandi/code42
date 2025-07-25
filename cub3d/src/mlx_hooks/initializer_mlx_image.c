@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/19 12:15:15 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/23 15:17:06 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/25 12:15:38 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 static t_image_addr	*initialize(t_settings *st, t_image_addr *addr, char *path)
 {
 	void	*asset;
-  
+
 	asset = mlx_xpm_file_to_image(st->mlx, path, &addr->width, &addr->height);
 	if (asset == NULL)
         exit_game(st);

@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 10:30:40 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/23 14:23:45 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/25 12:18:21 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ static int	init_map(t_settings *st, char **av)
 		return (ft_putendl_fd("MEM: allocate_scheme", 2), 1);
 	if (read_file(av[1], st))
 		return (1);
+	st->player.py = (st->player.py * TILE_SIZE) + TILE_SIZE / 2;
+	st->player.px = (st->player.px * TILE_SIZE) + TILE_SIZE / 2;
 	return (0);
 }
 
@@ -58,8 +60,8 @@ int	main(int ac, char **av)
 	if (init_map(&st, av))
 		exit_game(&st);
 	st.mlx = mlx_init();
-	st.mlx_win = mlx_new_window(st.mlx, 800, 600, "cub3d");
-	st.img = mlx_new_image(st.mlx, 800, 600);
+	st.mlx_win = mlx_new_window(st.mlx, WIDTH, HEIGHT, "cub3d");
+	st.img = mlx_new_image(st.mlx, WIDTH, HEIGHT);
 	initializer_mlx_image(&st);
 	st.img_data = mlx_get_data_addr(st.img, &st.addr.bpp, &st.addr.line_len, &st.addr.endian);
 	set_mlx_hooks(&st);

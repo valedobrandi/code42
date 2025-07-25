@@ -39,7 +39,8 @@ set_hook.c \
 move_hook.c \
 draw_map.c \
 cast_raytrace.c \
-add.c
+add.c \
+texture_mapping.c \
 
 OBJ = $(SRC:.c=.o)
 
@@ -118,7 +119,8 @@ obj/cast_raytrace.o: src/draw/cast_raytrace.c include/cub3d.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c src/draw/cast_raytrace.c -o obj/cast_raytrace.o
 obj/add.o: src/draw/add.c include/cub3d.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c src/draw/add.c -o obj/add.o
-
+obj/texture_mapping.o: src/draw/texture_mapping.c include/cub3d.h
+	$(CC) $(CFLAGS) $(INCLUDES) -c src/draw/texture_mapping.c -o obj/texture_mapping.o
 
 clean:
 	rm -rf $(OBJ_DR)

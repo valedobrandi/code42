@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 09:31:28 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/22 13:38:43 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/25 10:14:34 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ int	read_file(char *path, t_settings *st)
 	close(fd);
 	if (entries != 6)
 		return (ft_putendl_fd("Error: bad textute/rgb", 2), 1);
-	if (validate_rgb(st->rgb_texture))
+	if (validate_rgb(st->rgb_texture, st))
 		return (ft_putendl_fd("Error: bad rgb format", 2), 1);
 	if (validate_texture(st->rgb_texture))
 		return (ft_putendl_fd("Error: opening texture", 2), 1);
