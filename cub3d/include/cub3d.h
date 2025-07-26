@@ -15,8 +15,8 @@
 
 # define BUFFER 1024
 
-# define TILE_SIZE 4
-# define MARGIN 0.4
+# define TILE_SIZE 32
+# define MARGIN (TILE_SIZE * 0.2)
 
 # define WIDTH 1000
 # define HEIGHT 600
@@ -26,7 +26,7 @@
 # define HFOV FFOV / 2.0
 # define NUM_RAYS 360
 
-# define MOVE_SPEED 0.005
+# define MOVE_SPEED 0.2
 # define ROTATE_SPEED 0.01
 
 # define KEY_UP 65362
@@ -203,7 +203,7 @@ int						key_update(t_settings *st);
 void					initializer_mlx_image(t_settings *st);
 
 // draw
-void					init_window(t_settings *settings);
+void					draw_map(t_settings *settings);
 void					draw_pixel(int height, int width, t_settings *st,
 							unsigned int color);
 void					set_pixels(t_settings *st);

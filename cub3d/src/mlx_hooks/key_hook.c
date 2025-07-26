@@ -52,6 +52,7 @@ int key_update(t_settings *st)
 		rotate_right(st);
     if (st->keys.left)
 		rotate_left(st);
+    draw_map(st);
 	return (0);
 }
 

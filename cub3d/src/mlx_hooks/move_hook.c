@@ -18,8 +18,17 @@ int is_wall(t_settings *st, double world_x, double world_y)
 }
 
 int collides(double x, double y, double margin, t_settings *st) {
-    return is_wall(st, x + margin, y) || is_wall(st, x - margin, y)
-        || is_wall(st, x, y + margin) || is_wall(st, x, y - margin);
+    double corner_margin;
+    // 4-point check
+    if (is_wall(st, x + margin, y) || is_wall(st, x - margin, y) ||
+        is_wall(st, x, y + margin) || is_wall(st, x, y - margin))
+        return (1);
+    corner_margin = margin * 0.5;
+    // corner checks
+    if (is_wall(st, x + corner_margin, y + corner_margin) || is_wall(st, x - corner_margin, y + corner_margin) ||
+        is_wall(st, x + corner_margin, y - corner_margin) || is_wall(st, x - corner_margin, y - corner_margin))
+        return (1);
+    return (0);
 }
 
 void forward(t_settings *st)
@@ -34,9 +43,6 @@ void forward(t_settings *st)
     	st->player.px = next_px;
 	if (!collides(st->player.px, next_py, MARGIN, st))
     	st->player.py = next_py;
-
-	raytracer_render(&st);
-	mlx_put_image_to_window(st->mlx, st->mlx_win, st->img, 0, 0);
 }
 
 void backward(t_settings *st)
@@ -51,9 +57,6 @@ void backward(t_settings *st)
     	st->player.px = next_px;
 	if (!collides(st->player.px, next_py, MARGIN, st))
     	st->player.py = next_py;
-
-	raytracer_render(&st);
-	mlx_put_image_to_window(st->mlx, st->mlx_win, st->img, 0, 0);
 }
 
 void rotate_right(t_settings *st)
@@ -63,8 +66,6 @@ void rotate_right(t_settings *st)
         st->player.pa += 2 * PI;
     st->player.pdx = cos(st->player.pa) * MOVE_SPEED;
     st->player.pdy = sin(st->player.pa) * MOVE_SPEED;
-    raytracer_render(&st);
-    mlx_put_image_to_window(st->mlx, st->mlx_win, st->img, 0, 0);
 }
 
 void rotate_left(t_settings *st)
@@ -74,8 +75,6 @@ void rotate_left(t_settings *st)
         st->player.pa -= 2 * PI;
     st->player.pdx = cos(st->player.pa) * MOVE_SPEED;
     st->player.pdy = sin(st->player.pa) * MOVE_SPEED;
-    raytracer_render(&st);
-    mlx_put_image_to_window(st->mlx, st->mlx_win, st->img, 0, 0);
 }
 
 

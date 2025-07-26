@@ -65,7 +65,7 @@ int	main(int ac, char **av)
 	initializer_mlx_image(&st);
 	st.img_data = mlx_get_data_addr(st.img, &st.addr.bpp, &st.addr.line_len, &st.addr.endian);
 	set_mlx_hooks(&st);
-	init_window(&st);
+	draw_map(&st);
 	mlx_loop(st.mlx);
 	return (0);
 }
