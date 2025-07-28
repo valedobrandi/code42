@@ -28,7 +28,7 @@ static void wall_start_end(t_raycast *cast, double raw_distance, int i,
     if (corrected_distance < 0.5)
         corrected_distance = 0.5;
     cast->wall_distance = corrected_distance;
-    wall_height = (HEIGHT * 10) / cast->wall_distance;
+    wall_height = (HEIGHT) / cast->wall_distance;
     cast->wall_start = (HEIGHT / 2) - (wall_height / 2);
     cast->wall_end = (HEIGHT / 2) + (wall_height / 2);
     if (cast->wall_start < 0)

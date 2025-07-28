@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 09:40:45 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/25 12:18:25 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/28 09:35:02 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 
 # define BUFFER 1024
 
-# define TILE_SIZE 32
+# define MINIMAP_SCALE 0.25
+# define TILE_SIZE 4
 # define MARGIN (TILE_SIZE * 0.2)
 
 # define WIDTH 1000
@@ -26,7 +27,7 @@
 # define HFOV FFOV / 2.0
 # define NUM_RAYS 360
 
-# define MOVE_SPEED 0.2
+# define MOVE_SPEED 0.02
 # define ROTATE_SPEED 0.01
 
 # define KEY_UP 65362
@@ -216,5 +217,8 @@ void					ray_travel_distance(int *hit, int *side, t_cast_dda *t,
 void					texture_mapping(int side, t_dda_result *result,
 							t_cast_dda *t);
 t_dda_result			cast_dda_ray(t_settings *st, double ray_angle);
+void					draw_minimap(t_settings *st);
+void					draw_minimap_tile(int map_y, int map_x, t_settings *st,
+							unsigned int color);
 
 #endif

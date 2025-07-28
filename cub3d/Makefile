@@ -41,6 +41,7 @@ draw_map.c \
 cast_raytrace.c \
 add.c \
 texture_mapping.c \
+mini_map.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -121,6 +122,8 @@ obj/add.o: src/draw/add.c include/cub3d.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c src/draw/add.c -o obj/add.o
 obj/texture_mapping.o: src/draw/texture_mapping.c include/cub3d.h
 	$(CC) $(CFLAGS) $(INCLUDES) -c src/draw/texture_mapping.c -o obj/texture_mapping.o
+obj/mini_map.o: src/draw/mini_map.c include/cub3d.h
+	$(CC) $(CFLAGS) $(INCLUDES) -c src/draw/mini_map.c -o obj/mini_map.o
 
 clean:
 	rm -rf $(OBJ_DR)
