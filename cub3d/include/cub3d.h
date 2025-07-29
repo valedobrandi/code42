@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 09:40:45 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/28 09:35:02 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/28 09:50:37 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 # define BUFFER 1024
 
-# define MINIMAP_SCALE 0.25
+# define MINIMAP_SCALE 3
 # define TILE_SIZE 4
 # define MARGIN (TILE_SIZE * 0.2)
 

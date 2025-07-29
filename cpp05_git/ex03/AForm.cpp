@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Form.cpp                                           :+:      :+:    :+:   */
+/*   AForm.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/29 11:23:15 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/29 13:02:17 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/29 14:43:34 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Form.hpp"
+#include "AForm.hpp"
 #include "Bureaucrat.hpp"
 
 AForm::AForm(void) : _name(""), _isSigned(0), _requiredSign(0), _requiredExecute(0)
@@ -80,12 +80,17 @@ int AForm::validateGrade(int grade)
 
 const char* AForm::GradeTooHigthException::what() const throw()
 {
-	return "GradeTooHighException";
+	return "GradeTooHighException: Grade too higth";
 }
 
 const char* AForm::GradeTooLowException::what() const throw()
 {
-	return "GradeTooLowException";
+	return "GradeTooLowException: Grade too low.";
+}
+
+const char* AForm::FormNotSignedException::what() const throw()
+{
+	return "FormNotSignedException: Form not signed.";
 }
 
 std::ostream &operator<<(std::ostream &out, const AForm &value)
@@ -93,7 +98,6 @@ std::ostream &operator<<(std::ostream &out, const AForm &value)
 	out << "name: " << value.getName()
 	<< ", signed: " << value.getIsSigned()
 	<< ", require grade to sign: " << value.getRequireSing()
-	<< ", require grade to execute: " << value.getRequireExecute()
-	<< std::endl;
+	<< ", require grade to execute: " << value.getRequireExecute();
 	return out;
 }

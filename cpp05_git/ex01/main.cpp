@@ -6,11 +6,12 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 14:14:45 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/28 14:31:46 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/29 12:43:18 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Bureaucrat.hpp"
+#include "Form.hpp"
 #include <iostream>
 
 int	main(void)
@@ -37,7 +38,7 @@ int	main(void)
 
 	try
 	{
-		std::cout << "TOO LOW EXECPETION" << std::endl;
+		std::cout << "Bureaucrat bob(\"Bob\", -1)" << std::endl;
 		Bureaucrat bob("Bob", -1);
 	}
 	catch (std::exception &e)
@@ -47,7 +48,7 @@ int	main(void)
 
 	try
 	{
-		std::cout << "TOO HIGHT EXECPETION" << std::endl;
+		std::cout << "Bureaucrat charlie(\"Charlie\", 151)" << std::endl;
 		Bureaucrat charlie("Charlie", 151);
 	}
 	catch (std::exception &e)
@@ -57,7 +58,7 @@ int	main(void)
 
 	try
 	{
-		std::cout << "TOO HIGHT EXECPETION" << std::endl;
+		std::cout << "Bureaucrat elite(\"Elite\", 1) + elite.incrementGrade()" << std::endl;
 		Bureaucrat elite("Elite", 1);
 		elite.incrementGrade();
 	}
@@ -68,7 +69,7 @@ int	main(void)
 
 	try
 	{
-		std::cout << "TOO LOW EXECPETION" << std::endl;
+		std::cout << "Bureaucrat intern(\"Intern\", 150) + intern.decrementGrade()" << std::endl;
 		Bureaucrat intern("Intern", 150);
 		intern.decrementGrade();
 	}
@@ -106,6 +107,55 @@ int	main(void)
 	catch (std::exception &e)
 	{
 		std::cerr << "Assignment operator exception: " << e.what() << std::endl;
+	}
+
+	std::cout << "====== FORM ======" << std::endl;
+	try
+	{
+		std::cout << "Form a(\"Alpha\", 0, 150)" << std::endl;
+		AForm a("Alpha", 0, 150);
+
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << "Alpha: " << e.what() << std::endl;
+	}
+
+	try
+	{
+		std::cout << "Form b(\"Beta\", 1, 151)" << std::endl;
+		AForm b("Beta", 1, 151);
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << "Beta: " << e.what() << std::endl;
+	}
+	std::cerr  << std::endl;
+	try
+	{
+		Bureaucrat a("Alpha", 60);
+		std::cout << a << std::endl;
+		AForm t("Beta", 15, 70);
+		std::cout << t << std::endl;
+		a.signForm(t);
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
+	}
+
+	try
+	{
+		Bureaucrat a("Alpha", 15);
+		std::cout << a << std::endl;
+		AForm t("Beta", 15, 70);
+		std::cout << t << std::endl;
+		a.signForm(t);
+		std::cout << t << std::endl;
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << e.what() << std::endl;
 	}
 
 	return (0);

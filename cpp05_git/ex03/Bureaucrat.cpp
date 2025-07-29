@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 12:49:43 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/29 14:09:43 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/29 14:11:48 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,21 @@ void Bureaucrat::signForm( AForm& form)
 	}
 
 }
+
+void Bureaucrat::executeForm(AForm const &form) const
+{
+	try
+	{
+		form.execute(*this);
+		std::cout << this->getName() << " executed " << form.getName() << std::endl;
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+
+}
+
 
 const char* Bureaucrat::GradeTooHigthException::what() const throw()
 {

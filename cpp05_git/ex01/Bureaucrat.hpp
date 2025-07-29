@@ -6,13 +6,15 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 12:42:54 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/28 15:25:00 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/29 13:55:20 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef BUREAUCRAT_CLASS_H
 # define BUREAUCRAT_CLASS_H
+
 #include <iostream>
+#include "Form.hpp"
 
 class Bureaucrat
 {
@@ -36,9 +38,9 @@ class Bureaucrat
 		void incrementGrade( void );
 		void decrementGrade( void );
 
-		virtual void signForm( void );
+		virtual void signForm( AForm& );
 
-		class GradeToohigthException: public std::exception
+		class GradeTooHigthException: public std::exception
 		{
 			virtual const char* what() const throw();
 		};

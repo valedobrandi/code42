@@ -28,3 +28,7 @@ Thumbs.db
 # Build logs or debug
 *.log
 *.gch
+
+#
+test/
+minilibx-linux/

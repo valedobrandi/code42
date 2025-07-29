@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 12:42:54 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/28 14:16:27 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/29 13:02:38 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ class Bureaucrat
 		void incrementGrade( void );
 		void decrementGrade( void );
 
-		class GradeToohigthException: public std::exception
+		class GradeTooHigthException: public std::exception
 		{
 			virtual const char* what() const throw();
 		};
