@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 14:14:45 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/29 15:16:51 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/30 12:57:58 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ void	shrubberyCreationForm(void)
 {
 	try
 	{
-		std::cout << "---> ShrubberyCreationForm Bob Test" << std::endl;
+		std::cout << "\033[32m---> ShrubberyCreationForm Bob OK/SIGN FAIL/EXECUTE\033[0m" << std::endl;
+
 		Bureaucrat bob("Bob", 145);
 		ShrubberyCreationForm form("home");
 		std::cout << bob << std::endl;
@@ -37,7 +38,7 @@ void	shrubberyCreationForm(void)
 	std::cout << std::endl;
 	try
 	{
-		std::cout << "---> ShrubberyCreationForm Alice Test" << std::endl;
+		std::cout << "---> ShrubberyCreationForm Alice FAIL/SIGN FAIL/EXECUTE" << std::endl;
 		Bureaucrat alice("Alice", 146);
 		ShrubberyCreationForm form("home");
 		std::cout << alice << std::endl;
@@ -52,7 +53,7 @@ void	shrubberyCreationForm(void)
 	std::cout << std::endl;
 	try
 	{
-		std::cout << "---> ShrubberyCreationForm Kenny Test" << std::endl;
+		std::cout << "\033[32m---> ShrubberyCreationForm Kenny OK/SIGN OK/EXECUTE\033[0m" << std::endl;
 		Bureaucrat kenny("Kenny", 1);
 		ShrubberyCreationForm form("home");
 		std::cout << kenny << std::endl;
@@ -70,7 +71,8 @@ void robotomyRequestForm()
 {
 try
 	{
-		std::cout << "---> RobotomyRequestForm Bob Test" << std::endl;
+		std::cout << "\033[32m---> RobotomyRequestForm Bob OK/SIGN FAIL/EXECUTE\033[0m" << std::endl;
+
 		Bureaucrat bob("Bob", 72);
 		RobotomyRequestForm form("home");
 		std::cout << bob << std::endl;
@@ -85,7 +87,7 @@ try
 	std::cout << std::endl;
 	try
 	{
-		std::cout << "---> RobotomyRequestForm Alice Test" << std::endl;
+		std::cout << "---> RobotomyRequestForm Alice FAIL/SIGN FAIL/EXECUTE" << std::endl;
 		Bureaucrat alice("Alice", 73);
 		RobotomyRequestForm form("home");
 		std::cout << alice << std::endl;
@@ -100,7 +102,7 @@ try
 	std::cout << std::endl;
 	try
 	{
-		std::cout << "\033[32m---> RobotomyRequestForm Kenny Test\033[0m" << std::endl;
+		std::cout << "\033[32m---> RobotomyRequestForm Kenny OK/SIGN OK/EXECUTE\033[0m" << std::endl;
 		Bureaucrat kenny("Kenny", 1);
 		RobotomyRequestForm form("home");
 		std::cout << kenny << std::endl;
@@ -118,7 +120,8 @@ void presidentialPardonForm()
 {
 try
 	{
-		std::cout << "---> PresidentialPardonForm Bob Test" << std::endl;
+		std::cout << "\033[32m---> PresidentialPardonForm Bob OK/SIGN FAIL/EXECUTE\033[0m" << std::endl;
+
 		Bureaucrat bob("Bob", 25);
 		PresidentialPardonForm form("home");
 		std::cout << bob << std::endl;
@@ -133,7 +136,7 @@ try
 	std::cout << std::endl;
 	try
 	{
-		std::cout << "---> PresidentialPardonForm Alice Test" << std::endl;
+		std::cout << "---> PresidentialPardonForm Alice FAIL/SIGN FAIL/EXECUTE" << std::endl;
 		Bureaucrat alice("Alice", 26);
 		PresidentialPardonForm form("home");
 		std::cout << alice << std::endl;
@@ -148,7 +151,7 @@ try
 	std::cout << std::endl;
 	try
 	{
-		std::cout << "\033[32m---> PresidentialPardonForm Kenny Test\033[0m" << std::endl;
+		std::cout << "\033[32m---> PresidentialPardonForm Kenny OK/SIGN OK/EXECUTE\033[0m" << std::endl;
 		Bureaucrat kenny("Kenny", 1);
 		PresidentialPardonForm form("home");
 		std::cout << kenny << std::endl;

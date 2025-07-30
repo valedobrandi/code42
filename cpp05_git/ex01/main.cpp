@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 14:14:45 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/07/29 12:43:18 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/07/30 12:47:52 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,27 +131,28 @@ int	main(void)
 		std::cerr << "Beta: " << e.what() << std::endl;
 	}
 	std::cerr  << std::endl;
+	std::cout << "====== 1.FORM SIGN ======" << std::endl;
 	try
 	{
 		Bureaucrat a("Alpha", 60);
 		std::cout << a << std::endl;
 		AForm t("Beta", 15, 70);
-		std::cout << t << std::endl;
+		std::cout << t;
 		a.signForm(t);
 	}
 	catch (std::exception &e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
-
+	std::cout << "====== 2.FORM SIGN ======" << std::endl;
 	try
 	{
 		Bureaucrat a("Alpha", 15);
 		std::cout << a << std::endl;
 		AForm t("Beta", 15, 70);
-		std::cout << t << std::endl;
+		std::cout << t;
 		a.signForm(t);
-		std::cout << t << std::endl;
+		std::cout << t;
 	}
 	catch (std::exception &e)
 	{

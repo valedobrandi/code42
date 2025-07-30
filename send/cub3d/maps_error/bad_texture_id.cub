@@ -1,0 +1,15 @@
+
+
+EA ./texture/rockwall.xpm
+SO ./texture/rockwall.xpm
+WE ./texture/rockwall.xpm
+
+F 120,120,120
+C 255,255,255
+
+111111
+1000N1
+100001
+111111
+
+
