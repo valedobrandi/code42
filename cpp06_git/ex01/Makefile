@@ -4,7 +4,7 @@ CXX = c++
 
 CXXFLAGS = -Wall -Werror -Wextra -std=c++98
 
-SRC = main.cpp ScalarConverter.cpp
+SRC = main.cpp Serializer.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -13,11 +13,11 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJ)
 
-main.o: main.cpp ScalarConverter.hpp
+main.o: main.cpp Serializer.hpp data.hpp
 	$(CXX) $(CXXFLAGS) -c  main.cpp -o main.o
 
-ScalarConverter.o: ScalarConverter.cpp ScalarConverter.hpp
-	$(CXX) $(CXXFLAGS) -c  ScalarConverter.cpp -o ScalarConverter.o
+Serializer.o: Serializer.cpp Serializer.hpp data.hpp
+	$(CXX) $(CXXFLAGS) -c  Serializer.cpp -o Serializer.o
 
 clean:
 	rm -f $(OBJ)

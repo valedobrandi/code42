@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ScalarConverter.hpp                                :+:      :+:    :+:   */
+/*   Base.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -10,23 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SCALARCONVERTER_CLASS_H
-# define SCALARCONVERTER_CLASS_H
+#ifndef BASE_CLASS_H
+# define BASE_CLASS_H
 
-#include <iostream>
-
-class ScalarConverter
+class Base
 {
-	private:
+    public:
 
-        ScalarConverter( void );
+        virtual ~Base( void );
 
-	public:
-
-        ScalarConverter( const ScalarConverter& other );
-        ScalarConverter& operator=( const ScalarConverter& other );
-        ~ScalarConverter( void );
-		static void convert(const std::string&);
 };
 
 #endif

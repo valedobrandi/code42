@@ -15,55 +15,64 @@
 #include <iostream>
 #include <unistd.h>
 #include <poll.h>
+#include <fcntl.h>
 #include <vector>
 
 int main(void)
 {
-	std::vector <pollfd> fds;
-	pollfd listener_fd;
+    struct pollfd socked_fd[1];
 
+    // BERNARDO
+    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
 
-	// BERNARDO
-	int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    sockaddr_in server_addr;
 
-	sockaddr_in server_addr;
+    std::memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+    server_addr.sin_port = htons(8080);
 
-	std::memset(&server_addr, 0, sizeof(server_addr));
-	server_addr.sin_family = AF_INET;
-	server_addr.sin_addr.s_addr = INADDR_ANY;
-	server_addr.sin_port = htons(8080);
+    bind(server_fd, (sockaddr *)&server_addr, sizeof(server_addr));
 
-	bind(server_fd, (sockaddr*)&server_addr, sizeof(server_addr));
+    listen(server_fd, 1);
 
-	listen(server_fd, 1);
+    std::cout << "Server is listening on port 8080" << std::endl;
 
-	std::cout << "Server is listening on port 8080" << std::endl;
+    fcntl(server_fd, F_SETFL, O_NONBLOCK);
 
-	listener_fd.fd = server_fd;
-	listener_fd.events = POLLIN;
-	fds.push_back(listener_fd);
+    std::vector<pollfd> fds;
+    fds.fd = server_fd;
+    fds.events = POLLIN;
+    fds.push_back({server_fd, POLLIN, 0});
+ 
+    while (true) {
+        int wait = poll(socked_fd, 1, 600);
+        if (ready <= 0) continue;
+        for (size_t i = 0; i < fds.size(); i++) {
+            if (fds[i].revents && POLLIN) {
+                if (fds[i].fd == server_fd) {
+                    int client_fd = accept(server_fd, NULL, NULL);
+                    if ( client_fd == -1 ) break;
+                    fcntl(server_fd, F_SETFL, O_NONBLOCK);
+                    fds.push_back({client_fd, POLLIN, 0});
+                    std::cout << "Connected:" << inet_ntoa(client_addr.sin_addr) << std::endl;
+                } else {
+                    char buffer[1024];
+                    std::memset(buffer, 0, sizeof(buffer));
+                    int bytes_reader = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+                    if (bytes_reader <= 0) {
+                        close(fds[i].fd);
+                        fds.erase(fds.begin() + i);
+                        --i;
+                    } else {
+                        const char *reply = "Hello Word!\n";
+                        send(client_fd, reply, strlen(reply), 0);
+                    }
+                }
+            }
+        }
+        
+    }
 
-	while (1) {
-		
-	}
-
-	sockaddr_in client_addr;
-	socklen_t client_len = sizeof(client_addr);
-	int client_fd = accept(server_fd, (sockaddr*)&client_addr, &client_len);
-
-	std::cout << "Connected:" << inet_ntoa(client_addr.sin_addr) << std::endl;
-
-	// LIEN
-	char buffer[1024];
-	std::memset(buffer, 0, sizeof(buffer));
-	recv(client_fd, buffer, sizeof(buffer) - 1, 0);
-
-
-	const char* reply = "Hello Word!\n";
-	send(client_fd, reply, strlen(reply), 0);
-
-	close(client_fd);
-	close(server_fd);
-
-	return 0;
+    return 0;
 }
