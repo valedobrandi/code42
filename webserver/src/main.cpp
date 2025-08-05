@@ -6,23 +6,28 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 10:26:13 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/08/04 15:28:00 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/08/05 12:43:42 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <arpa/inet.h>
-#include <cstring>
-#include <iostream>
-#include <unistd.h>
-#include <poll.h>
-#include <fcntl.h>
-#include <vector>
+#include "webserv.hpp"
+#include "Server.hpp"
 
-int main(void)
+int main( void ) {
+
+	std::vector<Connection> connections;
+
+	int connection_ports[] = { 8000, 8080, 3030 };
+
+	Server connect(connection_ports);
+
+
+	connect.poll_connections(connections);
+
+}
+
+/* int main(void)
 {
-    struct pollfd socked_fd[1];
-
-    // BERNARDO
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
 
     sockaddr_in server_addr;
@@ -41,25 +46,40 @@ int main(void)
     fcntl(server_fd, F_SETFL, O_NONBLOCK);
 
     std::vector<pollfd> fds;
-    fds.fd = server_fd;
-    fds.events = POLLIN;
-    fds.push_back({server_fd, POLLIN, 0});
- 
+	struct pollfd pfd;
+    pfd.fd = server_fd;
+    pfd.events = POLLIN;
+	pfd.revents = 0;
+    fds.push_back(pfd);
+
+	int client_fd;;
     while (true) {
-        int wait = poll(socked_fd, 1, 600);
+        int ready = poll(fds.data(), fds.size(), 600);
         if (ready <= 0) continue;
         for (size_t i = 0; i < fds.size(); i++) {
             if (fds[i].revents && POLLIN) {
                 if (fds[i].fd == server_fd) {
-                    int client_fd = accept(server_fd, NULL, NULL);
+
+                    struct sockaddr_in client_addr;
+					socklen_t client_len = sizeof(client_addr);
+					client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
+
                     if ( client_fd == -1 ) break;
+
                     fcntl(server_fd, F_SETFL, O_NONBLOCK);
-                    fds.push_back({client_fd, POLLIN, 0});
+
+					struct pollfd pfd;
+					pfd.fd = client_fd;
+					pfd.events = POLLIN;
+					pfd.revents = 0;
+					fds.push_back(pfd);
+
                     std::cout << "Connected:" << inet_ntoa(client_addr.sin_addr) << std::endl;
+
                 } else {
                     char buffer[1024];
                     std::memset(buffer, 0, sizeof(buffer));
-                    int bytes_reader = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+                    int bytes_reader = recv(fds[i].fd, buffer, sizeof(buffer) - 1, 0);
                     if (bytes_reader <= 0) {
                         close(fds[i].fd);
                         fds.erase(fds.begin() + i);
@@ -71,8 +91,8 @@ int main(void)
                 }
             }
         }
-        
+
     }
 
     return 0;
-}
+} */
