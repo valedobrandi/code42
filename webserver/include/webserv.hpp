@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 11:27:23 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/08/05 12:06:33 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/08/06 14:21:34 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,19 +16,16 @@
 #include <string>
 
 enum ConnectionState {
-	HEADER,
+	WAIT,
 	BODY,
-	READY,
-	DONE
+	DONE,
 };
 
 struct Connection {
 	int fd;
+	int contentLength;
 	std::string buffer;
 	ConnectionState state;
-	size_t body_size;
-	std::string header;
-	std::string body;
 };
 
 

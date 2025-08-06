@@ -2,7 +2,7 @@ import socket
 import threading
 import time
 
-HOSTS = ['127.0.0.1', '192.168.1.100']  # Add as many hosts as you want
+HOSTS = ['127.0.0.1']  # Add as many hosts as you want
 PORTS = [8080, 8000, 3030]
 CLIENTS_PER_PORT = 3
 

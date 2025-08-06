@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/05 11:26:56 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/08/05 15:10:24 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/08/06 14:47:19 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define SERVER_CLASS_HPP
 
 # include "webserv.hpp"
+# include <map>
 # include <vector>
 # include <set>
 
@@ -31,7 +32,7 @@ class Server
 	~Server(void);
 
 	Server(int *port);
-	void poll_connections(std::vector<Connection> &connections);
+	void poll_connections(std::map<int, Connection>&);
 };
 
 #endif

@@ -6,16 +6,18 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/04 10:26:13 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/08/05 12:43:42 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/08/06 14:46:52 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "webserv.hpp"
 #include "Server.hpp"
+#include <map>
+#include <iostream>
 
 int main( void ) {
 
-	std::vector<Connection> connections;
+	std::map<int, Connection> connections;
 
 	int connection_ports[] = { 8000, 8080, 3030 };
 
@@ -23,6 +25,7 @@ int main( void ) {
 
 
 	connect.poll_connections(connections);
+
 
 }
 
