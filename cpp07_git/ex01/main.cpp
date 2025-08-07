@@ -28,11 +28,13 @@ int main(void)
         for (int i = 0; i < 6; i++)
             std::cout << t[i] << " ";
     }
+	std::cout << std::endl;
     {
         const int arr[] = {10, 20, 30};
 
         ::iter(arr, 3, print);
     }
+	std::cout << std::endl;
     {
         std::string t[] = {"hello", "world", "test"};
         ::iter(t, 3, capitalize);
