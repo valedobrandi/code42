@@ -16,13 +16,15 @@
 #include <string>
 #include <map>
 
-class Request {
+class Request
+{
 public:
     Request();
     ~Request();
 
     bool parse(const std::string &raw);
     std::string getMethod() const;
+    std::string getHost() const;
     std::string getURI() const;
     std::string getVersion() const;
     std::string getHeader(const std::string &key) const;
@@ -33,6 +35,7 @@ private:
     std::string _method;
     std::string _uri;
     std::string _version;
+    std::string _host;
     std::map<std::string, std::string> _headers;
     std::string _body;
     bool _complete;
@@ -43,4 +46,3 @@ private:
 };
 
 #endif
-

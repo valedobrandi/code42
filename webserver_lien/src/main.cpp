@@ -12,7 +12,6 @@
 
 #include "Config.hpp"
 #include "Server.hpp"
-#include "webserv.hpp"
 #include <iostream>
 
 int main(int argc, char* argv[]) {
@@ -28,15 +27,10 @@ int main(int argc, char* argv[]) {
     }
 
     Server server;
-    server.setConfig(&config);
 
-    if (!server.setup()) {
-        std::cerr << "Failed to setup server." << std::endl;
-        return 1;
-    }
+    server.setup(config);
 
-	std::map<int, Connection> connections;
-    server.run(connections);
+    server.run();
 
     return 0;
 }

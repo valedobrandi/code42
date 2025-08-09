@@ -11,48 +11,70 @@
 /* ************************************************************************** */
 
 #include "Client.hpp"
+#include <iostream>
 
-Client::Client() : _fd(-1), _requestReady(false) {}
+Client::Client(void) : client_fd(-1), server_fd(-1)
+{
+}
 
-Client::Client(int fd) : _fd(fd), _requestReady(false) {}
+Client::Client(const Client &other) : client_fd(other.client_fd), server_fd(other.server_fd)
+{
+}
+
+Client::Client(int client_fd, int server_fd) 
+    : client_fd(client_fd), server_fd(server_fd),  state(REQUEST), _requestReady(false)
+{
+    this->_request = Request();
+    this->_response = Response();
+}
 
 Client::~Client() {}
 
-int Client::getFd() const {
-    return _fd;
+int Client::getFd() const
+{
+    return client_fd;
 }
 
-void Client::setFd(int fd) {
-    _fd = fd;
-}
-
-std::string &Client::getBuffer() {
+std::string &Client::getBuffer()
+{
     return _buffer;
 }
 
-Request &Client::getRequest() {
+Request &Client::getRequest()
+{
     return _request;
 }
 
-Response &Client::getResponse() {
+Response &Client::getResponse()
+{
     return _response;
 }
 
-bool Client::parseRequest() {
-    if (_request.parse(_buffer)) {
+bool Client::parseRequest()
+{
+    if (_request.parse(_buffer))
+    {
         _requestReady = true;
         return true;
     }
     return false;
 }
 
-bool Client::isRequestReady() const {
+bool Client::isRequestReady() const
+{
     return _requestReady;
 }
 
-void Client::reset() {
+void Client::reset()
+{
     _buffer.clear();
     _request = Request();
     _response = Response();
     _requestReady = false;
+}
+std::ostream &operator<<(std::ostream &os, const Client &client)
+{
+    os << "[Client] client_fd: " << client.client_fd
+       << ", server_fd: " << client.server_fd;
+    return os;
 }

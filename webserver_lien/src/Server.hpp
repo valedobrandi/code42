@@ -19,34 +19,33 @@
 #include <sys/poll.h>
 #include <set>
 
-#include "webserv.hpp"
 #include "Client.hpp"
 #include "Config.hpp"
+#include "Connect.hpp"
+
+typedef std::map<int, Connect*>::iterator ConnectIt;
 
 class Server {
 public:
     Server();
     ~Server();
 
-    bool addPort(int port);
-    bool setup();
+    bool setup(Config& config);
     void run();
+    Connect* findConnectByClientFd(const int client_fd);
+    bool removeClientByFd(const int client_fd);
 
-    void setConfig(const Config* config);
 
 private:
-    std::vector<int> _ports;
-    std::vector<int> _sockets;
-    std::map<int, Client> _clients;
-    std::vector<struct pollfd> _pollfds;
 
-	std::vector<struct pollfd> _fds;
-	std::set<int> _sockets_listen_fds;
-	std::map<int, Connection> connections;
+    std::set<int> _sockets;
+    std::vector<struct pollfd> _fds;
 
-    bool createSocket(int port);
-    void acceptNewConnection(int server_fd);
-    void handleClientData(int client_fd);
+    std::map<int, Connect*> _connects;
+
+    void createSocket(std::vector<ServerConfig>&, int);
+    void acceptNewConnection( Connect& t);
+    void handleClientData(Client&, Connect&);
     void closeClient(int client_fd);
     void runCgi(const std::string& scriptPath, const std::string& interpreter, int client_fd);
 };

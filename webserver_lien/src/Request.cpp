@@ -36,10 +36,14 @@ bool Request::parse(const std::string &raw) {
     // Other lines: Headers
     std::string headers;
     while (std::getline(stream, line)) {
+        if (!line.empty() && line[line.size() - 1] == '\r')
+            line.erase(line.size() - 1);
         headers += line;
         headers += "\n";
     }
     parseHeaders(headers);
+
+    this->_host = getHeader("Host");
 
     _body = bodyPart;
 
@@ -50,7 +54,7 @@ bool Request::parse(const std::string &raw) {
         int len;
         ss >> len;
         if ((int)_body.length() < len)
-            return false; // wait for full body
+            return false;
     }
 
     _complete = true;
@@ -85,6 +89,11 @@ std::string Request::trim(const std::string &s) const {
 
 std::string Request::getMethod() const {
     return _method;
+}
+
+std::string Request::getHost() const
+{
+    return _host;
 }
 
 std::string Request::getURI() const {

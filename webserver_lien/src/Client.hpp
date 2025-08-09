@@ -17,14 +17,23 @@
 #include "Request.hpp"
 #include "Response.hpp"
 
+enum ClientState {
+    REQUEST, 
+    RESPONSE,
+    DONE
+};
+
 class Client {
 public:
-    Client();
-    Client(int fd);
+    const int client_fd;
+    const int server_fd;
+    ClientState state;
+    Client(void);
+    Client(const Client& other);
+    Client(int client_fd, int server_fd);
     ~Client();
 
     int getFd() const;
-    void setFd(int fd);
     std::string &getBuffer();
     Request &getRequest();
     Response &getResponse();
@@ -34,12 +43,14 @@ public:
     void reset();             // reset for next request
 
 private:
-    int _fd;
     std::string _buffer;
+    bool _requestReady;
     Request _request;
     Response _response;
-    bool _requestReady;
 };
+
+std::ostream &operator<<(std::ostream &os, const Client &client);
+
 
 #endif
 

@@ -16,12 +16,27 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <list>
+
+struct LocationConfig {
+    std::string path;
+    std::string root;
+    std::vector<std::string> allowed_methods;
+    bool autoindex;
+    std::string index;
+    std::string redirection;
+    std::string upload_store;
+    std::string cgi_pass;
+};
 
 struct ServerConfig {
+
     int port;
     std::string server_name;
     std::string root;
-    std::map<int, std::string> error_pages;
+    std::vector<LocationConfig> locations;
+
+    ServerConfig() : port(-1), server_name(""), root("") {}
 };
 
 class Config {
@@ -31,13 +46,11 @@ public:
 
     bool parseFile(const std::string &filename);
     const std::vector<ServerConfig> &getServers() const;
-    std::vector<int> getPorts() const;  // Add this method
+    std::vector<int> getPorts() const; 
 
 private:
     std::vector<ServerConfig> _servers;
-
-    std::string trim(const std::string &line);
-    std::vector<std::string> tokenize(const std::string &line);
+    void _validate(const ServerConfig & ) const;
 };
 
 #endif

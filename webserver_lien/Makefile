@@ -24,7 +24,8 @@ SRCS = $(SRC_DIR)/main.cpp \
        $(SRC_DIR)/Client.cpp \
        $(SRC_DIR)/Request.cpp \
        $(SRC_DIR)/Response.cpp \
-       $(SRC_DIR)/Config.cpp
+       $(SRC_DIR)/Config.cpp \
+	   $(SRC_DIR)/Connect.cpp
 
 # Object files (in obj/)
 OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRCS))
