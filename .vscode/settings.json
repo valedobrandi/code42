@@ -68,7 +68,14 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeindex": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "chrono": "cpp",
+        "condition_variable": "cpp",
+        "list": "cpp",
+        "ratio": "cpp",
+        "format": "cpp",
+        "mutex": "cpp",
+        "span": "cpp"
     },
     "[c]": {
         "editor.defaultFormatter": "ms-vscode.cpptools"
