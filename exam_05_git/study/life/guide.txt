@@ -1,0 +1,30 @@
+Step 1 — Understanding the program flow
+
+Parse arguments → width, height, iterations.
+Initialize the board → all cells dead.
+Read commands from stdin → move pen and mark cells alive while the pen is down.
+Simulate Game of Life for the given number of iterations.
+Print final board with 'O' for alive and ' ' for dead.
+
+Step 2 — Game of Life rules
+
+For each cell:
+Alive cell survives if it has 2 or 3 alive neighbors.
+Dead cell becomes alive if it has exactly 3 alive neighbors.
+Otherwise, it becomes dead.
+Neighbors are counted only inside the board — outside cells are considered dead.
+
+echo 'dxss' | ./a.out 3 3 0
+
+(0,0) pen up → all cells DEAD
+
+'d' 'x' 's' 's'
+
+[ ] [ ] [ ]
+[ ] [ ] [ ]
+[ ] [ ] [ ]
+
+[ ] [ ] [ ]
+[ ] [O] [ ]
+[ ] [ ] [ ]
+

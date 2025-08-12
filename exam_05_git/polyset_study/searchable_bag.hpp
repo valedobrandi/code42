@@ -1,7 +1,7 @@
 #ifndef SEARCHABLE_BAG_HPP
 # define SEARCHABLE_BAG_HPP
 
-#include "Bag.hpp"
+#include "bag.hpp"
 
 class searchable_bag : virtual public Bag
 {
