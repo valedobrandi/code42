@@ -6,18 +6,21 @@ Connect::Connect(int fd, std::vector<ServerConfig> data) : server_fd(fd), config
 {
 }
 
-LocationConfig Connect::getLocationConfig(std::string host, std::string uri)
+LocationConfig Connect::getLocationConfig(ServerConfig& server, std::string uri)
 {
-    LocationConfig conf;
+    LocationConfig config;
     for (size_t it = 0; it < this->configs.size(); ++it) {
-        if (configs[it].server_name == host) {
+        if (configs[it].server_name == server.server_name) {
             for (size_t at = 0; at < configs[it].locations.size(); ++at) {
                 if (configs[it].locations[at].path == uri)
-                    conf = configs[it].locations[at];
+                    config = configs[it].locations[at];
             }
         }
     }
-    return conf;
+
+    config.root = config.root.empty() ? server.root : config.root;
+    config.maxBody = config.maxBody <= 0 ? server.maxBody : config.maxBody;  
+    return config;
 }
 
 bool Connect::isAllowedMethod(std::vector<std::string> allowed_methods, std::string method)

@@ -27,7 +27,9 @@
 
 #define BUFFER_SIZE 4096
 
-static void sendResponse(int client_fd, std::string msg, int size, int flag) {
+static void sendResponse(int client_fd, std::string msg, int size, int flag)
+{
+    std::cout << msg << std::endl;
     send(client_fd, msg.c_str(), size, flag);
 }
 
@@ -51,42 +53,39 @@ Server::~Server()
     {
         close(it->first);
     } */
-    for (std::map<int, Connect *>::iterator it = _connects.begin(); it != _connects.end(); ++it)
+    /* for (std::map<int, Connect *>::iterator it = _connects.begin(); it != _connects.end(); ++it)
     {
         delete it->second;
-    }
+    } */
 }
 
 bool Server::setup(Config &config)
 {
-    try
-    {
-        std::vector<ServerConfig> t = config.getServers();
 
-        std::set<int> init_port;
+    std::vector<ServerConfig> t = config.getServers();
 
-        for (size_t i = 0; i < t.size(); ++i)
-            init_port.insert(t[i].port);
-        for (std::set<int>::iterator it = init_port.begin(); it != init_port.end(); ++it)
-        {
-            std::vector<ServerConfig> configs;
-            for (size_t i = 0; i < t.size(); ++i)
-            {
-                if (t[i].port == *it)
-                    configs.push_back(t[i]);
-            };
-            this->createSocket(configs, *it);
+    std::set<int> init_port;
+
+    for (size_t i = 0; i < t.size(); ++i)
+        init_port.insert(t[i].port);
+
+    for (std::set<int>::iterator it = init_port.begin(); it != init_port.end(); ++it) {
+        int server_fd = this->createSocket(t, *it);
+        if (server_fd > 0) {
+            for (size_t i = 0; i < t.size(); ++i) {
+                if (t[i].port == *it) {
+                    t[i].server_fd = server_fd;
+                    this->_connects.push_back(t[i]);
+                }
+            }
         }
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << e.what() << std::endl;
+
     }
 
     return true;
 }
 
-void Server::createSocket(std::vector<ServerConfig> &t, int port)
+int Server::createSocket(std::vector<ServerConfig> &t, int port)
 {
     sockaddr_in addr;
 
@@ -110,14 +109,14 @@ void Server::createSocket(std::vector<ServerConfig> &t, int port)
     {
         std::cerr << "Error: Fail to bind port: " << port << std::endl;
         close(server_fd);
-        return;
+        return 0;
     }
 
     if (listen(server_fd, 100) < 0)
     {
         std::cerr << "Error: Fail to listen port: " << port << std::endl;
         close(server_fd);
-        return;
+        return 0;
     }
 
     std::cout << "Listening on port " << port << std::endl;
@@ -127,12 +126,10 @@ void Server::createSocket(std::vector<ServerConfig> &t, int port)
     pfd.events = POLLIN;
     pfd.revents = 0;
 
-    this->_connects[server_fd] = new Connect(server_fd, t);
-
     this->_fds.push_back(pfd);
     this->_sockets.insert(server_fd);
 
-    return;
+    return server_fd;
 }
 
 Connect *Server::findConnectByClientFd(const int client_fd)
@@ -158,13 +155,12 @@ bool Server::removeClientByFd(const int client_fd)
     }
     return false;
 }
-
-void Server::acceptNewConnection(Connect &t)
+void Server::acceptNewConnection(int server_fd)
 {
     struct sockaddr_in client_addr;
 
     socklen_t client_len = sizeof(client_addr);
-    int client_fd = accept(t.server_fd, (struct sockaddr *)&client_addr, &client_len);
+    int client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_len);
 
     if (client_fd < 0)
         return;
@@ -178,13 +174,14 @@ void Server::acceptNewConnection(Connect &t)
 
     std::cout << "Connected:" << inet_ntoa(client_addr.sin_addr) << std::endl;
 
-    t.clients[client_fd] = new Client(client_fd, t.server_fd);
+    this->_clients[client_fd] = new Client(client_fd, server_fd);
 
     this->_fds.push_back(pfd);
 }
 
 void Server::run()
 {
+    std::cout << "CONNECTIONs" << this->_connects.size() << std::endl;
     while (true)
     {
         int ret = poll(&_fds[0], _fds.size(), -1);
@@ -197,7 +194,7 @@ void Server::run()
                 int fd = _fds[i].fd;
                 if (this->_sockets.count(fd))
                 {
-                    acceptNewConnection(*this->_connects[fd]);
+                    acceptNewConnection(fd);
                 }
                 else
                 {
@@ -227,36 +224,38 @@ void Server::handleClientData(Client &client, Connect &connect)
     client.getBuffer().append(buffer, bytes);
 
     ServerConfig server;
+    
     if (client.parseRequest())
     {
-        for (size_t i = 0; i < connect.configs.size(); ++i)
+        client.getRequest().getHostname();
+        for (size_t i = 0; i < this .size(); ++i)
         {
-            server = connect.configs[i];
-            if (client.getRequest().getHost().compare(0, server.server_name.size(), server.server_name) == 0) {
+            
+            if ()
+            {
                 server = connect.configs[i];
                 client.state = RESPONSE;
                 break;
             }
         }
     }
-    
+
     LocationConfig config;
     if (client.state == RESPONSE)
     {
         std::cout << "Header: " << client.getBuffer();
 
-        Request &req = client.getRequest();
-        Response &res = client.getResponse();
+        Request &request = client.getRequest();
+        Response &response = client.getResponse();
 
-        std::string uri = req.getURI();
-        std::string method = req.getMethod();
+        std::string uri = request.getURI();
+        std::string method = request.getMethod();
 
-        //get the rigth configuration location for the request
-        LocationConfig location = connect.getLocationConfig(server.server_name, req.getURI());
-        std::string root = location.root.empty() ? server.root : location.root;
+        // get the rigth configuration location for the request
+        LocationConfig location = connect.getLocationConfig(server, request.getURI());
+        std::string root = location.root;
         std::string path = root + uri;
 
-      
         // Check if URI ends with .php or .py for CGI handling
         if (uri.size() > 4)
         {
@@ -277,18 +276,18 @@ void Server::handleClientData(Client &client, Connect &connect)
             }
         }
 
-
         bool isAllowed = connect.isAllowedMethod(location.allowed_methods, method);
-        if (!isAllowed) {
+        if (!isAllowed)
+        {
             client.state = DONE;
-            res.setDefaultErrorBody(405);
+            response.setDefaultErrorBody(405);
         }
 
-        if ( method == "GET")
+        if (method == "GET")
         {
             if (uri == "/cause500")
             {
-                res.setDefaultErrorBody(500);
+                response.setDefaultErrorBody(500);
             }
             else
             {
@@ -302,22 +301,23 @@ void Server::handleClientData(Client &client, Connect &connect)
                 {
                     std::ostringstream ss;
                     ss << file.rdbuf();
-                    res.setStatus(200);
-                    res.setContentType("text/html");
-                    res.setBody(ss.str());
+                    response.setStatus(200);
+                    response.setContentType("text/html");
+                    response.setBody(ss.str());
                 }
                 else
                 {
-                    res.setDefaultErrorBody(404);
+                    response.setDefaultErrorBody(404);
                 }
             }
         }
-        else if (method == "POST")
-        {
-            std::string body = req.getBody();
-            std::string content_type = req.getHeader("Content-Type");
 
-            if (content_type.find("multipart/form-data") != std::string::npos)
+        if (method == "POST")
+        {
+            std::string body = request.getBody();
+            std::string content_type = request.getHeader("Content-Type");
+
+            if (true /* content_type.find("multipart/form-data") != std::string::npos */)
             {
                 size_t pos = content_type.find("boundary=");
                 if (pos != std::string::npos)
@@ -375,44 +375,44 @@ void Server::handleClientData(Client &client, Connect &connect)
                         start = body.find(boundary, start + boundary.length());
                     }
 
-                    res.setStatus(201);
-                    res.setBody("<h1>Upload Result</h1>\n" + response_body);
+                    response.setStatus(201);
+                    response.setBody("<h1>Upload Result</h1>\n" + response_body);
                 }
                 else
                 {
-                    res.setStatus(400);
-                    res.setBody("<h1>Bad Request: No boundary found</h1>");
+                    response.setStatus(400);
+                    response.setBody("<h1>Bad Request: No boundary found</h1>");
                 }
             }
             else
             {
-                res.setStatus(400);
-                res.setBody("<h1>Bad Request: Expected multipart/form-data</h1>");
+                response.setStatus(400);
+                response.setBody("<h1>Bad Request: Expected multipart/form-data</h1>");
             }
 
-            res.setContentType("text/html");
+            response.setContentType("text/html");
         }
-        else if (method == "DELETE")
+        if (method == "DELETE")
         {
             std::string path = "www" + uri;
             if (remove(path.c_str()) == 0)
             {
-                res.setStatus(200);
-                res.setBody("<h1>File deleted</h1>");
+                response.setStatus(200);
+                response.setBody("<h1>File deleted</h1>");
             }
             else
             {
-                res.setDefaultErrorBody(404);
+                response.setDefaultErrorBody(404);
             }
-            res.setContentType("text/html");
+            response.setContentType("text/html");
         }
         else
         {
-            res.setDefaultErrorBody(405); // Method Not Allowed
+            response.setDefaultErrorBody(405); // Method Not Allowed
         }
 
-        //response client
-        std::string output = res.build();
+        // response client
+        std::string output = response.build();
         sendResponse(client.client_fd, output.c_str(), output.size(), 0);
         client.state = DONE;
     }

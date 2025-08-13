@@ -58,6 +58,31 @@ void Config::_validate(const ServerConfig &config) const
         throw std::runtime_error("Error: root directive");
 }
 
+size_t Config::parseSize(const std::string &str)
+{
+    if (str.empty()) return -1;
+    
+    size_t multiplier = 1;
+    std::string numberPart = str;
+
+    char type = str[str.size() - 1];
+    
+    if (type == 'M' || type == 'm') {
+        multiplier = 1024 * 1024;
+        numberPart = str.substr(0, str.size() - 1);
+    }
+
+    if (type == 'K' || type == 'k') {
+        multiplier = 1024;
+        numberPart = str.substr(0, str.size() - 1);
+    }
+
+    size_t value;
+    std::istringstream(numberPart) >> value;
+    return value * multiplier;
+
+}
+
 std::vector<std::string> tokenize(const std::string &line)
 {
     std::vector<std::string> tokens;
@@ -165,6 +190,8 @@ bool Config::parseFile(const std::string &filename)
                     current.server_name = tokens[1];
                 else if (tokens[0] == "root")
                     current.root = tokens[1];
+                if (tokens[0] == "max_body_size")
+                    current.maxBody = this->parseSize(tokens[1]);
             }
 
             if (line.find("location") == 0 && line.find("{") != std::string::npos)
@@ -199,7 +226,7 @@ bool Config::parseFile(const std::string &filename)
                     else if (tokens[0] == "upload_store" && tokens[1] == "on")
                         location.autoIndex = true;
                     else if (tokens[0] == "client_max_body_size")
-                        location.max_body = std::atoi(tokens[1].c_str());
+                        location.maxBody = std::atoi(tokens[1].c_str());
                     else if (tokens[0] == "error_page")
                     {
                         location.errorPageCode = std::atoi(tokens[1].c_str());

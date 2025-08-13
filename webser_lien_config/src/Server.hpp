@@ -23,32 +23,30 @@
 #include "Config.hpp"
 #include "Connect.hpp"
 
-typedef std::map<int, Connect*>::iterator ConnectIt;
+typedef std::map<int, Connect *>::iterator ConnectIt;
 
-class Server {
+class Server
+{
 public:
     Server();
     ~Server();
 
-    bool setup(Config& config);
+    bool setup(Config &config);
     void run();
-    Connect* findConnectByClientFd(const int client_fd);
+    Connect *findConnectByClientFd(const int client_fd);
     bool removeClientByFd(const int client_fd);
 
-
 private:
-
     std::set<int> _sockets;
     std::vector<struct pollfd> _fds;
+    std::vector<ServerConfig &> _connects;
+    std::map<int, Client *> _clients;
 
-    std::map<int, Connect*> _connects;
-
-    void createSocket(std::vector<ServerConfig>&, int);
-    void acceptNewConnection( Connect& t);
-    void handleClientData(Client&, Connect&);
+    int createSocket(std::vector<ServerConfig> &, int);
+    void acceptNewConnection(int);
+    void handleClientData(Client &, Connect &);
     void closeClient(int client_fd);
-    void runCgi(const std::string& scriptPath, const std::string& interpreter, int client_fd);
+    void runCgi(const std::string &scriptPath, const std::string &interpreter, int client_fd);
 };
 
 #endif
-

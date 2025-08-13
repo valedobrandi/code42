@@ -38,9 +38,9 @@ public:
     Request &getRequest();
     Response &getResponse();
 
-    bool parseRequest();      // returns true if request is complete
+    bool parseRequest();     
     bool isRequestReady() const;
-    void reset();             // reset for next request
+    void reset();
 
 private:
     std::string _buffer;

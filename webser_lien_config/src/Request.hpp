@@ -15,12 +15,15 @@
 
 #include <string>
 #include <map>
+#include "Config.hpp"
 
 class Request
 {
 public:
+
     Request();
     ~Request();
+
 
     bool parse(const std::string &raw);
     std::string getMethod() const;
@@ -29,9 +32,11 @@ public:
     std::string getVersion() const;
     std::string getHeader(const std::string &key) const;
     std::string getBody() const;
+    std::string getHostname() const;
     bool isComplete() const;
 
 private:
+    std::string _hostname; 
     std::string _method;
     std::string _uri;
     std::string _version;

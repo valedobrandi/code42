@@ -18,7 +18,7 @@ public:
     ~Connect(void);
     Connect(int, std::vector<ServerConfig>);
 
-    LocationConfig getLocationConfig(std::string host, std::string uri);
+    LocationConfig getLocationConfig(ServerConfig& server, std::string uri);
     bool isAllowedMethod(std::vector<std::string>, std::string method);
 };
 

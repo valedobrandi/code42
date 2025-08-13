@@ -30,18 +30,22 @@ struct LocationConfig {
     std::string redirectPath;
     int redirectCode;
     bool autoIndex;
-    int max_body;
+    size_t maxBody;
     std::vector<std::string> allowed_methods;
+
+    LocationConfig() : maxBody(0) {}
 };
 
 struct ServerConfig {
 
     int port;
+    int server_fd;
+    size_t maxBody;
     std::string server_name; 
     std::string root;
     std::vector<LocationConfig> locations; 
 
-    ServerConfig() : port(-1), server_name(""), root("") {}
+    ServerConfig() : port(-1), maxBody(-1), server_name(""), root("") {}
 };
 
 class Config {
@@ -56,6 +60,7 @@ public:
 private:
     std::vector<ServerConfig> _servers;
     void _validate(const ServerConfig & ) const;
+    size_t parseSize(const std::string& str);
 };
 
 #endif

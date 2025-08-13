@@ -14,6 +14,8 @@
 #include <sstream>
 #include <iostream>
 
+class Connect;
+
 Request::Request() : _complete(false) {}
 
 Request::~Request() {}
@@ -21,7 +23,7 @@ Request::~Request() {}
 bool Request::parse(const std::string &raw) {
     std::string::size_type header_end = raw.find("\r\n\r\n");
     if (header_end == std::string::npos)
-        return false; // not complete
+        return false; // headers not complete yet
 
     std::string headerPart = raw.substr(0, header_end);
     std::string bodyPart = raw.substr(header_end + 4);
@@ -41,9 +43,17 @@ bool Request::parse(const std::string &raw) {
         headers += line;
         headers += "\n";
     }
+
     parseHeaders(headers);
 
     this->_host = getHeader("Host");
+    size_t index = this->_host.find(":");
+    if (index != std::string::npos) {
+        std::string hostname = this->_host.substr(0, index);
+        this->_hostname = hostname;
+    }
+
+
 
     _body = bodyPart;
 
@@ -115,6 +125,12 @@ std::string Request::getBody() const {
     return _body;
 }
 
+std::string Request::getHostname() const
+{
+    return _hostname;
+}
+
 bool Request::isComplete() const {
     return _complete;
 }
+
