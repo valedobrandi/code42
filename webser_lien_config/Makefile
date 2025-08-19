@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 # Compiler and flags
-CXX = g++ -g -fsanitize=address -fno-omit-frame-pointer -O1
+CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 # Directories

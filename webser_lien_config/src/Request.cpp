@@ -140,14 +140,14 @@ int Request::parseBody(std::vector<char> &buffer, size_t maxBodySize)
             std::vector<char>::iterator it = std::search(
                 buffer.begin() + _bodyIndex, buffer.end(), parseChunck.begin(), parseChunck.end());
 
-            if (it == buffer.end())
-                return 1;
+            if (it == buffer.end()) return 1;
 
             std::string getChunkSize(buffer.begin() + _bodyIndex, it);
 
+            std::cout << "getChunkSize: " << getChunkSize << std::endl;
+
             size_t chunckSize = strtoul(getChunkSize.c_str(), NULL, 16);
 
-            _bodyIndex = std::distance(buffer.begin(), it);
 
             if (chunckSize == 0)
             {
@@ -157,13 +157,15 @@ int Request::parseBody(std::vector<char> &buffer, size_t maxBodySize)
                 return 0;
             }
 
-            if (buffer.size() < _bodyIndex + chunckSize + 2) return 1;
+            if (buffer.size() < chunckSize + 4) return 1;
+
+            _bodyIndex = (it - buffer.begin()) + 2;
 
             std::ofstream out("/tmp/cgi_input", std::ios::binary | std::ios::app);
             out.write(buffer.data() + _bodyIndex, chunckSize);
             _maxBodySize += chunckSize;
 
-            _bodyIndex =+ chunckSize + 2;
+            _bodyIndex += chunckSize + 2;
         }
     }
 
