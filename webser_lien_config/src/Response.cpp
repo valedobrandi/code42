@@ -12,8 +12,9 @@
 
 #include "Response.hpp"
 #include <sstream>
-#include <fcntl.h>    // for open
-#include <unistd.h>   // for read, close
+#include <fcntl.h>  
+#include <unistd.h>   
+#include <iostream>
 
 Response::Response() : _outputLength(0), _bodySendedIndex(0), _statusCode(200), _statusMessage("OK") {
     _headers["Server"] = "42Webserv";
@@ -82,8 +83,9 @@ void Response::build() {
     response << "\r\n";
     response << _body;
 
-    this->output = response.str();
+    output = response.str();
     this->_outputLength = output.size();
+    std::cout << "OutputLength: " << _outputLength << std::endl;
 }
 
 std::string Response::getStatusMessage(int code) const {

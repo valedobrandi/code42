@@ -38,6 +38,7 @@ void Server::handleClientWrite(Client *client)
         std::cout << "Response preview:\n";
         std::cout << response.output.substr(0, std::min(preview_size, response.output.size())) << std::endl;
     }
+
     ssize_t sendResponse = send(
         client->client_fd,
         response.output.c_str() + response._bodySendedIndex,
@@ -50,13 +51,13 @@ void Server::handleClientWrite(Client *client)
     if (sendResponse > 0)
     {
         response._bodySendedIndex += sendResponse;
-
-        std::cout << "SENDED: " << response._bodySendedIndex << std::endl;
     }
 
     if (response._bodySendedIndex >= response._outputLength)
     {
+        //shutdown(client->client_fd, SHUT_WR);
         this->switchEvents(client->client_fd, "EXIT");
+        std::cout << "Resonse size: " << sendResponse << std::endl;
         client->state = DONE;
     }
 }
@@ -243,18 +244,6 @@ void Server::switchEvents(int client_fd, std::string type)
             }
         }
     }
-
-    if (type == "EXIT")
-    {
-        for (size_t i = 0; i < _fds.size(); ++i)
-        {
-            if (_fds[i].fd == client_fd)
-            {
-                _fds[i].events &= ~(POLLIN | POLLOUT);
-                return;
-            }
-        }
-    }
 }
 
 bool Server::_isAllowedMethod(std::vector<std::string> allowed_methods, std::string method)
@@ -292,6 +281,7 @@ void Server::acceptNewConnection(int server_fd)
 
 void Server::run()
 {
+    signal(SIGPIPE, SIG_IGN);
     while (true)
     {
         int ret = poll(&_fds[0], _fds.size(), -1);
@@ -306,7 +296,7 @@ void Server::run()
                 int fd = _fds[i].fd;
                 if (this->_sockets.count(fd))
                 {
-                    std::cout << " ----> NEW CONNECTION" << std::endl;
+                    std::cout << "=====NEW CONNECTION=====" << std::endl;
                     acceptNewConnection(fd);
                 }
                 else
@@ -322,7 +312,6 @@ void Server::run()
 
             if (find && find->state == DONE)
             {
-                std::cout << " ----> DONE" << std::endl;
                 closeClient(find->client_fd);
             }
         }
@@ -427,11 +416,17 @@ void Server::handleClientData(Client *client)
                 client->output = runCgi(scriptPath, "/usr/bin/python3", "");
             else if (extension == ".bla" && method == "POST")
             {
-
+                struct stat st;
+                if (stat("/tmp/cgi_input", &st) == 0)
+                {
+                    std::cout << "St_size: " <<  st.st_size << std::endl;
+                }
                 client->output = runCgi(
-                    "/home/bernardoalbuquerque/Documentos/code42/code42_git/webser_lien_config/YoupiBanane/ubuntu_cgi_tester",
+                    "/home/bde-albu/code42/github/webser_lien_config/YoupiBanane/ubuntu_cgi_tester",
                     "",
-                    "/tmp/cgi_input");
+                    "/tmp/cgi_input"
+                );
+                std::remove("/tmp/cgi_input");
             }
         }
 
@@ -469,6 +464,24 @@ void Server::handleClientData(Client *client)
                 }
             }
         }
+        /* std::string delimiter = "\r\n\r\n";
+        std::vector<char>::iterator it = std::search(
+            output.begin(), output.end(),
+            delimiter.begin(), delimiter.end()
+        );
+
+        if (it != output.end()) {
+            size_t header_end = (it - output.begin()) + delimiter.size();
+
+            // Construct body string from vector range
+            std::string body(output.begin() + header_end, output.end());
+
+            response.setBody(body);
+        } else {
+            // No headers found – use entire output as body
+            std::string body(output.begin(), output.end());
+            response.setBody(body);
+        } */
 
         if (method == "POST")
         {
@@ -476,23 +489,22 @@ void Server::handleClientData(Client *client)
             std::string content_type = request.getHeader("Content-Type");
             if (client->hasCGI)
             {
+                std::cout << "CGI Output preview:\n";
+                size_t preview_len = client->output.size() < 100 ? client->output.size() : 100;
+                std::string preview(client->output.begin(), client->output.begin() + preview_len);
+                std::cout << preview << std::endl;
                 std::string cgi_output(client->output.begin(), client->output.end());
 
                 size_t header_end = cgi_output.find("\r\n\r\n");
-                std::string cgi_body;
 
                 if (header_end != std::string::npos)
                 {
-                    // Skip CGI headers
-                    cgi_body = cgi_output.substr(header_end + 4);
+                    response.setBody(cgi_output.substr(header_end + 4));
                 }
                 else
                 {
-                    // CGI returned only body
-                    cgi_body = cgi_output;
+                    response.setBody(cgi_output);
                 }
-
-                response.setBody(cgi_body);
             }
             else if (content_type.find("multipart/form-data") != std::string::npos)
             {
@@ -629,7 +641,7 @@ void Server::closeClient(int client_fd)
 
 std::vector<char> Server::runCgi(const std::string &scriptPath, const std::string &interpreter, /* int client_fd, */ const std::string &tmp_file)
 {
-    int pipefd[2]; // child stdout -> parent
+    int pipefd[2];
     std::vector<char> output;
 
     if (pipe(pipefd) == -1)
@@ -694,7 +706,6 @@ std::vector<char> Server::runCgi(const std::string &scriptPath, const std::strin
     }
     else
     {
-
         close(pipefd[1]); // Close stdout write end
         // Parent process
 
@@ -712,8 +723,7 @@ std::vector<char> Server::runCgi(const std::string &scriptPath, const std::strin
         int status;
         waitpid(pid, &status, 0);
 
-        // Build HTTP response manually (assuming CGI returll HTns fuTP headers)
-        std::string out_str(output.begin(), output.end());
+        std::cout << "OutputCgiSize: " << output.size() << std::endl;
         return output;
     }
 }

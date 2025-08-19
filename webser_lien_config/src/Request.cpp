@@ -70,7 +70,6 @@ bool Request::parseHeader(std::vector<char> &buffer)
         this->_hostname = this->_host;
 
     this->_bodyIndex = std::distance(buffer.begin(), header_end) + 4;
-    std::cout << "_bodyStartIndex: " << _bodyIndex << std::endl;
     _bodyEndIndex = this->_bodyIndex;
 
     hasHeader = true;
@@ -105,6 +104,19 @@ void Request::parseHeaders(const std::string &headerSection)
     }
 }
 
+/* Chunk size (hex): 8000, decimal: 32768
+Writing 32768 bytes to file at offset 99934198
+Chunk size (hex): 8000, decimal: 32768
+Writing 32768 bytes to file at offset 99966974
+Chunk size (hex): 6100, decimal: 24832
+Writing 24832 bytes to file at offset 99999750
+BytesToWrite: 100024416
+St_size: 99995904
+OutputCgiSize: 99998556
+Method:  POST
+OutputLength: 99998606
+ */
+
 int Request::parseBody(std::vector<char> &buffer, size_t maxBodySize)
 {
     std::string contentLength = getHeader("Content-Length");
@@ -135,38 +147,36 @@ int Request::parseBody(std::vector<char> &buffer, size_t maxBodySize)
         if (maxBodySize && this->_maxBodySize > maxBodySize)
             return 2;
 
-        while (true)
+        std::ofstream out("/tmp/cgi_input", std::ios::binary | std::ios::app);
+        std::vector<char>::iterator it = std::search(
+            buffer.begin() + _bodyIndex, buffer.end(), parseChunck.begin(), parseChunck.end());
+
+        if (it == buffer.end()) return 1;
+
+        std::string getChunkSize(buffer.begin() + _bodyIndex, it);
+
+        size_t chunckSize = strtoul(getChunkSize.c_str(), NULL, 16);
+
+        std::cout << "Chunk size (hex): " << getChunkSize << ", decimal: " << chunckSize << std::endl;
+        if (chunckSize == 0)
         {
-            std::vector<char>::iterator it = std::search(
-                buffer.begin() + _bodyIndex, buffer.end(), parseChunck.begin(), parseChunck.end());
-
-            if (it == buffer.end()) return 1;
-
-            std::string getChunkSize(buffer.begin() + _bodyIndex, it);
-
-            std::cout << "getChunkSize: " << getChunkSize << std::endl;
-
-            size_t chunckSize = strtoul(getChunkSize.c_str(), NULL, 16);
-
-
-            if (chunckSize == 0)
-            {
-                if (buffer.size() >= _bodyIndex + 2)
-                    _bodyIndex += 2;
-                std::cout << "BytesToWrite: " << _maxBodySize << std::endl;
-                return 0;
-            }
-
-            if (buffer.size() < chunckSize + 4) return 1;
-
-            _bodyIndex = (it - buffer.begin()) + 2;
-
-            std::ofstream out("/tmp/cgi_input", std::ios::binary | std::ios::app);
-            out.write(buffer.data() + _bodyIndex, chunckSize);
-            _maxBodySize += chunckSize;
-
-            _bodyIndex += chunckSize + 2;
+            if (buffer.size() >= _bodyIndex + 2)
+                _bodyIndex += 2;
+            std::cout << "BytesToWrite: " << _maxBodySize << std::endl;
+            return 0;
         }
+        size_t totalChunkSize = chunckSize + getChunkSize.size() + 4;
+        if (buffer.size() < totalChunkSize) return 1;
+
+        _bodyIndex += getChunkSize.size() + 2;
+
+        out.write(buffer.data() + _bodyIndex, chunckSize);
+        std::cout << "Writing " << chunckSize << " bytes to file at offset " << _bodyIndex << std::endl;
+
+        _maxBodySize += chunckSize;
+
+        _bodyIndex += chunckSize + 2;
+        
     }
 
     return 1;
