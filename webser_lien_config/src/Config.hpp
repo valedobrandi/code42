@@ -18,8 +18,11 @@
 #include <vector>
 #include <list>
 
-struct LocationConfig {
-    std::string server_name; 
+struct LocationConfig
+{
+    int port;
+    int server_fd;
+    std::string server_name;
     std::string path;
     std::string root;
     std::string index;
@@ -30,37 +33,58 @@ struct LocationConfig {
     std::string redirectPath;
     int redirectCode;
     bool autoIndex;
-    size_t maxBody;
+    size_t maxBodySize;
     std::vector<std::string> allowed_methods;
 
-    LocationConfig() : maxBody(0) {}
+    LocationConfig() : port(0),
+                       server_fd(0),
+                       server_name(""),
+                       path(""),
+                       root(""),
+                       index(""),
+                       uploadStore(""),
+                       cgi_pass(""),
+                       errorPagePath(""),
+                       errorPageCode(0),
+                       redirectPath(""),
+                       redirectCode(0),
+                       autoIndex(false),
+                       maxBodySize(0),
+                       allowed_methods()
+    {
+    }
 };
 
-struct ServerConfig {
+struct ServerConfig
+{
 
     int port;
     int server_fd;
-    size_t maxBody;
-    std::string server_name; 
+    size_t maxBodySize;
+    std::string server_name;
+    std::string index;
     std::string root;
-    std::vector<LocationConfig> locations; 
-
-    ServerConfig() : port(-1), maxBody(-1), server_name(""), root("") {}
+    std::vector<LocationConfig> locations;
 };
 
-class Config {
+class Config
+{
 public:
     Config();
     ~Config();
 
     bool parseFile(const std::string &filename);
-    const std::vector<ServerConfig> &getServers() const;
-    std::vector<int> getPorts() const; 
+    std::vector<ServerConfig> &getServers();
+    std::vector<int> getPorts() const;
 
 private:
     std::vector<ServerConfig> _servers;
-    void _validate(const ServerConfig & ) const;
-    size_t parseSize(const std::string& str);
+    void _validate(const ServerConfig &) const;
+    size_t parseSize(const std::string &str);
+    bool _isRootSet(const ServerConfig &) const;
+    std::vector<LocationConfig> _locations;
 };
+
+std::ostream &operator<<(std::ostream &os, const LocationConfig &loc);
 
 #endif

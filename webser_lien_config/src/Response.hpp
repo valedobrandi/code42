@@ -18,6 +18,11 @@
 
 class Response {
 public:
+    int _outputLength;
+    int _bodySendedIndex;
+    std::string _body;
+    std::string output;
+
     Response();
     ~Response();
 
@@ -27,13 +32,12 @@ public:
     void setContentType(const std::string &type);
     void setDefaultErrorBody(int code);
 
-    std::string build() const;
+    void build();
 
 private:
     int _statusCode;
     std::string _statusMessage;
     std::map<std::string, std::string> _headers;
-    std::string _body;
 
     std::string getStatusMessage(int code) const;
 };

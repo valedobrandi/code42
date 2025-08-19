@@ -17,33 +17,51 @@
 #include "Request.hpp"
 #include "Response.hpp"
 
-enum ClientState {
-    REQUEST, 
+enum ClientState
+{
+    REQUEST,
+    BODY,
     RESPONSE,
+    SEND,
     DONE
 };
 
-class Client {
+struct CgiResult {
+    int statusCode;
+    std::map<std::string, std::string> headers;
+    std::string body;
+    std::string contentType;
+};
+
+class Client
+{
 public:
     const int client_fd;
     const int server_fd;
+    LocationConfig* location; 
     ClientState state;
+    std::vector<char> output;
+    bool hasCGI;
+ 
     Client(void);
-    Client(const Client& other);
+    Client(const Client &other);
     Client(int client_fd, int server_fd);
     ~Client();
 
     int getFd() const;
-    std::string &getBuffer();
+    std::vector<char> &getBuffer();
     Request &getRequest();
     Response &getResponse();
 
-    bool parseRequest();     
+   
+    bool parseHeader();
+    int parseBody(size_t maxBodySize);
     bool isRequestReady() const;
+
     void reset();
 
 private:
-    std::string _buffer;
+    std::vector<char> _buffer;
     bool _requestReady;
     Request _request;
     Response _response;
@@ -51,6 +69,4 @@ private:
 
 std::ostream &operator<<(std::ostream &os, const Client &client);
 
-
 #endif
-

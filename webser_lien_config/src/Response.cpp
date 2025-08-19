@@ -15,7 +15,7 @@
 #include <fcntl.h>    // for open
 #include <unistd.h>   // for read, close
 
-Response::Response() : _statusCode(200), _statusMessage("OK") {
+Response::Response() : _outputLength(0), _bodySendedIndex(0), _statusCode(200), _statusMessage("OK") {
     _headers["Server"] = "42Webserv";
     _headers["Connection"] = "close";
 }
@@ -69,7 +69,7 @@ void Response::setDefaultErrorBody(int code) {
     setStatus(code);
 }
 
-std::string Response::build() const {
+void Response::build() {
     std::ostringstream response;
 
     response << "HTTP/1.1 " << _statusCode << " " << _statusMessage << "\r\n";
@@ -82,7 +82,8 @@ std::string Response::build() const {
     response << "\r\n";
     response << _body;
 
-    return response.str();
+    this->output = response.str();
+    this->_outputLength = output.size();
 }
 
 std::string Response::getStatusMessage(int code) const {

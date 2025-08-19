@@ -19,7 +19,7 @@ LocationConfig Connect::getLocationConfig(ServerConfig& server, std::string uri)
     }
 
     config.root = config.root.empty() ? server.root : config.root;
-    config.maxBody = config.maxBody <= 0 ? server.maxBody : config.maxBody;  
+    config.maxBodySize = config.maxBodySize <= 0 ? server.maxBody : config.maxBodySize;  
     return config;
 }
 

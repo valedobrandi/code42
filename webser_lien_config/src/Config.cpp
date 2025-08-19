@@ -19,17 +19,54 @@
 #include <unistd.h> // read, close
 #include <cerrno>
 #include <cstring> // strerror
+#include <ostream>
 
 Config::Config() {}
 
 Config::~Config() {}
 
-const std::vector<ServerConfig> &Config::getServers() const
+bool Config::_isRootSet(const ServerConfig &server) const {
+    for (size_t it = 0; it < server.locations.size() ; ++it) {
+        if ( server.locations[it].path == "/")
+            return true;
+    }
+    return false;
+}
+
+std::vector<ServerConfig> &Config::getServers()
 {
-    for (size_t i = 0; i < this->_servers.size(); ++i)
-        this->_validate(this->_servers[i]);
+
+    for (size_t i = 0; i < _servers.size(); ++i) {
+        ServerConfig &srv = _servers[i];
+        _validate(srv);
+
+        // If no root location exists, create it
+        if (!_isRootSet(srv)) {
+            LocationConfig root;
+            root.path = "/";
+            root.root = srv.root;
+            root.maxBodySize = srv.maxBodySize;
+            root.index = srv.index;
+            srv.locations.push_back(root);
+        }
+
+
+        // Inherit missing settings in all locations
+        for (size_t j = 0; j < srv.locations.size(); ++j) {
+            LocationConfig &local = srv.locations[j];
+            if (local.root.empty())
+                local.root = srv.root;
+            if (local.maxBodySize == 0)
+                local.maxBodySize = srv.maxBodySize;
+            if (local.index.empty())
+                local.index = srv.index;
+            local.port = srv.port;
+            local.server_name = srv.server_name;
+        }
+    }
     return _servers;
 }
+
 
 std::vector<int> Config::getPorts() const
 {
@@ -150,11 +187,15 @@ bool Config::parseFile(const std::string &filename)
 
     if (content == "") return false;
 
-
     std::istringstream stream(content);
     std::string line;
+
     ServerConfig current;
+    current.maxBodySize = 0;
+
     LocationConfig location;
+    location.maxBodySize = 0;
+
     bool inside_server = false;
     bool inside_location = false;
 
@@ -174,7 +215,14 @@ bool Config::parseFile(const std::string &filename)
 
         if (inside_server)
         {
-            if (line == "}")
+            if (inside_location && line == "}")
+            {
+                current.locations.push_back(location);
+                inside_location = false;
+                continue;
+            }
+
+            if ( !inside_location && line == "}")
             {
                 _servers.push_back(current);
                 inside_server = false;
@@ -182,6 +230,7 @@ bool Config::parseFile(const std::string &filename)
             }
 
             std::vector<std::string> tokens = tokenize(line);
+
             if (tokens.size() >= 2 && !inside_location)
             {
                 if (tokens[0] == "listen")
@@ -191,10 +240,10 @@ bool Config::parseFile(const std::string &filename)
                 else if (tokens[0] == "root")
                     current.root = tokens[1];
                 if (tokens[0] == "max_body_size")
-                    current.maxBody = this->parseSize(tokens[1]);
+                    current.maxBodySize = this->parseSize(tokens[1]);
             }
 
-            if (line.find("location") == 0 && line.find("{") != std::string::npos)
+            if (!inside_location && line.find("location") == 0 && line.find("{") != std::string::npos)
             {
                 inside_location = true;
                 location = LocationConfig();
@@ -202,13 +251,6 @@ bool Config::parseFile(const std::string &filename)
 
             if (inside_location)
             {
-                if (line == "}")
-                {
-                    this->_servers.end()->locations.push_back(location);
-                    inside_location = false;
-                    continue;
-                }
-
                 if (tokens.size() >= 2)
                 {
                     if (tokens[0] == "location")
@@ -226,7 +268,7 @@ bool Config::parseFile(const std::string &filename)
                     else if (tokens[0] == "upload_store" && tokens[1] == "on")
                         location.autoIndex = true;
                     else if (tokens[0] == "client_max_body_size")
-                        location.maxBody = std::atoi(tokens[1].c_str());
+                        location.maxBodySize = std::atoi(tokens[1].c_str());
                     else if (tokens[0] == "error_page")
                     {
                         location.errorPageCode = std::atoi(tokens[1].c_str());
@@ -243,4 +285,21 @@ bool Config::parseFile(const std::string &filename)
     }
 
     return true;
+}
+
+std::ostream& operator<<(std::ostream& os, const LocationConfig& loc) {
+    os << "{server_name: " << loc.server_name
+       << ", path: " << loc.path
+       << ", root: " << loc.root
+       << ", index: " << loc.index
+       << ", uploadStore: " << loc.uploadStore
+       << ", cgi_pass: " << loc.cgi_pass
+       << ", errorPageCode: " << loc.errorPageCode
+       << ", errorPagePath: " << loc.errorPagePath
+       << ", redirectCode: " << loc.redirectCode
+       << ", redirectPath: " << loc.redirectPath
+       << ", autoIndex: " << (loc.autoIndex ? "true" : "false")
+       << ", maxBodySize: " << loc.maxBodySize;
+
+    return os;
 }

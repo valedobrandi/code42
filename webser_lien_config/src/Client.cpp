@@ -12,17 +12,19 @@
 
 #include "Client.hpp"
 #include <iostream>
+#include <sstream>
+#include <cstdlib>
 
-Client::Client(void) : client_fd(-1), server_fd(-1)
+Client::Client(void) : client_fd(-1), server_fd(-1), location(NULL), hasCGI(false)
 {
 }
 
-Client::Client(const Client &other) : client_fd(other.client_fd), server_fd(other.server_fd)
+Client::Client(const Client &other) : client_fd(other.client_fd), server_fd(other.server_fd), location(other.location), hasCGI(other.hasCGI)
 {
 }
 
-Client::Client(int client_fd, int server_fd) 
-    : client_fd(client_fd), server_fd(server_fd),  state(REQUEST), _requestReady(false)
+Client::Client(int client_fd, int server_fd)
+    : client_fd(client_fd), server_fd(server_fd), location(NULL), state(REQUEST), hasCGI(false), _requestReady(false)
 {
     this->_request = Request();
     this->_response = Response();
@@ -35,7 +37,7 @@ int Client::getFd() const
     return client_fd;
 }
 
-std::string &Client::getBuffer()
+std::vector<char> &Client::getBuffer()
 {
     return _buffer;
 }
@@ -50,19 +52,16 @@ Response &Client::getResponse()
     return _response;
 }
 
-bool Client::parseRequest()
+bool Client::parseHeader()
 {
-    if (_request.parse(_buffer))
-    {
-        _requestReady = true;
+    if (_request.parseHeader(_buffer))
         return true;
-    }
     return false;
 }
 
-bool Client::isRequestReady() const
+int Client::parseBody(size_t maxBodySize)
 {
-    return _requestReady;
+    return _request.parseBody(_buffer, maxBodySize);
 }
 
 void Client::reset()
