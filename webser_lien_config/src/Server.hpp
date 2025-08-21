@@ -50,7 +50,7 @@ private:
 
     int createSocket(int);
     void acceptNewConnection(int);
-    void closeClient(int client_fd);
+    void closeConnection(int client_fd);
     void handleClientData(Client *);
     bool _isAllowedMethod(std::vector<std::string>, std::string);
     std::vector<char>  runCgi(const std::string &scriptPath, const std::string &interpreter, /* int client_fd,  */const std::string &post_body);

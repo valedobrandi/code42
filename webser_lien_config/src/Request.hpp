@@ -18,6 +18,19 @@
 #include "Config.hpp"
 #include "Config.hpp"
 
+struct Chunk
+{
+    size_t bytesReadFromChunk;
+    size_t chunckSize;
+    std::string hex;
+
+    Chunk():
+        bytesReadFromChunk(0),
+        chunckSize(0),
+        hex("") {}
+};
+
+
 class Request
 {
 public:
@@ -25,10 +38,11 @@ public:
     Request();
     ~Request();
 
-    size_t _bodyIndex;
+    Chunk chunk;
+    size_t byteStart;
+    size_t byteEnd;
     size_t _bodyEndIndex;
     bool hasBody;
-    bool hasHeader;
     bool parseHeader(std::vector<char> &raw);
     int parseBody(std::vector<char> &buffer, size_t maxBodySize );
     std::string getMethod() const;

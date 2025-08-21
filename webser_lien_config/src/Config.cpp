@@ -287,19 +287,34 @@ bool Config::parseFile(const std::string &filename)
     return true;
 }
 
-std::ostream& operator<<(std::ostream& os, const LocationConfig& loc) {
-    os << "{server_name: " << loc.server_name
-       << ", path: " << loc.path
-       << ", root: " << loc.root
-       << ", index: " << loc.index
-       << ", uploadStore: " << loc.uploadStore
-       << ", cgi_pass: " << loc.cgi_pass
-       << ", errorPageCode: " << loc.errorPageCode
-       << ", errorPagePath: " << loc.errorPagePath
-       << ", redirectCode: " << loc.redirectCode
-       << ", redirectPath: " << loc.redirectPath
-       << ", autoIndex: " << (loc.autoIndex ? "true" : "false")
-       << ", maxBodySize: " << loc.maxBodySize;
+std::ostream& operator<<(std::ostream& os, const LocationConfig& location) {
+
+    std::string methods;
+    if (!location.allowed_methods.empty())
+    {
+        for (std::vector<std::string>::const_iterator it = location.allowed_methods.begin();
+        it != location.allowed_methods.end(); ++it) {
+        if (!methods.empty())
+        {
+            methods += ", ";
+        }
+        methods += *it;
+    }
+}
+
+    os << "{server_name: " << location.server_name
+       << ", path: " << location.path
+       << ", root: " << location.root
+       << ", index: " << location.index
+       << ", uploadStore: " << location.uploadStore
+       << ", cgi_pass: " << location.cgi_pass
+       << ", errorPageCode: " << location.errorPageCode
+       << ", errorPagePath: " << location.errorPagePath
+       << ", redirectCode: " << location.redirectCode
+       << ", redirectPath: " << location.redirectPath
+       << ", autoIndex: " << (location.autoIndex ? "true" : "false")
+       << ", maxBodySize: " << location.maxBodySize
+       << ", allowedMethods: " << methods;
 
     return os;
 }

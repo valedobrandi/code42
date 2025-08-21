@@ -14,16 +14,17 @@
 #define CLIENT_HPP
 
 #include <string>
+#include <vector>
 #include "Request.hpp"
 #include "Response.hpp"
 
 enum ClientState
 {
-    REQUEST,
+    HEADER,
     BODY,
+    METHOD,
     RESPONSE,
-    SEND,
-    DONE
+    COMPLETED
 };
 
 struct CgiResult {
@@ -36,11 +37,18 @@ struct CgiResult {
 class Client
 {
 public:
+    std::vector<char> buffer;
+
+    size_t byteStart;
+
     const int client_fd;
     const int server_fd;
+
     LocationConfig* location; 
     ClientState state;
+
     std::vector<char> output;
+
     bool hasCGI;
  
     Client(void);
@@ -59,9 +67,9 @@ public:
     bool isRequestReady() const;
 
     void reset();
+    void receive();
 
 private:
-    std::vector<char> _buffer;
     bool _requestReady;
     Request _request;
     Response _response;

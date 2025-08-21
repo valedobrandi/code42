@@ -85,7 +85,6 @@ void Response::build() {
 
     output = response.str();
     this->_outputLength = output.size();
-    std::cout << "OutputLength: " << _outputLength << std::endl;
 }
 
 std::string Response::getStatusMessage(int code) const {

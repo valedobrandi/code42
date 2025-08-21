@@ -20,14 +20,14 @@
 
 class Connect;
 
-Request::Request()
-    : _bodyIndex(0),
-      _bodyEndIndex(0),
-      hasBody(false),
-      hasHeader(false),
-      _maxBodySize(0),
-      _chunkSizeToWrite(0),
-      _totalBytesRead(0) {}
+Request::Request(): 
+    byteStart(0),
+    byteEnd(0),
+    _bodyEndIndex(0),
+    hasBody(false),
+    _maxBodySize(0),
+    _chunkSizeToWrite(0),
+    _totalBytesRead(0) {}
 
 Request::~Request() {}
 
@@ -64,15 +64,14 @@ bool Request::parseHeader(std::vector<char> &buffer)
     this->_host = getHeader("Host");
     size_t index = this->_host.find(":");
 
+    this->_hostname = this->_host;
+
     if (index != std::string::npos)
+    {
         this->_hostname = this->_host.substr(0, index);
-    else
-        this->_hostname = this->_host;
+    }
 
-    this->_bodyIndex = std::distance(buffer.begin(), header_end) + 4;
-    _bodyEndIndex = this->_bodyIndex;
-
-    hasHeader = true;
+    this->byteStart = std::distance(buffer.begin(), header_end) + 4;
 
     if (!getHeader("Content-Length").empty() || !getHeader("Transfer-Encoding").empty())
     {
@@ -129,54 +128,110 @@ int Request::parseBody(std::vector<char> &buffer, size_t maxBodySize)
         ss >> length;
 
         if (maxBodySize && length > maxBodySize)
+        {
             return 2;
+        }
 
-        if (buffer.size() <= _bodyIndex)
+        /* // NEED MORE DATA
+        if (buffer.size() <= bytesProcessed)
+        {
             return 1;
+        }
 
-        size_t availableBodyData = buffer.size() - _bodyIndex;
+        size_t availableBodyData = buffer.size() - bytesProcessed;
         if (availableBodyData >= length)
         {
             return 0;
-        }
+        } */
     }
     else if (transferEnconding == "chunked")
     {
-        std::string parseChunck = "\r\n";
-
-        if (maxBodySize && this->_maxBodySize > maxBodySize)
-            return 2;
+        std::string headerEnd = "\r\n";
 
         std::ofstream out("/tmp/cgi_input", std::ios::binary | std::ios::app);
-        std::vector<char>::iterator it = std::search(
-            buffer.begin() + _bodyIndex, buffer.end(), parseChunck.begin(), parseChunck.end());
 
-        if (it == buffer.end()) return 1;
-
-        std::string getChunkSize(buffer.begin() + _bodyIndex, it);
-
-        size_t chunckSize = strtoul(getChunkSize.c_str(), NULL, 16);
-
-        std::cout << "Chunk size (hex): " << getChunkSize << ", decimal: " << chunckSize << std::endl;
-        if (chunckSize == 0)
+        std::cout << "====UpdateBuffer====" << std::endl;
+        while (true)
         {
-            if (buffer.size() >= _bodyIndex + 2)
-                _bodyIndex += 2;
-            std::cout << "BytesToWrite: " << _maxBodySize << std::endl;
-            return 0;
+
+            if (maxBodySize && this->_maxBodySize > maxBodySize)
+            {
+                return 2;
+            }
+
+            if (chunk.chunckSize == 0)
+            {
+
+                std::vector<char>::iterator it = std::search(
+                    buffer.begin() + byteStart, buffer.begin() + byteEnd, headerEnd.begin(), headerEnd.end()
+                );
+
+                if (it == buffer.end())
+                {
+                    return 1;
+                } 
+
+                chunk.hex.assign(buffer.begin() + byteStart, it);
+                
+                for (size_t at = 0; at < chunk.hex.size(); ++at)
+                {
+                    if (!isxdigit(chunk.hex[at])) std::cerr << "Error: BadHex" << std::endl;
+                }
+
+                chunk.chunckSize = strtoul(chunk.hex.c_str(), NULL, 16);
+                chunk.bytesReadFromChunk = 0;
+
+                std::cout << "ByteHex: " << chunk.chunckSize << std::endl;
+                
+                byteStart += std::distance(buffer.begin() + byteStart, it) + 2;
+
+                if (chunk.chunckSize == 0)
+                {
+                    if (buffer.size() >= byteStart + 2)
+                    {
+                        byteStart += 2;
+                    }
+                    std::cout << "BytesToWrite: " << _maxBodySize << std::endl;
+                    return 0;
+                }
+            }
+
+
+            size_t available = byteEnd - byteStart;
+            if (available == 0)
+            {
+                return 1;
+            }
+
+            size_t toWrite = std::min(chunk.chunckSize - chunk.bytesReadFromChunk, available);
+            
+
+            if (toWrite > 0)
+            {
+                std::cout << "toWrite: " << toWrite << std::endl;
+                out.write(buffer.data() + byteStart, toWrite);
+                
+                byteStart += toWrite;
+                chunk.bytesReadFromChunk += toWrite;
+                _maxBodySize += toWrite;
+                std::cout << "TotalChunk: " << _maxBodySize << std::endl;
+            }
+            
+            if (chunk.bytesReadFromChunk < chunk.chunckSize)
+            {
+                return 1;
+            }
+
+            if (byteEnd < byteStart + 2)
+            {
+                return 1;
+            }
+
+            byteStart += 2;
+            chunk.chunckSize = 0;
+            chunk.bytesReadFromChunk = 0;
+            chunk.hex.clear();
         }
-        size_t totalChunkSize = chunckSize + getChunkSize.size() + 4;
-        if (buffer.size() < totalChunkSize) return 1;
-
-        _bodyIndex += getChunkSize.size() + 2;
-
-        out.write(buffer.data() + _bodyIndex, chunckSize);
-        std::cout << "Writing " << chunckSize << " bytes to file at offset " << _bodyIndex << std::endl;
-
-        _maxBodySize += chunckSize;
-
-        _bodyIndex += chunckSize + 2;
-        
     }
 
     return 1;
@@ -221,7 +276,7 @@ std::string Request::getHeader(const std::string &key) const
 
 std::string Request::getBody(std::vector<char> buffer) const
 {
-    return std::string(buffer.begin() + _bodyIndex, buffer.end());
+    return std::string(buffer.begin() + byteStart, buffer.end());
 }
 
 std::string Request::getHostname() const

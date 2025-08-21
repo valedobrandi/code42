@@ -14,8 +14,10 @@
 #include <iostream>
 #include <sstream>
 #include <cstdlib>
+#include <cstring>
+#include <sys/socket.h>
 
-Client::Client(void) : client_fd(-1), server_fd(-1), location(NULL), hasCGI(false)
+Client::Client(void) : buffer(8192), client_fd(-1), server_fd(-1), location(NULL), hasCGI(false)
 {
 }
 
@@ -23,8 +25,14 @@ Client::Client(const Client &other) : client_fd(other.client_fd), server_fd(othe
 {
 }
 
-Client::Client(int client_fd, int server_fd)
-    : client_fd(client_fd), server_fd(server_fd), location(NULL), state(REQUEST), hasCGI(false), _requestReady(false)
+Client::Client(int client_fd, int server_fd) :
+    buffer(8192),
+    client_fd(client_fd), 
+    server_fd(server_fd), 
+    location(NULL), 
+    state(HEADER), 
+    hasCGI(false), 
+    _requestReady(false)
 {
     this->_request = Request();
     this->_response = Response();
@@ -39,7 +47,7 @@ int Client::getFd() const
 
 std::vector<char> &Client::getBuffer()
 {
-    return _buffer;
+    return buffer;
 }
 
 Request &Client::getRequest()
@@ -54,22 +62,35 @@ Response &Client::getResponse()
 
 bool Client::parseHeader()
 {
-    if (_request.parseHeader(_buffer))
+    if (_request.parseHeader(buffer))
         return true;
     return false;
 }
 
 int Client::parseBody(size_t maxBodySize)
 {
-    return _request.parseBody(_buffer, maxBodySize);
+    return _request.parseBody(buffer, maxBodySize);
 }
 
 void Client::reset()
 {
-    _buffer.clear();
+    buffer.clear();
     _request = Request();
     _response = Response();
     _requestReady = false;
+}
+void Client::receive()
+{
+    ssize_t bytesReader = recv(client_fd, buffer.data() + _request.byteEnd, buffer.size() - _request.byteEnd, 0);
+
+    _request.byteEnd += bytesReader;
+
+    size_t leftover = _request.byteEnd - _request.byteStart ;
+    memmove(buffer.data(), buffer.data() + _request.byteStart , leftover);
+
+    _request.byteStart = 0;
+    _request.byteEnd = leftover;
+
 }
 std::ostream &operator<<(std::ostream &os, const Client &client)
 {

@@ -58,7 +58,7 @@ void Server::handleClientWrite(Client *client)
         //shutdown(client->client_fd, SHUT_WR);
         this->switchEvents(client->client_fd, "EXIT");
         std::cout << "Resonse size: " << sendResponse << std::endl;
-        client->state = DONE;
+        client->state = COMPLETED;
     }
 }
 
@@ -310,9 +310,9 @@ void Server::run()
                 handleClientWrite(find);
             }
 
-            if (find && find->state == DONE)
+            if (find && find->state == COMPLETED)
             {
-                closeClient(find->client_fd);
+                closeConnection(find->client_fd);
             }
         }
     }
@@ -321,74 +321,77 @@ void Server::run()
 void Server::handleClientData(Client *client)
 {
 
-    char buffer[BUFFER_SIZE];
+    client->receive();
 
-    std::memset(buffer, 0, sizeof(buffer));
+    if (client->state == COMPLETED)
+    {
+        return closeConnection(client->client_fd);
+    }
 
-    int bytes = recv(client->client_fd, buffer, BUFFER_SIZE - 1, 0);
-
-    if (bytes <= 0 && client->state == REQUEST)
-        return closeClient(client->client_fd);
-
-    if (client->state == DONE)
-        return closeClient(client->client_fd);
-
-    client->getBuffer().insert(client->getBuffer().end(),
-                               buffer, buffer + bytes);
     Request &request = client->getRequest();
+
     Response &response = client->getResponse();
 
-    if (client->state == REQUEST)
+    if (client->state == HEADER)
     {
-        client->parseHeader();
+        /* std::cout << "=====HEADER=====" << std::endl; */
 
-        if (request.hasHeader && !client->location)
+        if (client->parseHeader() && !client->location)
         {
+            /* std::cout << "=====LOCATION=====" << std::endl; */
             client->location = this->getServerConfig(client);
+            /* std::cout << *client->location << std::endl */;
         }
 
         if (client->location)
         {
             if (!request.hasBody)
-                client->state = RESPONSE;
+            {
+                client->state = METHOD;
+            }
 
             if (request.hasBody)
+            {
                 client->state = BODY;
+            }
 
             if (!_isAllowedMethod(client->location->allowed_methods, request.getMethod()))
             {
+                /* std::cout << "=====ALLOWED METHOD=====" << std::endl; */
                 response.setDefaultErrorBody(405);
                 response.build();
-                client->state = SEND;
+                client->state = RESPONSE;
             }
+
         }
     }
 
     if (client->state == BODY)
     {
-
         switch (client->parseBody(client->location->maxBodySize))
         {
-        case 2:
-        {
-            response.setDefaultErrorBody(413);
-            response.build();
-            client->state = SEND;
-            return;
-        }
-        case 0:
-            client->state = RESPONSE;
+            case 0:
+            {
+                client->state = METHOD;
+            }
+            break;
+            case 2:
+            {
+                response.setDefaultErrorBody(413);
+                response.build();
+                client->state = RESPONSE;
+            }
+            break;
         }
     }
 
-    if (client->state == RESPONSE)
+    if (client->state == METHOD)
     {
 
         std::string uri = request.getURI();
         std::string method = request.getMethod();
 
-        /* std::cout << "DEBUGG:322:uri: " << uri << std::endl;
-        std::cout << "DEBUGG:323:location->path: " << location->path << std::endl; */
+
 
         std::string path;
         std::string temp = client->location->path;
@@ -402,7 +405,7 @@ void Server::handleClientData(Client *client)
             path = uri;
         }
 
-        // Check if URI ends with .php or .py for CGI handling
+
         if (uri.size() > 4)
         {
             client->hasCGI = true;
@@ -612,18 +615,17 @@ void Server::handleClientData(Client *client)
 
         response.build();
 
-        client->state = SEND;
+        client->state = RESPONSE;
     }
 
-    if (client->state == SEND)
+    if (client->state == RESPONSE)
     {
         switchEvents(client->client_fd, "POLLOUT");
         handleClientWrite(client);
-        return;
     }
 }
 
-void Server::closeClient(int client_fd)
+void Server::closeConnection(int client_fd)
 {
     close(client_fd);
 
