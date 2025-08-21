@@ -150,88 +150,50 @@ int Request::parseBody(std::vector<char> &buffer, size_t maxBodySize)
 
         std::ofstream out("/tmp/cgi_input", std::ios::binary | std::ios::app);
 
-        std::cout << "====UpdateBuffer====" << std::endl;
-        while (true)
+        if (maxBodySize && this->_maxBodySize > maxBodySize) { return 2; } 
+
+        if (chunk.chunckSize == 0)
         {
+            std::vector<char>::iterator it = std::search(
+                buffer.begin() + byteStart, buffer.end(), headerEnd.begin(), headerEnd.end()
+            );
 
-            if (maxBodySize && this->_maxBodySize > maxBodySize)
-            {
-                return 2;
-            }
+            if (it == buffer.end()) { return 1; }
 
-            if (chunk.chunckSize == 0)
-            {
-
-                std::vector<char>::iterator it = std::search(
-                    buffer.begin() + byteStart, buffer.begin() + byteEnd, headerEnd.begin(), headerEnd.end()
-                );
-
-                if (it == buffer.end())
-                {
-                    return 1;
-                } 
-
-                chunk.hex.assign(buffer.begin() + byteStart, it);
-                
-                for (size_t at = 0; at < chunk.hex.size(); ++at)
-                {
-                    if (!isxdigit(chunk.hex[at])) std::cerr << "Error: BadHex" << std::endl;
-                }
-
-                chunk.chunckSize = strtoul(chunk.hex.c_str(), NULL, 16);
-                chunk.bytesReadFromChunk = 0;
-
-                std::cout << "ByteHex: " << chunk.chunckSize << std::endl;
-                
-                byteStart += std::distance(buffer.begin() + byteStart, it) + 2;
-
-                if (chunk.chunckSize == 0)
-                {
-                    if (buffer.size() >= byteStart + 2)
-                    {
-                        byteStart += 2;
-                    }
-                    std::cout << "BytesToWrite: " << _maxBodySize << std::endl;
-                    return 0;
-                }
-            }
-
-
-            size_t available = byteEnd - byteStart;
-            if (available == 0)
-            {
-                return 1;
-            }
-
-            size_t toWrite = std::min(chunk.chunckSize - chunk.bytesReadFromChunk, available);
-            
-
-            if (toWrite > 0)
-            {
-                std::cout << "toWrite: " << toWrite << std::endl;
-                out.write(buffer.data() + byteStart, toWrite);
-                
-                byteStart += toWrite;
-                chunk.bytesReadFromChunk += toWrite;
-                _maxBodySize += toWrite;
-                std::cout << "TotalChunk: " << _maxBodySize << std::endl;
-            }
-            
-            if (chunk.bytesReadFromChunk < chunk.chunckSize)
-            {
-                return 1;
-            }
-
-            if (byteEnd < byteStart + 2)
-            {
-                return 1;
-            }
-
-            byteStart += 2;
-            chunk.chunckSize = 0;
-            chunk.bytesReadFromChunk = 0;
-            chunk.hex.clear();
+            chunk.hex.assign(buffer.begin() + byteStart, it);
+            chunk.chunckSize = strtoul(chunk.hex.c_str(), NULL, 16);
+            byteStart += std::distance(buffer.begin() + byteStart, it) + 2;
         }
+
+        if (!chunk.chunckSize && !chunk.bytesReadFromChunk)
+        {
+            if (buffer.size() >= byteStart + 2) { byteStart += 2; }
+            return 0;
+        }
+
+        size_t available = byteEnd - byteStart;
+        if (available == 0) { return 1; }
+
+        size_t toWrite = std::min(chunk.chunckSize - chunk.bytesReadFromChunk, available);
+
+        if (toWrite > 0)
+        {
+            out.write(buffer.data() + byteStart, toWrite);
+            
+            byteStart += toWrite;
+            chunk.bytesReadFromChunk += toWrite;
+            _maxBodySize += toWrite;
+            std::cout << "\rTotalChunk: " << _maxBodySize << std::flush;
+        }
+        
+        if (chunk.bytesReadFromChunk < chunk.chunckSize) { return 1; }
+
+        if (byteEnd < byteStart + 2) { return 1; }
+        
+        byteStart += 2;
+        chunk.chunckSize = 0;
+        chunk.bytesReadFromChunk = 0;
+        chunk.hex.clear();
     }
 
     return 1;

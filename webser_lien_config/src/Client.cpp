@@ -16,19 +16,27 @@
 #include <cstdlib>
 #include <cstring>
 #include <sys/socket.h>
+#include <unistd.h>
+#include <fstream>
 
-Client::Client(void) : buffer(8192), client_fd(-1), server_fd(-1), location(NULL), hasCGI(false)
-{
-}
-
-Client::Client(const Client &other) : client_fd(other.client_fd), server_fd(other.server_fd), location(other.location), hasCGI(other.hasCGI)
+Client::Client(void) : 
+    buffer(8192), 
+    client_fd(-1), 
+    server_fd(-1),
+    write_fd(0),
+    fileFd(-1),
+    location(NULL), 
+    hasCGI(false),
+    writingFile(false)
 {
 }
 
 Client::Client(int client_fd, int server_fd) :
     buffer(8192),
     client_fd(client_fd), 
-    server_fd(server_fd), 
+    server_fd(server_fd),
+    write_fd(0),
+    fileFd(-1),
     location(NULL), 
     state(HEADER), 
     hasCGI(false), 
@@ -70,6 +78,22 @@ bool Client::parseHeader()
 int Client::parseBody(size_t maxBodySize)
 {
     return _request.parseBody(buffer, maxBodySize);
+}
+
+bool Client::writeFile()
+{
+    std::ofstream tmp(writePath.c_str(), std::ios::binary);
+
+    char buffer[8192];
+    ssize_t n = read(write_fd, buffer, 8192);
+
+    if (n > 0) { tmp.write(buffer, n); return false; }
+
+    tmp.close();
+
+    this->writingFile = false;
+
+    return true;
 }
 
 void Client::reset()

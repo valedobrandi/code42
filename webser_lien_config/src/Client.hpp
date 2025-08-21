@@ -22,6 +22,7 @@ enum ClientState
 {
     HEADER,
     BODY,
+    WRITING,
     METHOD,
     RESPONSE,
     COMPLETED
@@ -38,11 +39,11 @@ class Client
 {
 public:
     std::vector<char> buffer;
-
-    size_t byteStart;
-
     const int client_fd;
     const int server_fd;
+    int write_fd;
+    int fileFd;
+    std::string writePath;
 
     LocationConfig* location; 
     ClientState state;
@@ -50,9 +51,10 @@ public:
     std::vector<char> output;
 
     bool hasCGI;
+    bool writingFile;
+    size_t bodyOffSet;
  
     Client(void);
-    Client(const Client &other);
     Client(int client_fd, int server_fd);
     ~Client();
 
@@ -64,7 +66,7 @@ public:
    
     bool parseHeader();
     int parseBody(size_t maxBodySize);
-    bool isRequestReady() const;
+    bool writeFile();
 
     void reset();
     void receive();

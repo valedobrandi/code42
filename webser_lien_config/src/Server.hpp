@@ -24,6 +24,7 @@
 #include "Connect.hpp"
 
 typedef std::map<int, Connect *>::iterator ConnectIt;
+typedef std::map<int,int>::iterator WriteIt;
 
 class Server
 {
@@ -38,11 +39,10 @@ public:
     LocationConfig* getServerConfig(Client *);
     void switchEvents(int client_fd, std::string type);
     void handleClientWrite(Client *client);
-    std::string vectorToString(std::vector<char>);
-
 
 private:
     std::set<int> _sockets;
+    std::map<int, int> _writeJobs;
     std::vector<struct pollfd> _fds;
     std::vector<ServerConfig *> _connects;
     std::map<int , std::vector<LocationConfig *> > _locations;
@@ -53,7 +53,8 @@ private:
     void closeConnection(int client_fd);
     void handleClientData(Client *);
     bool _isAllowedMethod(std::vector<std::string>, std::string);
-    std::vector<char>  runCgi(const std::string &scriptPath, const std::string &interpreter, /* int client_fd,  */const std::string &post_body);
+    void runCgi(Client *client, const std::string &scriptPath, const std::string &interpreter, const std::string &tmp_file);
+    void fileStream(Client *client);
 
     bool _isDirectory(const std::string &path);
     bool _isFile(const std::string &path);

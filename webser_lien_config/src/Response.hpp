@@ -18,10 +18,13 @@
 
 class Response {
 public:
-    int _outputLength;
-    int _bodySendedIndex;
+    bool sendFile;
+    size_t headerByteSize;
+    size_t _outputLength;
+    size_t _indexByteSend;
     std::string _body;
     std::string output;
+
 
     Response();
     ~Response();
@@ -29,6 +32,7 @@ public:
     void setStatus(int code);
     void setHeader(const std::string &key, const std::string &value);
     void setBody(const std::string &body);
+    void setFileContentLength(std::string path, size_t bodyOffSet);
     void setContentType(const std::string &type);
     void setDefaultErrorBody(int code);
 
