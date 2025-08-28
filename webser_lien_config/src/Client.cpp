@@ -18,12 +18,15 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <fstream>
+#include <assert.h>
+
+int Client::_counter = 0;
 
 Client::Client(void) : 
-    buffer(8192), 
+    buffer( 1024 * 9 ), 
     client_fd(-1), 
     server_fd(-1),
-    write_fd(0),
+    write_fd(-1),
     fileFd(-1),
     location(NULL), 
     hasCGI(false),
@@ -32,10 +35,10 @@ Client::Client(void) :
 }
 
 Client::Client(int client_fd, int server_fd) :
-    buffer(8192),
+    buffer( 1024 * 24 ),
     client_fd(client_fd), 
     server_fd(server_fd),
-    write_fd(0),
+    write_fd(-1),
     fileFd(-1),
     location(NULL), 
     state(HEADER), 
@@ -44,9 +47,21 @@ Client::Client(int client_fd, int server_fd) :
 {
     this->_request = Request();
     this->_response = Response();
+    _id = ++_counter;
+    /* std::cout << "[Client#" << _id << "] created" << std::endl; */
+
+    std::ostringstream oss;
+    oss << "/tmp/cgi_input_" << getId();
+    this->inputPath = oss.str();
+
+    oss.str("");
+    oss << "/tmp/cgi_output_" << getId();
+    this->outputPath = oss.str();
 }
 
-Client::~Client() {}
+Client::~Client() { 
+    /* std::cout << "[Client#" << _id << "] destroyed" << std::endl; */
+}
 
 int Client::getFd() const
 {
@@ -75,25 +90,9 @@ bool Client::parseHeader()
     return false;
 }
 
-int Client::parseBody(size_t maxBodySize)
+int Client::parseBody()
 {
-    return _request.parseBody(buffer, maxBodySize);
-}
-
-bool Client::writeFile()
-{
-    std::ofstream tmp(writePath.c_str(), std::ios::binary);
-
-    char buffer[8192];
-    ssize_t n = read(write_fd, buffer, 8192);
-
-    if (n > 0) { tmp.write(buffer, n); return false; }
-
-    tmp.close();
-
-    this->writingFile = false;
-
-    return true;
+    return _request.parseBody(*this);
 }
 
 void Client::reset()
@@ -105,20 +104,42 @@ void Client::reset()
 }
 void Client::receive()
 {
-    ssize_t bytesReader = recv(client_fd, buffer.data() + _request.byteEnd, buffer.size() - _request.byteEnd, 0);
-
-    _request.byteEnd += bytesReader;
-
-    size_t leftover = _request.byteEnd - _request.byteStart ;
-    memmove(buffer.data(), buffer.data() + _request.byteStart , leftover);
-
+    size_t leftover = _request.byteEnd - _request.byteStart;
+    assert(_request.byteEnd >= _request.byteStart);
+    if (leftover > 0 && _request.byteEnd > 0) {
+        memmove(buffer.data(), buffer.data() + _request.byteStart , leftover);
+    }
     _request.byteStart = 0;
     _request.byteEnd = leftover;
-
+   size_t hasSpace = buffer.size() - _request.byteEnd;
+   if (hasSpace == 0) {
+        return;
+    }
+    ssize_t bytesReader = recv(client_fd, buffer.data() + _request.byteEnd, hasSpace, 0);
+    if (bytesReader == 0) {
+        this->state = COMPLETED;
+        return;
+    }
+    if (bytesReader < 0) { 
+        perror("recv"); 
+        return; 
+    }
+    _request.byteEnd += bytesReader;
 }
+int Client::getId(void) const
+{
+    return this->_id;
+}
+
 std::ostream &operator<<(std::ostream &os, const Client &client)
 {
-    os << "[Client] client_fd: " << client.client_fd
-       << ", server_fd: " << client.server_fd;
+    os << "[Client]"
+       << " client_fd: " << client.client_fd
+       << ", server_fd: " << client.server_fd
+       << ", write_fd: " << client.write_fd
+       << ", fileFd: " << client.fileFd
+       << ", hasCGI: " << (client.hasCGI ? "true" : "false")
+       << ", state: " << client.state;
+
     return os;
 }

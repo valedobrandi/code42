@@ -20,6 +20,7 @@ class Response {
 public:
     bool sendFile;
     size_t headerByteSize;
+    size_t bodyByteIndex;
     size_t _outputLength;
     size_t _indexByteSend;
     std::string _body;

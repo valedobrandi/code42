@@ -267,7 +267,7 @@ bool Config::parseFile(const std::string &filename)
                         location.index = tokens[1];
                     else if (tokens[0] == "upload_store" && tokens[1] == "on")
                         location.autoIndex = true;
-                    else if (tokens[0] == "client_max_body_size")
+                    else if (tokens[0] == "max_body_size")
                         location.maxBodySize = std::atoi(tokens[1].c_str());
                     else if (tokens[0] == "error_page")
                     {

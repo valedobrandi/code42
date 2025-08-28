@@ -13,19 +13,22 @@
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 
-#include <string>
+#include <memory> 
 #include <map>
+#include <string>
+#include <fstream>
 #include "Config.hpp"
-#include "Config.hpp"
+
+class Client;
 
 struct Chunk
 {
-    size_t bytesReadFromChunk;
+    size_t bytesRead;
     size_t chunckSize;
     std::string hex;
 
     Chunk():
-        bytesReadFromChunk(0),
+        bytesRead(0),
         chunckSize(0),
         hex("") {}
 };
@@ -36,6 +39,7 @@ class Request
 public:
 
     Request();
+    Request& operator=(const Request& other);
     ~Request();
 
     Chunk chunk;
@@ -44,7 +48,7 @@ public:
     size_t _bodyEndIndex;
     bool hasBody;
     bool parseHeader(std::vector<char> &raw);
-    int parseBody(std::vector<char> &buffer, size_t maxBodySize );
+    int parseBody(Client &client);
     std::string getMethod() const;
     std::string getHost() const;
     std::string getURI() const;
@@ -53,6 +57,7 @@ public:
     std::string getBody(std::vector<char> buffer) const;
     std::string getHostname() const;
     bool isComplete() const;
+    void setCGIEnvironment() const;
 
 private:
     std::string _hostname; 
@@ -61,7 +66,7 @@ private:
     std::string _version;
     std::string _host;
     std::string _body;
-    size_t _maxBodySize;
+    size_t _totalBodySize;
 
     size_t _chunkSizeToWrite;
     size_t _totalBytesRead;
@@ -69,6 +74,7 @@ private:
     
 
     std::map<std::string, std::string> _headers;
+    std::ofstream _out;
 
     std::string trim(const std::string &s) const;
     void parseRequestLine(const std::string &line);

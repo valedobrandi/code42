@@ -53,6 +53,9 @@ public:
     bool hasCGI;
     bool writingFile;
     size_t bodyOffSet;
+    int childPid;
+    std::string outputPath;
+    std::string inputPath;
  
     Client(void);
     Client(int client_fd, int server_fd);
@@ -65,16 +68,19 @@ public:
 
    
     bool parseHeader();
-    int parseBody(size_t maxBodySize);
-    bool writeFile();
+    int parseBody();
 
     void reset();
     void receive();
+    int getId( void ) const;
 
 private:
     bool _requestReady;
     Request _request;
     Response _response;
+    std::ofstream _out;
+    static int _counter;
+    int _id;
 };
 
 std::ostream &operator<<(std::ostream &os, const Client &client);

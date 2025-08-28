@@ -31,55 +31,62 @@
 void Server::handleClientWrite(Client *client)
 {
     Response &res = client->getResponse();
-    size_t CHUNK_SIZE = 4 * 1024 * 1024;
+    size_t CHUNK_SIZE = BUFFER_SIZE;
     ssize_t byteSend = 0;
     size_t toSend;
     if (res._indexByteSend == 0) {
-        size_t preview_size = 100;
-        std::cout << "=====Preview=====" << std::endl;
-        std::cout << res.output.substr(0, std::min(preview_size, res.output.size())) << std::endl;
+        //size_t preview_size = 80;
+        //std::cout << "=====response=====" << std::endl;
+        //std::cout << res.output.substr(0, std::min(preview_size, res.output.size())) << std::endl;
+        //std::cout << "=================" << std::endl;
     }
     if (res.headerByteSize > res._indexByteSend) {
         toSend = std::min(CHUNK_SIZE, res.headerByteSize  - res._indexByteSend);
+        byteSend = send(
+            client->client_fd,
+            res.output.c_str() + res._indexByteSend,
+            toSend,
+            0);
     } else if (!res.sendFile){
-        size_t bodySent = res._indexByteSend - res.headerByteSize;
-        size_t bodyLeft = res._outputLength - res.headerByteSize - bodySent;
-        toSend = std::min(CHUNK_SIZE, bodyLeft);
+        toSend = std::min(CHUNK_SIZE, res._outputLength - res._indexByteSend);
+        byteSend = send(
+            client->client_fd,
+            res.output.c_str() + res._indexByteSend,
+            toSend,
+            0);
     } else {
         if (client->write_fd == -1) {
-            client->write_fd = open(client->writePath.c_str(), O_RDONLY);
+            client->write_fd = open(client->outputPath.c_str(), O_RDONLY);
+            res.bodyByteIndex = 0;
             if (client->write_fd == -1) {
                 perror("open");
                 return;
             }
-            if (client->bodyOffSet > 0) {
-                if (lseek(client->write_fd, client->bodyOffSet, SEEK_SET) == -1) {
-                    perror("lseek");
-                    close(client->write_fd);
-                    return;
-                }
-            }
         }
-        std::vector<char> buffer(CHUNK_SIZE);
-        ssize_t bytesReader = read(client->write_fd, &buffer[0], sizeof(buffer));
-        if (bytesReader)  {
-            byteSend = send(client->client_fd, &buffer[0], bytesReader, 0);
-        } else {
-            close(client->write_fd);
-            client->write_fd = -1;
+        size_t offset = client->bodyOffSet + res.bodyByteIndex;
+        ssize_t bytesReader = pread(client->write_fd, client->buffer.data(), client->buffer.size(), offset);
+        if (bytesReader <= 0) {
             return;
         }
+        byteSend = send(client->client_fd, client->buffer.data(), bytesReader, 0);
+        if (byteSend > 0) {
+            res.bodyByteIndex += byteSend;
+        }
     }
-    byteSend = send(
-        client->client_fd,
-        res.output.c_str() + res._indexByteSend,
-        toSend,
-        0);
-    if (byteSend > 0) { res._indexByteSend += byteSend; }
-    if (byteSend == -1) { return; }
-    if (byteSend > 0) {  std::cout << "\rTotalByteSend: " << res._indexByteSend << std::flush; }
-    if (res._indexByteSend >= res._outputLength && !byteSend) { client->state = COMPLETED; }
-    
+    if (byteSend > 0) { 
+        res._indexByteSend += byteSend; 
+    }
+    if (byteSend <= 0) { return; }
+    if (byteSend > 0) {  
+        //std::cout << "\rTotalByteSend: " << res._indexByteSend << std::flush; 
+    }
+    if (res._indexByteSend >= res._outputLength) {
+        shutdown(client->client_fd, SHUT_WR);
+        switchEvents(client->client_fd, "POLLINN");
+        close(client->write_fd);
+        client->state = COMPLETED;
+        return;
+    } 
 }
 
 Server::Server() {}
@@ -101,7 +108,7 @@ Server::~Server()
 
 bool Server::setup(Config &config)
 {
-
+    signal(SIGPIPE, SIG_IGN);
     std::vector<ServerConfig> &t = config.getServers();
 
     std::set<int> init_port;
@@ -189,16 +196,22 @@ Client *Server::findByClientFd(const int client_fd)
 
 bool Server::removeClientByFd(const int client_fd)
 {
-    Client *client = this->findByClientFd(client_fd);
+    clientList it = this->_clients.find(client_fd);
+    if (it == this->_clients.end()) {
+        return false;
+    }
+    Client *client = it->second;
+    ::remove(client->inputPath.c_str() );
+    ::remove(client->outputPath.c_str());
+    this->_clients.erase(it);
     delete client;
-    this->_clients.erase(client_fd);
-    return false;
+    return true;
 }
 
 LocationConfig *Server::getServerConfig(Client *client)
 {
     size_t maxLength = 0;
-    LocationConfig *bestLocation;
+    LocationConfig *bestLocation = NULL;
     for (size_t at = 0; at < this->_connects.size(); ++at)
     {
         ServerConfig *config = this->_connects[at];
@@ -236,18 +249,21 @@ LocationConfig *Server::getServerConfig(Client *client)
 
 void Server::switchEvents(int client_fd, std::string type)
 {
-    if (type == "POLLOUT")
+
+    for (size_t i = 0; i < _fds.size(); ++i)
     {
-        for (size_t i = 0; i < _fds.size(); ++i)
+        if (_fds[i].fd == client_fd)
         {
-            if (_fds[i].fd == client_fd)
-            {
+            if (type == "POLLOUT") {
                 _fds[i].events |= POLLOUT;
                 _fds[i].events &= ~POLLIN;
-                return;
+            } else if (type == "POLLIN") {
+                _fds[i].events |= POLLIN;
+                _fds[i].events &= ~POLLOUT;
             }
         }
     }
+    
 }
 
 bool Server::_isAllowedMethod(std::vector<std::string> allowed_methods, std::string method)
@@ -276,58 +292,41 @@ void Server::acceptNewConnection(int server_fd)
     pfd.events = POLLIN;
     pfd.revents = 0;
 
-    std::cout << "Connected:" << inet_ntoa(client_addr.sin_addr) << std::endl;
+    std::cout << std::endl << "Connected:" << inet_ntoa(client_addr.sin_addr) << std::endl;
 
     this->_clients[client_fd] = new Client(client_fd, server_fd);
 
     this->_fds.push_back(pfd);
 }
 
-void Server::run()
-{
-    std::remove("/tmp/cgi_input");
-    while (true)
-    {
-        int ret = poll(&_fds[0], _fds.size(), -1);
-        if (ret <= 0)
-            continue;
-        for (size_t i = 0; i < _fds.size(); i++)
-        {
+void Server::run() {
+    while (true) {
+        int ret = poll(&_fds[0], _fds.size(), 1000);
+        this->checkChildProcesses();
+        if (ret <= 0) { 
+            continue; 
+        }
+        for (size_t i = 0; i < _fds.size();) {
             int fd = _fds[i].fd;
-
             Client *client = this->findByClientFd(_fds[i].fd);
-
-            WriteIt it = _writeJobs.find(fd);
-
-            if (_fds[i].revents & POLLIN)
-            {
-                if (this->_sockets.count(fd))
-                {
-                    acceptNewConnection(fd);
-                }
-                else if (it != _writeJobs.end())
-                {
-                    client = this->findByClientFd(it->second);
-                    client->writeFile();
-                    if (client->writingFile) {
-                        closeConnection(client->write_fd);
-                    }
-                }
-                else
-                {
-                    handleClientData(client);
+            if (client && client->state == COMPLETED) {
+                disconnect(*client);
+                continue;
+            }
+            else if (_fds[i].revents & POLLOUT) { 
+                handleClientWrite(client); 
+            }
+            else if (_fds[i].revents & POLLIN) {
+                if (this->_sockets.count(fd)) { 
+                    acceptNewConnection(fd); 
+                } else if (client){ 
+                    handleClientData(client); 
                 }
             }
-
-            if (_fds[i].revents & POLLOUT) { handleClientWrite(client); }
-
-            if (client && client->state == COMPLETED)
-            {
-                if (_fds[i].revents & POLLHUP)
-                {
-                    closeConnection(client->client_fd);
-                }
+            if (client) {
+                handleResponse(client);
             }
+            ++i; 
         }
     }
 }
@@ -335,52 +334,49 @@ void Server::run()
 void Server::handleClientData(Client *client)
 {
 
-    client->receive();
+    if (client->state == HEADER || client->state == BODY) {
+        client->receive();
+    }
 
-    if (client->state == COMPLETED)
-    {
-        return closeConnection(client->client_fd);
+    if (client->state == COMPLETED) {
+        return disconnect(*client);
     }
 
     Request &request = client->getRequest();
 
-    Response &response = client->getResponse();
-
     if (client->state == HEADER)
     {
-        if (client->parseHeader() && !client->location)
-        {
+        if (client->parseHeader() && !client->location) {
             client->location = this->getServerConfig(client);
-        }
-
-        if (client->location)
-        {
-            if (!request.hasBody) { client->state = METHOD; }
-            if (request.hasBody) { client->state = BODY; }
-            if (!_isAllowedMethod(client->location->allowed_methods, request.getMethod()))
-            {
-                response.setDefaultErrorBody(405);
-                response.build();
-                client->state = RESPONSE;
+            if (client->location) {
+                if (!request.hasBody) { client->state = METHOD; }
+                if (request.hasBody) { client->state = BODY; }
+                if (!_isAllowedMethod(client->location->allowed_methods, request.getMethod())) {
+                    response(client, 405);
+                }
+            } else {
+                response(client, 404);
             }
         }
+
     }
 
     if (client->state == BODY)
     {
-        switch (client->parseBody(client->location->maxBodySize))
+        switch (client->parseBody())
         {
-            case 0: { client->state = METHOD; } break;
-            case 2:
-            {
-                response.setDefaultErrorBody(413);
-                response.build();
-                client->state = RESPONSE;
-            }
+            case 0: { client->state = METHOD; } 
+            break;
+            case 2: { response(client, 413); }
             break;
         }
     }
-    
+}
+
+void Server::handleResponse(Client * client)
+{
+    Request &request = client->getRequest();
+    Response &response = client->getResponse();
 
     if (client->state == METHOD)
     {
@@ -393,29 +389,29 @@ void Server::handleClientData(Client *client)
             path = client->location->root + uri.substr(temp.size());
         }
         else { path = uri; }
-        if (uri.size() > 4) {
+        if (uri.size() > 4 && !client->hasCGI) {
             client->hasCGI = true;
             std::string extension = uri.substr(uri.size() - 4);
             std::string scriptPath = "www" + uri;
             if (extension == ".php")
-                runCgi( client, scriptPath, "/usr/bin/php-cgi", "");
+                runCgi( client, scriptPath, "/usr/bin/php-cgi");
             else if (extension == ".py")
-                runCgi(client, scriptPath, "/usr/bin/python3", "");
+                runCgi(client, scriptPath, "/usr/bin/python3");
             else if (extension == ".bla" && method == "POST")
             {
-                struct stat st;
-                if (stat("/tmp/cgi_input", &st) == 0) {
-                    std::cout << std::endl << "St_size: " <<  st.st_size << std::endl;
-                }
+/*                 struct stat st;
+                if (stat(client->inputPath.c_str(), &st) == 0) {
+                   //std::cout << std::endl << "St_size: " <<  st.st_size << std::endl;
+                } */
                 runCgi(
                     client,
                     "/home/bernardoalbuquerque/Documentos/code42/code42_git/webser_lien_config/YoupiBanane/ubuntu_cgi_tester",
-                    "",
-                    "/tmp/cgi_input"
+                    ""
                 );
-                std::remove("/tmp/cgi_input");
             }
         }
+
+        if (client->state == WRITING) { return; }
 
         if (method == "GET")
         {
@@ -458,8 +454,7 @@ void Server::handleClientData(Client *client)
             std::string content_type = request.getHeader("Content-Type");
             if (client->hasCGI)
             {
-                
-                int fd = open(client->writePath.c_str(), O_RDONLY);
+                int fd = open(client->outputPath.c_str(), O_RDONLY);
                 // HANDLE OPEN FILE ERROR;
                 if (fd == -1) { };
                 
@@ -479,10 +474,15 @@ void Server::handleClientData(Client *client)
                         hasHeader = true;
                     }
                 }
+   
+                //size_t preview_size = 200;
+                //std::cout << "=====CGIHEADER=====" << std::endl;
+                //std::cout << headerBuffer.substr(0, std::min(preview_size, headerBuffer.size())) << std::endl;
+                
                 // HANDLE CGI NO HEADER ERROR;
                 if (!hasHeader) {};
 
-                response.setFileContentLength(client->writePath, client->bodyOffSet);
+                response.setFileContentLength(client->outputPath, client->bodyOffSet);
 
             }
             else if (content_type.find("multipart/form-data") != std::string::npos)
@@ -555,17 +555,10 @@ void Server::handleClientData(Client *client)
             }
             else
             {
-                std::string body = request.getBody(client->getBuffer());
-                std::ofstream out(path.c_str(), std::ios::binary);
-                if (out.is_open())
-                {
-                    out.write(body.data(), body.size());
-                    out.close();
-                    response.setStatus(201);
+                std::ifstream in(client->inputPath.c_str(), std::ios::binary | std::ios::ate);
+                if (in.is_open()) {
                     response.setBody("<h1>File uploaded successfully</h1>");
-                }
-                else
-                {
+                } else {
                     response.setStatus(500);
                     response.setBody("<h1>Failed to save file</h1>");
                 }
@@ -590,14 +583,9 @@ void Server::handleClientData(Client *client)
         }
 
         response.build();
-
         client->state = RESPONSE;
-    }
-
-    if (client->state == RESPONSE)
-    {
-        switchEvents(client->client_fd, "POLLOUT");
-        handleClientWrite(client);
+        this->switchEvents(client->client_fd, "POLLOUT");
+        this->handleClientWrite(client);
     }
 }
 
@@ -605,6 +593,7 @@ void Server::closeConnection(int fd)
 {
     close(fd);
 
+    //std::cout << std::endl << "RemoveClient: " << fd << std::endl;
     for (size_t i = 0; i < _fds.size(); ++i)
     {
         if (_fds[i].fd == fd)
@@ -615,18 +604,11 @@ void Server::closeConnection(int fd)
     }
 
     this->removeClientByFd(fd);
+    return;
 }
 
-void Server::runCgi(Client *client, const std::string &scriptPath, const std::string &interpreter, const std::string &tmp_file)
+void Server::runCgi(Client *client, const std::string &scriptPath, const std::string &interpreter)
 {
-    int pipefd[2];
-
-    if (pipe(pipefd) == -1)
-    {
-        perror("pipe");
-        return ;
-    }
-
     pid_t pid = fork();
     if (pid < 0)
     {
@@ -636,64 +618,28 @@ void Server::runCgi(Client *client, const std::string &scriptPath, const std::st
 
     if (pid == 0)
     {
-        close(pipefd[0]);
-
-        int fd = open(tmp_file.c_str(), O_RDONLY);
-
-        if (fd < 0) { perror("open tmp_file"); exit(1); }
-
-        dup2(fd, STDIN_FILENO);
-        close(fd);
-
-        dup2(pipefd[1], STDOUT_FILENO);
-        dup2(pipefd[1], STDERR_FILENO);
-        close(pipefd[1]);
-
+        int in = open(client->inputPath.c_str(), O_RDONLY);
+        int out = open(client->outputPath.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0644);
+        if (in < 0 || out < 0) { perror("open tmp_file"); exit(1); }
+        dup2(in, STDIN_FILENO);
+        dup2(out, STDOUT_FILENO);
+        close(in);
+        close(out);
         if (interpreter.empty())
         {
-            struct stat st;
-            if (stat(tmp_file.c_str(), &st) == 0)
-            {
-                std::stringstream ss;
-                ss << st.st_size;
-                setenv("CONTENT_LENGTH", ss.str().c_str(), 1);
-            }
-            else
-                perror("stat tmp_file");
-              
-            
-            setenv("SERVER_PROTOCOL", "HTTP/1.1", 1);
-            setenv("REQUEST_METHOD", "POST", 1);
-            setenv("CONTENT_TYPE", "application/x-www-form-urlencoded", 1);
-            setenv("SCRIPT_NAME", "", 1);
-            setenv("PATH_INFO", "/example/path", 1);
+            client->getRequest().setCGIEnvironment();
+            setenv("PATH_INFO", scriptPath.c_str(), 1);
             execlp(scriptPath.c_str(), scriptPath.c_str(), NULL);
         }
         else
             execlp(interpreter.c_str(), interpreter.c_str(), scriptPath.c_str(), NULL);
-
-        // If execlp fails
         perror("execlp");
         exit(1);
     }
-    else
-    {
-        close(pipefd[1]); 
 
-        fcntl(pipefd[0], F_SETFL, O_NONBLOCK);
-
-        struct pollfd pfd;
-        pfd.fd = pipefd[0];
-        pfd.events = POLLIN;
-        pfd.revents = 0;
-
-        this->_fds.push_back(pfd);
-        this->_writeJobs[pipefd[0]] = client->client_fd;
-        client->writingFile =  true;
-        client->writePath = "tmp_response.dat";
-        int status;
-        waitpid(pid, &status, 0);
-    }
+    _childProcesses[pid] = client->client_fd;
+    client->state = WRITING;
+    
 }
 
 bool Server::_isDirectory(const std::string &path)
@@ -704,40 +650,53 @@ bool Server::_isDirectory(const std::string &path)
     return S_ISDIR(info.st_mode);
 }
 
-void Server::fileStream(Client *client)
-{
-    size_t CHUNK_SIZE = 4 * 1024 * 1024;
-    Response &res = client->getResponse();
-    if (client->write_fd == -1) {
-        client->write_fd = open(client->writePath.c_str(), O_RDONLY);
-        if (client->write_fd == -1) {
-            perror("open");
-            return;
-        }
-        if (client->bodyOffSet > 0) {
-            if (lseek(client->write_fd, client->bodyOffSet, SEEK_SET) == -1) {
-                perror("lseek");
-                close(client->write_fd);
-                return;
-            }
-        }
-    }
-    std::vector<char> buffer(CHUNK_SIZE);
-    ssize_t bytesReader = read(client->write_fd, &buffer[0], sizeof(buffer));
-    if (bytesReader)  {
-        ssize_t byteSend = send(client->client_fd, &buffer[0], bytesReader, 0);
-        if (byteSend) { res._indexByteSend += byteSend; }
-    } else {
-        close(client->write_fd);
-        client->write_fd = -1;
-        return;
-    }
-}
-
 bool Server::_isFile(const std::string &path)
 {
     struct stat info;
     if (stat(path.c_str(), &info) != 0)
         return false;
     return S_ISREG(info.st_mode);
+}
+
+void Server::checkChildProcesses()
+{
+    for (ChildIt it = _childProcesses.begin(); it != _childProcesses.end();) {
+        int status;
+        pid_t result = waitpid(it->first, &status, WNOHANG);
+        if (result > 0) {
+            struct stat st;
+            if (stat(this->_clients[it->second]->outputPath.c_str(), &st) == 0) {
+                    //std::cout << std::endl << "OutputSize: " <<  st.st_size << std::endl;
+                }
+            this->_clients[it->second]->getResponse().sendFile = true;
+            this->_clients[it->second]->state = METHOD;
+            handleResponse(this->_clients[it->second]);
+            _childProcesses.erase(it++);
+            return;
+        } else if (result == -1) {
+            perror("waitpid");
+            _childProcesses.erase(it++);
+        } else {
+            ++it;
+        }
+    } 
+}
+
+void Server::disconnect(Client &client)
+{
+    char buffer[1];
+    int result = recv(client.client_fd, buffer, 1, 0);
+    if (result <= 0) {
+        closeConnection(client.client_fd);
+    }
+}
+
+void Server::response(Client *t, int code)
+{
+    Response &res = t->getResponse();
+    res.setDefaultErrorBody(code);
+    res.build();
+    t->state = RESPONSE;
+    switchEvents(t->client_fd, "POLLOUT");
+    handleClientWrite(t);
 }

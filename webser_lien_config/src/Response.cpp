@@ -96,13 +96,13 @@ void Response::build() {
     response << "\r\n";
 
     headerByteSize = response.str().size();
-    std::cout << "HeaderByteSize: " <<  headerByteSize << std::endl;
+    //std::cout << "HeaderByteSize: " <<  headerByteSize << std::endl;
 
     response << _body;
 
     output = response.str();
-    _outputLength = output.size();
-    std::cout << "ResponseSize: " <<  output.size() << std::endl;
+    _outputLength += output.size();
+    //std::cout << "OutputLength: " <<  _outputLength << std::endl;
 }
 
 std::string Response::getStatusMessage(int code) const {

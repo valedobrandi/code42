@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 # Compiler and flags
-CXX = c++
+CXX = c++ -fsanitize=address -g -O1
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
 # Directories
