@@ -319,8 +319,15 @@ void Server::run() {
             }
             if (client) {
                 handleResponse(client);
-                disconnect(*client);
             }
+        }
+        for (fdsIt it = _fds.begin(); it != _fds.end(); ) {
+            Client *client = this->findByClientFd(it->fd);
+            if (client && disconnect(*client)) {
+                it = _fds.erase(it);
+                continue;
+            }
+            ++it;
         }
     }
 }
@@ -579,24 +586,6 @@ void Server::handleResponse(Client * client)
     }
 }
 
-void Server::closeConnection(int fd)
-{
-    close(fd);
-
-    //std::cout << std::endl << "RemoveClient: " << fd << std::endl;
-    for (size_t i = 0; i < _fds.size(); ++i)
-    {
-        if (_fds[i].fd == fd)
-        {
-            _fds.erase(_fds.begin() + i);
-            break;
-        }
-    }
-
-    this->removeClientByFd(fd);
-    return;
-}
-
 void Server::runCgi(Client *client, const std::string &scriptPath, const std::string &interpreter)
 {
     pid_t pid = fork();
@@ -672,15 +661,18 @@ void Server::checkChildProcesses()
     } 
 }
 
-void Server::disconnect(Client &client)
+bool Server::disconnect(Client &client)
 {
     if (client.state == COMPLETED) {
         char buffer[1];
         int result = recv(client.client_fd, buffer, 1, 0);
         if (result <= 0) {
-            closeConnection(client.client_fd);
+            close(client.client_fd);
+            this->removeClientByFd(client.client_fd);
+            return true;
         }
     }
+    return false;
 }
 
 void Server::response(Client *t, int code)

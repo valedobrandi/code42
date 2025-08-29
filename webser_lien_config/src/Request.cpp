@@ -183,56 +183,57 @@ int Request::parseBody(Client &client)
     else if (getHeader("Transfer-Encoding") == "chunked")
     {
         std::string headerEnd = "\r\n";
-        
-        if (chunk.chunckSize == 0)
-        {
-            std::vector<char>::iterator it = std::search(
-                client.buffer.begin() + byteStart, client.buffer.end(), headerEnd.begin(), headerEnd.end()
-            );
-            if (it == client.buffer.end()) { 
-                return 1; 
+        while (true) {
+            if (chunk.chunckSize == 0)
+            {
+                std::vector<char>::iterator it = std::search(
+                    client.buffer.begin() + byteStart, client.buffer.end(), headerEnd.begin(), headerEnd.end()
+                );
+                if (it == client.buffer.end()) { 
+                    break;
+                }
+                chunk.hex.assign(client.buffer.begin() + byteStart, it);
+                chunk.chunckSize = strtoul(chunk.hex.c_str(), NULL, 16);
+                byteStart += std::distance(client.buffer.begin() + byteStart, it) + 2;
             }
-            chunk.hex.assign(client.buffer.begin() + byteStart, it);
-            chunk.chunckSize = strtoul(chunk.hex.c_str(), NULL, 16);
-            byteStart += std::distance(client.buffer.begin() + byteStart, it) + 2;
-        }
-        if (!chunk.chunckSize && !chunk.bytesRead)
-        {
-            if (byteEnd >= byteStart + 2) { 
-                byteStart += 2; 
+            if (!chunk.chunckSize && !chunk.bytesRead)
+            {
+                if (byteEnd >= byteStart + 2) { 
+                    byteStart += 2; 
+                }
+                if (_out.is_open()) { 
+                    _out.close(); 
+                }
+                return 0;
             }
-            if (_out.is_open()) { 
-                _out.close(); 
+            size_t available = byteEnd - byteStart;
+            if (available <= 0 || byteStart >= client.buffer.size()) {
+                break;
             }
-            return 0;
+            size_t toWrite = std::min(chunk.chunckSize - chunk.bytesRead, available);
+            toWrite = std::min(toWrite, client.buffer.size() - byteStart);
+            if (toWrite > 0 && _out.is_open())
+            {
+                _out.write(client.buffer.data() + byteStart, toWrite);
+                byteStart += toWrite;
+                chunk.bytesRead += toWrite;
+                _totalBodySize += toWrite;
+                std::cout << "\rTotalChunk: " << _totalBodySize << " " << std::flush;
+            }
+            if (maxBodySize && this->_totalBodySize > maxBodySize) {
+                return 2; 
+            } 
+            if (chunk.bytesRead < chunk.chunckSize) {
+                break;
+            }
+            if (byteEnd < byteStart + 2) {
+                break;
+            }
+            byteStart += 2;
+            chunk.chunckSize = 0;
+            chunk.bytesRead = 0;
+            chunk.hex.clear();
         }
-        size_t available = byteEnd - byteStart;
-        if (available <= 0 || byteStart >= client.buffer.size()) {
-            return 1; 
-        }
-        size_t toWrite = std::min(chunk.chunckSize - chunk.bytesRead, available);
-        toWrite = std::min(toWrite, client.buffer.size() - byteStart);
-        if (toWrite > 0 && _out.is_open())
-        {
-            _out.write(client.buffer.data() + byteStart, toWrite);
-            byteStart += toWrite;
-            chunk.bytesRead += toWrite;
-            _totalBodySize += toWrite;
-            std::cout << "\rTotalChunk: " << _totalBodySize << " " << std::flush;
-        }
-        if (maxBodySize && this->_totalBodySize > maxBodySize) {
-            return 2; 
-        } 
-        if (chunk.bytesRead < chunk.chunckSize) {
-            return 1; 
-        }
-        if (byteEnd < byteStart + 2) {
-            return 1; 
-        }
-        byteStart += 2;
-        chunk.chunckSize = 0;
-        chunk.bytesRead = 0;
-        chunk.hex.clear();
     }
     return 1;
 }

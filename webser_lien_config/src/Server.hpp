@@ -23,7 +23,7 @@
 #include "Config.hpp"
 #include "Connect.hpp"
 
-typedef std::map<int, Connect *>::iterator ConnectIt;
+typedef std::vector<struct pollfd>::iterator fdsIt;
 typedef std::map<int,int>::iterator WriteIt;
 typedef std::map<int, pid_t>::iterator ChildIt;
 typedef std::map<int, Client*>::iterator clientList;
@@ -52,7 +52,6 @@ private:
 
     int createSocket(int);
     void acceptNewConnection(int);
-    void closeConnection(int client_fd);
     void handleClientData(Client *);
     void handleResponse(Client *);
     bool _isAllowedMethod(std::vector<std::string>, std::string);
@@ -60,7 +59,7 @@ private:
     bool _isDirectory(const std::string &path);
     bool _isFile(const std::string &path);
     void checkChildProcesses();
-    void disconnect(Client &client);
+    bool disconnect(Client &client);
     void response( Client*, int );
 
 };
