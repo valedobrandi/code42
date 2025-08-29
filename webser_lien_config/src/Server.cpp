@@ -77,9 +77,7 @@ void Server::handleClientWrite(Client *client)
         res._indexByteSend += byteSend; 
     }
     if (byteSend <= 0) { return; }
-    if (byteSend > 0) {  
-        //std::cout << "\rTotalByteSend: " << res._indexByteSend << std::flush; 
-    }
+
     if (res._indexByteSend >= res._outputLength) {
         shutdown(client->client_fd, SHUT_WR);
         switchEvents(client->client_fd, "POLLINN");
@@ -306,14 +304,10 @@ void Server::run() {
         if (ret <= 0) { 
             continue; 
         }
-        for (size_t i = 0; i < _fds.size();) {
+        for (size_t i = 0; i < _fds.size(); ++i) {
             int fd = _fds[i].fd;
             Client *client = this->findByClientFd(_fds[i].fd);
-            if (client && client->state == COMPLETED) {
-                disconnect(*client);
-                continue;
-            }
-            else if (_fds[i].revents & POLLOUT) { 
+            if (_fds[i].revents & POLLOUT) { 
                 handleClientWrite(client); 
             }
             else if (_fds[i].revents & POLLIN) {
@@ -325,8 +319,8 @@ void Server::run() {
             }
             if (client) {
                 handleResponse(client);
+                disconnect(*client);
             }
-            ++i; 
         }
     }
 }
@@ -336,10 +330,6 @@ void Server::handleClientData(Client *client)
 
     if (client->state == HEADER || client->state == BODY) {
         client->receive();
-    }
-
-    if (client->state == COMPLETED) {
-        return disconnect(*client);
     }
 
     Request &request = client->getRequest();
@@ -684,10 +674,12 @@ void Server::checkChildProcesses()
 
 void Server::disconnect(Client &client)
 {
-    char buffer[1];
-    int result = recv(client.client_fd, buffer, 1, 0);
-    if (result <= 0) {
-        closeConnection(client.client_fd);
+    if (client.state == COMPLETED) {
+        char buffer[1];
+        int result = recv(client.client_fd, buffer, 1, 0);
+        if (result <= 0) {
+            closeConnection(client.client_fd);
+        }
     }
 }
 

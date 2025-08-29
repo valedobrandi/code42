@@ -23,7 +23,7 @@
 int Client::_counter = 0;
 
 Client::Client(void) : 
-    buffer( 1024 * 9 ), 
+    buffer( 1024 * 16 ), 
     client_fd(-1), 
     server_fd(-1),
     write_fd(-1),
@@ -35,7 +35,7 @@ Client::Client(void) :
 }
 
 Client::Client(int client_fd, int server_fd) :
-    buffer( 1024 * 24 ),
+    buffer( 1024 * 16 ),
     client_fd(client_fd), 
     server_fd(server_fd),
     write_fd(-1),
@@ -48,7 +48,8 @@ Client::Client(int client_fd, int server_fd) :
     this->_request = Request();
     this->_response = Response();
     _id = ++_counter;
-    /* std::cout << "[Client#" << _id << "] created" << std::endl; */
+
+    std::cout << "[Client#" << _id << "] created" << std::endl;
 
     std::ostringstream oss;
     oss << "/tmp/cgi_input_" << getId();
@@ -60,7 +61,7 @@ Client::Client(int client_fd, int server_fd) :
 }
 
 Client::~Client() { 
-    /* std::cout << "[Client#" << _id << "] destroyed" << std::endl; */
+    std::cout << "[Client#" << _id << "] destroyed" << std::endl;
 }
 
 int Client::getFd() const
@@ -104,10 +105,13 @@ void Client::reset()
 }
 void Client::receive()
 {
-    size_t leftover = _request.byteEnd - _request.byteStart;
-    assert(_request.byteEnd >= _request.byteStart);
-    if (leftover > 0 && _request.byteEnd > 0) {
-        memmove(buffer.data(), buffer.data() + _request.byteStart , leftover);
+    size_t leftover = 0;
+    //size_t leftover = _request.byteEnd - _request.byteStart;
+    if (_request.byteEnd >= _request.byteStart) {
+        leftover = _request.byteEnd - _request.byteStart;
+        if (leftover > 0) {
+            memmove(buffer.data(), buffer.data() + _request.byteStart , leftover);
+        }
     }
     _request.byteStart = 0;
     _request.byteEnd = leftover;
