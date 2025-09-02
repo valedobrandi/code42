@@ -20,7 +20,8 @@
 #include "Config.hpp"
 
 class Client;
-
+typedef std::map<std::string, std::string>::const_iterator mapStringit;
+typedef std::vector<char>::iterator bufferIt;
 struct Chunk
 {
     size_t bytesRead;
@@ -33,9 +34,26 @@ struct Chunk
         hex("") {}
 };
 
+struct Multipart {
+    std::string boundary;
+    bool hasFileHeader;
+    std::string file;
+    bool hasFilepath;
+    bool data;
+    std::string nextBondary;
+    bool reset;
 
-class Request
-{
+    Multipart():
+        boundary(""),
+        hasFileHeader(false), 
+        file(""),
+        hasFilepath(false),
+        data(false),
+        nextBondary(""),
+        reset(false) {}
+};
+
+class Request {
 public:
 
     Request();
@@ -57,7 +75,7 @@ public:
     std::string getBody(std::vector<char> buffer) const;
     std::string getHostname() const;
     bool isComplete() const;
-    void setCGIEnvironment() const;
+    void setCGIEnvironment(Client *client) const;
 
 private:
     std::string _hostname; 
@@ -75,10 +93,12 @@ private:
 
     std::map<std::string, std::string> _headers;
     std::ofstream _out;
+    Multipart _multipart;
 
     std::string trim(const std::string &s) const;
     void parseRequestLine(const std::string &line);
     void parseHeaders(const std::string &headerSection);
+    int multiform(Client &client, size_t bodyLength, size_t maxBodySize);
 };
 
 #endif

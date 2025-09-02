@@ -121,18 +121,150 @@ void Request::parseHeaders(const std::string &headerSection)
     //std::cout << "=================" << std::endl;
 }
 
-void Request::setCGIEnvironment() const
+int Request::multiform(Client &client, size_t bodyLength, size_t maxBodySize)
+{
+    if (!client.location->allow_upload) {
+        return 3;
+    }
+    if (this->_multipart.boundary.empty()) {
+        std::string contentType = getHeader("Content-Type");
+        size_t pos = contentType.find("boundary=");
+        if (pos == std::string::npos) {
+            return 1;
+        }
+        this->_multipart.boundary = contentType.substr(pos + 9);
+    }
+    while (byteStart <= byteEnd) {
+        if (!this->_multipart.hasFileHeader) {
+            std::string file = "filename=\"";
+            bufferIt it = std::search(
+                    client.buffer.begin() + byteStart, client.buffer.end(), file.begin(), file.end());
+            if (it == client.buffer.end()) { 
+                break;
+            }
+            size_t index = std::distance(client.buffer.begin() + byteStart, it) + file.size();
+            byteStart += index;
+            _totalBodySize += index;
+            this->_multipart.hasFileHeader = true;
+            this->_multipart.file.clear();
+        }
+        if (!this->_multipart.hasFilepath) {
+            bufferIt endIt = std::find(client.buffer.begin() + byteStart, client.buffer.end(), '"');
+            if (endIt == client.buffer.end()) { 
+                this->_multipart.file.append(client.buffer.data() + byteStart,
+                    byteEnd - byteStart);
+                break;
+            }
+            this->_multipart.file.append(client.buffer.data() + byteStart,
+                    std::distance(client.buffer.begin() + byteStart, endIt));
+            size_t index = std::distance(client.buffer.begin() + byteStart, endIt) + 1; 
+            byteStart += index;
+            _totalBodySize += index;
+            std::string filepath = client.location->root + "/" + this->_multipart.file;
+            this->_out.open(filepath.c_str(), std::ios::binary | std::ios::out | std::ios::trunc);
+            this->_multipart.hasFilepath = true;
+        }
+        if (!this->_multipart.data) {
+            std::string delimiter = "\r\n\r\n";
+            bufferIt it = std::search(
+                    client.buffer.begin() + byteStart, client.buffer.end(), delimiter.begin(), delimiter.end());
+            if (it == client.buffer.end()) { 
+                break;
+            }
+            size_t index = std::distance(client.buffer.begin() + byteStart, it) + delimiter.size(); 
+            byteStart += index;
+            _totalBodySize += index;
+            this->_multipart.data = true;
+        }
+        // --- Write file data until boundary ---
+        std::string baseBoundary = "--" + _multipart.boundary;
+        std::string middleBoundary = baseBoundary + "\r\n";
+        bufferIt it = std::search(client.buffer.begin() + byteStart,
+                            client.buffer.end(), baseBoundary.begin(), baseBoundary.end());
+        bool hasBoundary = (it != client.buffer.end());
+        bool hasFinalBoundary = false;
+        bool hasMiddleBoundary = false;
+        if (hasBoundary) {
+            bufferIt after = it + baseBoundary.size();
+            if (after + 1 < client.buffer.end() &&
+                *after == '-' && *(after+1) == '-') {
+                hasFinalBoundary = true;
+                after += 2;
+            } else if (after + 1 < client.buffer.end() &&
+                    *after == '\r' && *(after+1) == '\n') {
+                hasMiddleBoundary = true;
+                after += 2;
+            }
+        }
+        size_t lookahead = baseBoundary.size() + 4;
+        size_t safeWrite = 0;
+        size_t available = byteEnd - byteStart;
+        bool lastChunk = (_totalBodySize + available >= bodyLength);
+        if (hasBoundary) {
+            safeWrite = std::distance(client.buffer.begin() + byteStart, it);
+        } else if (available > lookahead) {
+            safeWrite = available - lookahead;
+        } else if (lastChunk) {
+            safeWrite = bodyLength - _totalBodySize;
+        } else {
+            return 1;
+        }
+        if (_out.is_open() && safeWrite > 0) {
+            _out.write(client.buffer.data() + byteStart, safeWrite);
+            _totalBodySize += safeWrite;
+            byteStart += safeWrite;
+            if (maxBodySize && _totalBodySize > maxBodySize) {
+                return 2;
+            }
+            if (hasMiddleBoundary) {
+                byteStart += middleBoundary.size();
+                _totalBodySize += middleBoundary.size();
+                if (_out.is_open()) {
+                    _out.close();
+                }
+                _multipart.hasFileHeader = false;
+                _multipart.hasFilepath = false;
+                _multipart.data = false;
+                _multipart.file.clear();
+                _multipart.nextBondary.clear();
+            } else if (hasFinalBoundary) {
+                if (_out.is_open()) {
+                    _out.close();
+                }
+                return 0;
+            }
+
+            if (_totalBodySize >= bodyLength) {
+                std::cout << "Finished: " << std::endl;
+                if (_out.is_open()) {
+                    _out.close();
+                }
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+void Request::setCGIEnvironment(Client *client) const
 {
     setenv("REQUEST_METHOD", getMethod().c_str(), 1);
     setenv("SERVER_PROTOCOL", "HTTP/1.1", 1);
+    std::string uri = client->getRequest().getURI();
+    std::string path = "/" + client->location->root + uri;
     setenv("SCRIPT_NAME", "", 1);
+    setenv("PATH_INFO", path.c_str(), 1);
     if (_headers.count("Content-Length")) {
         setenv("CONTENT_LENGTH", _headers.at("Content-Length").c_str(), 1);
+    } else {
+        setenv("CONTENT_LENGTH", "0", 1);
     }
     if (_headers.count("Content-Type")) {
         setenv("CONTENT_TYPE", _headers.at("Content-Type").c_str(), 1);
+    } else {
+        setenv("CONTENT_TYPE", "", 1);
     }
-        for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); ++it)
+    for (mapStringit it = _headers.begin(); it != _headers.end(); ++it)
     {
         std::string key = it->first;
         std::string value = it->second;
@@ -150,38 +282,15 @@ void Request::setCGIEnvironment() const
 int Request::parseBody(Client &client)
 {
     std::string contentLength = getHeader("Content-Length");
-    size_t &maxBodySize = client.location->maxBodySize;
-    if (!_out.is_open()) {
-        _out.open(client.inputPath.c_str(), std::ios::binary | std::ios::out | std::ios::trunc);
-    }
-    if (!contentLength.empty())
-    {
-        std::istringstream ss(contentLength);
-        size_t length;
-        ss >> length;
-        if (maxBodySize && length > maxBodySize) {
-            return 2;
+    size_t bodyLength = std::strtoul(contentLength.c_str(), NULL, 10);
+    size_t maxBodySize = client.location->maxBodySize;
+    
+    if (getHeader("Content-Type").find("multipart/form-data") != std::string::npos) {
+        return multiform(client, bodyLength, maxBodySize);
+    } else if (getHeader("Transfer-Encoding") == "chunked") {
+        if (!_out.is_open()) {
+            _out.open(client.inputPath.c_str(), std::ios::binary | std::ios::out | std::ios::trunc);
         }
-        size_t availableBodyData = client.buffer.size() - chunk.bytesRead;
-        if (availableBodyData == 0) {
-            return 1;
-        }
-        size_t toWrite = std::min(length - _totalBodySize, availableBodyData);
-        if (toWrite > 0) {
-            _out.write(client.buffer.data() + chunk.bytesRead, toWrite);
-            chunk.bytesRead += toWrite;
-            _totalBodySize += toWrite;
-        }
-        if (maxBodySize < length) {
-            return 1;
-        }
-        if (_out.is_open()) {
-            _out.close();
-        }
-        return 0;
-    }
-    else if (getHeader("Transfer-Encoding") == "chunked")
-    {
         std::string headerEnd = "\r\n";
         while (true) {
             if (chunk.chunckSize == 0)
@@ -218,7 +327,7 @@ int Request::parseBody(Client &client)
                 byteStart += toWrite;
                 chunk.bytesRead += toWrite;
                 _totalBodySize += toWrite;
-                std::cout << "\rTotalChunk: " << _totalBodySize << " " << std::flush;
+                //std::cout << "\rTotalChunk: " << _totalBodySize << " " << std::flush;
             }
             if (maxBodySize && this->_totalBodySize > maxBodySize) {
                 return 2; 
@@ -234,6 +343,33 @@ int Request::parseBody(Client &client)
             chunk.bytesRead = 0;
             chunk.hex.clear();
         }
+    } else if (!contentLength.empty()) {
+        if (!_out.is_open()) {
+            _out.open(client.inputPath.c_str(), std::ios::binary | std::ios::out | std::ios::trunc);
+        }
+        std::istringstream ss(contentLength);
+        size_t length;
+        ss >> length;
+        if (maxBodySize && length > maxBodySize) {
+            return 2;
+        }
+        size_t availableBodyData = client.buffer.size() - chunk.bytesRead;
+        if (availableBodyData == 0) {
+            return 1;
+        }
+        size_t toWrite = std::min(length - _totalBodySize, availableBodyData);
+        if (toWrite > 0) {
+            _out.write(client.buffer.data() + chunk.bytesRead, toWrite);
+            chunk.bytesRead += toWrite;
+            _totalBodySize += toWrite;
+        }
+        if (maxBodySize < length) {
+            return 1;
+        }
+        if (_out.is_open()) {
+            _out.close();
+        }
+        return 0;
     }
     return 1;
 }

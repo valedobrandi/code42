@@ -239,8 +239,12 @@ bool Config::parseFile(const std::string &filename)
                     current.server_name = tokens[1];
                 else if (tokens[0] == "root")
                     current.root = tokens[1];
+                else if (tokens[0] == "index")
+                    current.index = tokens[1];
                 if (tokens[0] == "max_body_size")
                     current.maxBodySize = this->parseSize(tokens[1]);
+                else
+                    _commonToken(tokens, current);
             }
 
             if (!inside_location && line.find("location") == 0 && line.find("{") != std::string::npos)
@@ -257,28 +261,24 @@ bool Config::parseFile(const std::string &filename)
                         location.path = tokens[1];
                     else if (tokens[0] == "root")
                         location.root = tokens[1];
+                    else if (tokens[0] == "cgi_extension")
+                        location.cgiExtension = tokens[1];
                     else if (tokens[0] == "cgi_pass")
-                        location.cgi_pass = tokens[1];
+                        location.cgiPass = tokens[1];
+                    else if (tokens[0] == "cgi_bin")
+                        location.cgiBin = tokens[1];
                     else if (tokens[0] == "allow_methods")
                         getMethods(tokens, location);
                     else if (tokens[0] == "index")
                         location.index = tokens[1];
-                    else if (tokens[0] == "upload_store")
-                        location.index = tokens[1];
-                    else if (tokens[0] == "upload_store" && tokens[1] == "on")
+                    else if (tokens[0] == "autoindex" && tokens[1] == "on")
                         location.autoIndex = true;
+                    else if (tokens[0] == "allow_upload" && tokens[1] == "on")
+                        location.allow_upload = true;
                     else if (tokens[0] == "max_body_size")
                         location.maxBodySize = std::atoi(tokens[1].c_str());
-                    else if (tokens[0] == "error_page")
-                    {
-                        location.errorPageCode = std::atoi(tokens[1].c_str());
-                        location.errorPagePath = tokens[2];
-                    }
-                    else if (tokens[0] == "return")
-                    {
-                        location.redirectCode = std::atoi(tokens[1].c_str());
-                        location.redirectPath = tokens[2];
-                    }
+                    else 
+                        _commonToken(tokens, location);
                 }
             }
         }
@@ -287,16 +287,26 @@ bool Config::parseFile(const std::string &filename)
     return true;
 }
 
+void Config::_commonToken(std::vector<std::string> &tokens, CommonConfig &input)
+{
+    if (tokens[0] == "error_page") {
+        input.errorPageCode = std::atoi(tokens[1].c_str());
+        input.errorPagePath = tokens[2];
+    }
+    else if (tokens[0] == "redirect") {
+        input.redirectCode = std::atoi(tokens[1].c_str());
+        input.redirectPath = tokens[2];
+    }
+}
+
 std::ostream& operator<<(std::ostream& os, const LocationConfig& location) {
 
     std::string methods;
-    if (!location.allowed_methods.empty())
-    {
+    if (!location.allowed_methods.empty()) {
         for (std::vector<std::string>::const_iterator it = location.allowed_methods.begin();
         it != location.allowed_methods.end(); ++it) {
-        if (!methods.empty())
-        {
-            methods += ", ";
+            if (!methods.empty()) {
+                methods += ", ";
         }
         methods += *it;
     }
@@ -306,8 +316,9 @@ std::ostream& operator<<(std::ostream& os, const LocationConfig& location) {
        << ", path: " << location.path
        << ", root: " << location.root
        << ", index: " << location.index
-       << ", uploadStore: " << location.uploadStore
-       << ", cgi_pass: " << location.cgi_pass
+       << ", uploadStore: " << location.allow_upload
+       << ", cgi_pass: " << location.cgiPass
+       << ", cgi_bin: " << location.cgiBin
        << ", errorPageCode: " << location.errorPageCode
        << ", errorPagePath: " << location.errorPagePath
        << ", redirectCode: " << location.redirectCode

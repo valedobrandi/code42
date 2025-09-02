@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <dirent.h>
 
 #define BUFFER_SIZE 4096
 
@@ -35,6 +36,12 @@ void Server::handleClientWrite(Client *client)
     ssize_t byteSend = 0;
     size_t toSend;
     if (res._indexByteSend == 0) {
+        std::cout << "[Client# " << client->getId() << "]" << std::endl;
+        std::cout << "res.headerByteSize: " << res.headerByteSize << std::endl;
+        std::cout << "res._indexByteSend: " << res._indexByteSend << std::endl;
+        std::cout << "res._outputLength: " << res._outputLength << std::endl;
+        std::cout << "byteSend: " << byteSend << std::endl;
+        std::cout << "res.sendFile: " << res.sendFile << std::endl;
         //size_t preview_size = 80;
         //std::cout << "=====response=====" << std::endl;
         //std::cout << res.output.substr(0, std::min(preview_size, res.output.size())) << std::endl;
@@ -124,12 +131,11 @@ bool Server::setup(Config &config)
                 if (t[i].port == *it)
                 {
                     t[i].server_fd = server_fd;
-                    this->_connects.push_back(&t[i]);
                     for (size_t at = 0; at < t[i].locations.size(); ++at)
                     {
-                        if (t[i].locations[at].port == *it)
-                        {
+                        if (t[i].locations[at].port == *it) {
                             t[i].locations[at].port = *it;
+                            this->_locations.push_back(&t[i].locations[at]); 
                         }
                     }
                 }
@@ -210,38 +216,26 @@ LocationConfig *Server::getServerConfig(Client *client)
 {
     size_t maxLength = 0;
     LocationConfig *bestLocation = NULL;
-    for (size_t at = 0; at < this->_connects.size(); ++at)
-    {
-        ServerConfig *config = this->_connects[at];
-        if (config->server_fd == client->server_fd && config->server_name == client->getRequest().getHostname())
-        {
-            for (size_t it = 0; it < config->locations.size(); ++it)
-            {
-
-                std::string locationPath = config->locations[it].path;
-                std::string requestURI = client->getRequest().getURI();
-
-                if (requestURI.size() > 1 && requestURI[requestURI.size() - 1] == '/')
-                    requestURI.erase(requestURI.size() - 1);
-
-                if (locationPath.size() > 1 && locationPath[locationPath.size() - 1] == '/')
-                    locationPath.erase(locationPath.size() - 1);
-
-                if (!requestURI.compare(0, locationPath.size(), locationPath))
-                {
-                    if (requestURI.size() == locationPath.size() || requestURI[locationPath.size()] == '/')
-                    {
-                        if (locationPath.size() > maxLength)
-                        {
-                            bestLocation = &config->locations[it];
-                            maxLength = locationPath.size();
-                        }
-                    }
+    std::string requestURI = client->getRequest().getURI();
+    for (size_t it = 0; it < this->_locations.size(); ++it) {
+        std::string locationPath = this->_locations[it]->path;
+        if (locationPath != "/" && requestURI != "/") {
+            if (requestURI[requestURI.size() - 1] == '/') {
+                requestURI.erase(requestURI.size() - 1);
+            }
+            if (locationPath[locationPath.size() - 1] == '/') {
+                locationPath.erase(locationPath.size() - 1);
+            }
+        } 
+        if (!requestURI.compare(0, locationPath.size(), locationPath)) {
+            if (requestURI.size() == locationPath.size() || requestURI[locationPath.size()] == '/') {
+                if (locationPath.size() > maxLength) {
+                    bestLocation = this->_locations[it];
+                    maxLength = locationPath.size();
                 }
             }
         }
     }
-
     return bestLocation;
 }
 
@@ -264,7 +258,7 @@ void Server::switchEvents(int client_fd, std::string type)
     
 }
 
-bool Server::_isAllowedMethod(std::vector<std::string> allowed_methods, std::string method)
+bool Server::isAllowedMethod(std::vector<std::string> allowed_methods, std::string method)
 {
     if (allowed_methods.empty() && method == "GET")
         return true;
@@ -307,17 +301,17 @@ void Server::run() {
         for (size_t i = 0; i < _fds.size(); ++i) {
             int fd = _fds[i].fd;
             Client *client = this->findByClientFd(_fds[i].fd);
-            if (_fds[i].revents & POLLOUT) { 
-                handleClientWrite(client); 
-            }
-            else if (_fds[i].revents & POLLIN) {
-                if (this->_sockets.count(fd)) { 
-                    acceptNewConnection(fd); 
-                } else if (client){ 
-                    handleClientData(client); 
+            if (_fds[i].revents & POLLIN) {
+                if (this->_sockets.count(fd)) {
+                    acceptNewConnection(fd);
                 }
             }
             if (client) {
+                if (_fds[i].revents & POLLOUT) { 
+                    handleClientWrite(client); 
+                } else if (_fds[i].revents & POLLIN) {
+                    handleClientData(client); 
+                }
                 handleResponse(client);
             }
         }
@@ -334,38 +328,95 @@ void Server::run() {
 
 void Server::handleClientData(Client *client)
 {
+    Response &response = client->getResponse();
+    Request &request = client->getRequest();
 
     if (client->state == HEADER || client->state == BODY) {
         client->receive();
     }
-
-    Request &request = client->getRequest();
-
-    if (client->state == HEADER)
-    {
+    if (client->state == HEADER) {
         if (client->parseHeader() && !client->location) {
             client->location = this->getServerConfig(client);
             if (client->location) {
-                if (!request.hasBody) { client->state = METHOD; }
-                if (request.hasBody) { client->state = BODY; }
-                if (!_isAllowedMethod(client->location->allowed_methods, request.getMethod())) {
-                    response(client, 405);
+                std::cout << "=== location ===" << std::endl;
+                std::cout << *client->location << std::endl;
+                if (!isAllowedMethod(client->location->allowed_methods, request.getMethod())) {
+                    return errorResponse(client, 405);
                 }
+                if (client->location->redirectCode) {
+                    if (client->location->redirectPath != "") {
+                        response.setStatus(client->location->redirectCode);
+                        response.setHeader("Location", client->location->redirectPath);
+                        return setResponse(client);
+                    }
+                }
+                std::string uri = request.getURI();
+                std::cout << "uri: " << uri << std::endl;
+                std::string method = request.getMethod();
+                std::string local = client->location->path;
+                client->systemPath = client->location->root;      
+                if (uri.rfind(local, 0) == 0) {     
+                    std::string relative = uri.substr(local.size());
+                    if (!relative.empty()) {
+                        if (client->systemPath[client->systemPath.size()-1] != '/' && relative[0] != '/') {
+                            client->systemPath += '/';
+                        } else if (client->systemPath[client->systemPath.size()-1] == '/' && relative[0] == '/') {
+                            relative = relative.substr(1);
+                        }
+                        client->systemPath += relative;
+                    }
+                }
+                std::cout << "Path[1]: " << client->systemPath << std::endl;
+                if (this->isDirectory("./" + client->systemPath)) {
+                    if (client->location->index.empty() == false) {
+                        if (client->systemPath[client->systemPath.size()-1] != '/') {
+                            client->systemPath += '/';
+                        }
+                        client->systemPath += client->location->index;
+                    }
+                    std::cout << "Path[2]: " << client->systemPath << std::endl;
+                }
+                // if (this->isFile(client->systemPath) == false) {
+                //     std::cout << "Path[3]: " << client->systemPath << std::endl;
+                //     if (this->getFileExtension(uri) != client->location->cgiExtension) {
+                //         if (client->location->autoIndex &&
+                //             client->getRequest().getMethod() == "GET") {
+                //                 std::string indexFile = client->location->index;
+                //                 if (!indexFile.empty() && client->systemPath.size() >= indexFile.size()) {
+                //                     client->systemPath.erase(
+                //                         client->systemPath.size() - indexFile.size()
+                //                     );
+                //                 }
+                //                 std::string html = generateAutoIndex(client->systemPath, uri);
+                //                 client->getResponse().setStatus(200);
+                //                 client->getResponse().setBody(html);
+                //                 return this->setResponse(client);
+                //         } else {
+                //             return errorResponse(client, 404);
+                //         }
+                //     }
+                // }
+                if (!request.hasBody) { 
+                    client->state = this->_setState(client); 
+                }
+                if (request.hasBody) {
+                    std::cout << "BODY" << std::endl; 
+                    client->state = BODY; 
+                }
+                
             } else {
-                response(client, 404);
+                return errorResponse(client, 404);
             }
         }
-
     }
 
-    if (client->state == BODY)
-    {
-        switch (client->parseBody())
-        {
-            case 0: { client->state = METHOD; } 
+    if (client->state == BODY) {
+        switch (client->parseBody()) {
+            case 0: client->state = this->_setState(client); 
             break;
-            case 2: { response(client, 413); }
+            case 2: errorResponse(client, 413); 
             break;
+            case 3: errorResponse(client, 403);
         }
     }
 }
@@ -374,219 +425,120 @@ void Server::handleResponse(Client * client)
 {
     Request &request = client->getRequest();
     Response &response = client->getResponse();
+    std::string uri = request.getURI();
 
-    if (client->state == METHOD)
+    if (client->state == SET_CGI) {
+        std::cout << "SET_CGI" << std::endl;
+        std::string execute;
+        std::string type;
+        if (client->location->cgiBin != "") {
+            execute = client->location->cgiBin;
+            type = "BIN";
+        }
+        if (client->location->cgiPass != "") {
+            execute = client->location->cgiPass;
+            type = "PASS";
+        }
+        runCgi(client, type, execute);
+    }
+
+    if (client->state == PROCESS_CGI)
     {
-        std::string path;
-        std::string uri = request.getURI();
-        std::string method = request.getMethod();
-        std::string temp = client->location->path;
-        if (temp != "/" && temp[0] == '/'){
-            temp = client->location->path.substr(1);
-            path = client->location->root + uri.substr(temp.size());
-        }
-        else { path = uri; }
-        if (uri.size() > 4 && !client->hasCGI) {
-            client->hasCGI = true;
-            std::string extension = uri.substr(uri.size() - 4);
-            std::string scriptPath = "www" + uri;
-            if (extension == ".php")
-                runCgi( client, scriptPath, "/usr/bin/php-cgi");
-            else if (extension == ".py")
-                runCgi(client, scriptPath, "/usr/bin/python3");
-            else if (extension == ".bla" && method == "POST")
+        std::cout << "PROCESS_CGI" << std::endl;
+        struct stat st;
+        int fd = open(client->outputPath.c_str(), O_RDONLY);
+        if (fstat(fd, &st) == -1 || st.st_size == 0) {
+            client->getResponse().sendFile = false;
+            client->state = PROCESS_RESPONSE;
+            return this->errorResponse(client, 200);
+        } else {
+            char buffer[4096];
+            std::string headerBuffer;
+            ssize_t n;
+            bool hasHeader = false;
+
+            while (!hasHeader && (n = read(fd, buffer, sizeof(buffer))) > 0)
             {
-/*                 struct stat st;
-                if (stat(client->inputPath.c_str(), &st) == 0) {
-                   //std::cout << std::endl << "St_size: " <<  st.st_size << std::endl;
-                } */
-                runCgi(
-                    client,
-                    "/home/bernardoalbuquerque/Documentos/code42/code42_git/webser_lien_config/YoupiBanane/ubuntu_cgi_tester",
-                    ""
-                );
-            }
-        }
-
-        if (client->state == WRITING) { return; }
-
-        if (method == "GET")
-        {
-            if (uri == "/cause500")
-                response.setDefaultErrorBody(500);
-            else
-            {
-                if (uri == "/")
-                    path = client->location->root + client->location->index;
-
-                /*  std::cout << "DEBUGG:333:path: " << path << std::endl; */
-
-                if (_isDirectory(std::string("./") + path))
+                headerBuffer.append(buffer, n);
+                size_t crfl = headerBuffer.find("\r\n\r\n");
+                if (crfl != std::string::npos)
                 {
-                    if (path[path.size() - 1] != '/' && client->location->index[client->location->index.size() - 1] != '/')
-                        path = path + std::string("/") + client->location->index;
-                    else
-                        path = path + client->location->index;
-                }
-
-                std::ifstream file(path.c_str());
-                if (file.is_open())
-                {
-                    std::ostringstream ss;
-                    ss << file.rdbuf();
-                    response.setStatus(200);
-                    response.setContentType("text/html");
-                    response.setBody(ss.str());
-                }
-                else
-                {
-                    response.setDefaultErrorBody(404);
+                    std::string cgiHeaders = headerBuffer.substr(0, crfl + 4);
+                    client->bodyOffSet = crfl + 4;
+                    hasHeader = true;
                 }
             }
+
+            //size_t preview_size = 200;
+            //std::cout << "=====CGIHEADER=====" << std::endl;
+            //std::cout << headerBuffer.substr(0, std::min(preview_size, headerBuffer.size())) << std::endl;
+            
+            // HANDLE CGI NO HEADER ERROR;
+            if (!hasHeader) {};
         }
+        client->state = SET_RESPONSE;
+        response.setFileContentLength(client->outputPath, client->bodyOffSet);
+    }
 
-
-        if (method == "POST")
-        {
-            std::string content_type = request.getHeader("Content-Type");
-            if (client->hasCGI)
-            {
-                int fd = open(client->outputPath.c_str(), O_RDONLY);
-                // HANDLE OPEN FILE ERROR;
-                if (fd == -1) { };
-                
-                char buffer[4096];
-                std::string headerBuffer;
-                ssize_t n;
-                bool hasHeader = false;
-
-                while (!hasHeader && (n = read(fd, buffer, sizeof(buffer))) > 0)
-                {
-                    headerBuffer.append(buffer, n);
-                    size_t crfl = headerBuffer.find("\r\n\r\n");
-                    if (crfl != std::string::npos)
-                    {
-                        std::string cgiHeaders = headerBuffer.substr(0, crfl + 4);
-                        client->bodyOffSet = crfl + 4;
-                        hasHeader = true;
-                    }
-                }
-   
-                //size_t preview_size = 200;
-                //std::cout << "=====CGIHEADER=====" << std::endl;
-                //std::cout << headerBuffer.substr(0, std::min(preview_size, headerBuffer.size())) << std::endl;
-                
-                // HANDLE CGI NO HEADER ERROR;
-                if (!hasHeader) {};
-
-                response.setFileContentLength(client->outputPath, client->bodyOffSet);
-
-            }
-            else if (content_type.find("multipart/form-data") != std::string::npos)
-            {
-                std::string body = request.getBody(client->getBuffer());
-                size_t pos = content_type.find("boundary=");
-                if (pos != std::string::npos)
-                {
-                    std::string boundary = "--" + content_type.substr(pos + 9);
-                    size_t start = 0;
-                    std::string response_body;
-                    // *** Removed mkdir call: make sure "www/uploads" directory exists manually ***
-
-                    while ((start = body.find(boundary, start)) != std::string::npos)
-                    {
-                        size_t header_end = body.find("\r\n\r\n", start);
-                        if (header_end == std::string::npos)
-                            break;
-
-                        std::string headers = body.substr(start, header_end - start);
-                        size_t filename_pos = headers.find("filename=\"");
-
-                        if (filename_pos != std::string::npos)
-                        {
-                            size_t start_filename = filename_pos + 10;
-                            size_t end_filename = headers.find("\"", start_filename);
-                            std::string filename = headers.substr(start_filename, end_filename - start_filename);
-
-                            if (!filename.empty())
-                            {
-                                size_t content_start = header_end + 4;
-                                size_t next_boundary = body.find(boundary, content_start);
-                                if (next_boundary == std::string::npos)
-                                    break;
-
-                                size_t content_end = next_boundary;
-                                // Remove trailing CRLF
-                                if (body[content_end - 2] == '\r' && body[content_end - 1] == '\n')
-                                {
-                                    content_end -= 2;
-                                }
-
-                                std::string filepath = "www/uploads/" + filename;
-                                std::ofstream out(filepath.c_str(), std::ios::binary);
-                                if (out.is_open())
-                                {
-                                    out.write(&body[content_start], content_end - content_start);
-                                    out.close();
-                                    response_body += "<p>Uploaded: " + filename + "</p>\n";
-                                }
-                                else
-                                {
-                                    response_body += "<p>Failed to save: " + filename + "</p>\n";
-                                }
-                            }
+    if (client->state == GET) {
+         if (this->isFile(client->systemPath) == false) {
+            std::cout << "Path[3]: " << client->systemPath << std::endl;
+            if (this->getFileExtension(uri) != client->location->cgiExtension) {
+                if (client->location->autoIndex &&
+                    client->getRequest().getMethod() == "GET") {
+                        std::string indexFile = client->location->index;
+                        if (!indexFile.empty() && client->systemPath.size() >= indexFile.size()) {
+                            client->systemPath.erase(
+                                client->systemPath.size() - indexFile.size()
+                            );
                         }
-
-                        // Move to next part
-                        start = body.find(boundary, start + boundary.length());
-                    }
-
-                    response.setStatus(201);
-                    response.setBody("<h1>Upload Result</h1>\n" + response_body);
-                }
-                else
-                {
-                    response.setStatus(400);
-                    response.setBody("<h1>Bad Request: No boundary found</h1>");
-                }
-            }
-            else
-            {
-                std::ifstream in(client->inputPath.c_str(), std::ios::binary | std::ios::ate);
-                if (in.is_open()) {
-                    response.setBody("<h1>File uploaded successfully</h1>");
+                        std::string html = generateAutoIndex(client->systemPath, uri);
+                        client->getResponse().setStatus(200);
+                        client->getResponse().setBody(html);
+                        return this->setResponse(client);
                 } else {
-                    response.setStatus(500);
-                    response.setBody("<h1>Failed to save file</h1>");
+                    return errorResponse(client, 404);
                 }
             }
-
-            response.setContentType("text/html");
         }
-
-        if (method == "DELETE")
-        {
-            std::string path = "www" + uri;
-            if (remove(path.c_str()) == 0)
-            {
-                response.setStatus(200);
-                response.setBody("<h1>File deleted</h1>");
-            }
-            else
-            {
-                response.setDefaultErrorBody(404);
-            }
+        std::ifstream file(client->systemPath.c_str());
+        if (file.is_open()) {
+            std::ostringstream ss;
+            ss << file.rdbuf();
+            response.setStatus(200);
             response.setContentType("text/html");
+            response.setBody(ss.str());
         }
+        client->state = SET_RESPONSE;
+    }
 
-        response.build();
-        client->state = RESPONSE;
-        this->switchEvents(client->client_fd, "POLLOUT");
-        this->handleClientWrite(client);
+    if (client->state == POST) {
+        response.setStatus(201);
+        response.setHeader("Location", client->getRequest().getMethod());   
+        client->state = SET_RESPONSE;
+    }
+
+    if (client->state == DELETE)
+    {
+        std::cout << "DELETE" << std::endl;
+        std::string path = client->systemPath;
+        if (remove(path.c_str()) == 0) {
+            response.setStatus(200);
+            response.setBody("<h1>File deleted</h1>");
+        }
+        else {
+            response.setDefaultErrorBody(404);
+        }
+        response.setContentType("text/html");
+        client->state = SET_RESPONSE;
+    }
+
+    if (client->state == SET_RESPONSE) {
+        this->setResponse(client);
     }
 }
 
-void Server::runCgi(Client *client, const std::string &scriptPath, const std::string &interpreter)
+void Server::runCgi(Client *client, const std::string &type, const std::string &execute)
 {
     pid_t pid = fork();
     if (pid < 0)
@@ -594,34 +546,34 @@ void Server::runCgi(Client *client, const std::string &scriptPath, const std::st
         perror("pid");
         return ;
     }
-
     if (pid == 0)
     {
-        int in = open(client->inputPath.c_str(), O_RDONLY);
-        int out = open(client->outputPath.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0644);
+        int in, out;
+        in = open(client->inputPath.c_str(), O_RDONLY);
+        if (client->getRequest().getMethod() == "POST") {
+        } else {
+            in = open("/dev/null", O_RDONLY);
+        };
+        out = open(client->outputPath.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0644);
         if (in < 0 || out < 0) { perror("open tmp_file"); exit(1); }
         dup2(in, STDIN_FILENO);
         dup2(out, STDOUT_FILENO);
         close(in);
         close(out);
-        if (interpreter.empty())
-        {
-            client->getRequest().setCGIEnvironment();
-            setenv("PATH_INFO", scriptPath.c_str(), 1);
-            execlp(scriptPath.c_str(), scriptPath.c_str(), NULL);
+        client->getRequest().setCGIEnvironment(client);
+        if (type == "BIN") {
+            execlp(execute.c_str(), execute.c_str(), NULL);
+        } else if (type == "PASS") {
+            execlp(execute.c_str(), execute.c_str(), client->systemPath.c_str(), NULL);
         }
-        else
-            execlp(interpreter.c_str(), interpreter.c_str(), scriptPath.c_str(), NULL);
         perror("execlp");
         exit(1);
     }
-
     _childProcesses[pid] = client->client_fd;
     client->state = WRITING;
-    
 }
 
-bool Server::_isDirectory(const std::string &path)
+bool Server::isDirectory(const std::string &path)
 {
     struct stat info;
     if (stat(path.c_str(), &info) != 0)
@@ -629,7 +581,7 @@ bool Server::_isDirectory(const std::string &path)
     return S_ISDIR(info.st_mode);
 }
 
-bool Server::_isFile(const std::string &path)
+bool Server::isFile(const std::string &path)
 {
     struct stat info;
     if (stat(path.c_str(), &info) != 0)
@@ -643,13 +595,33 @@ void Server::checkChildProcesses()
         int status;
         pid_t result = waitpid(it->first, &status, WNOHANG);
         if (result > 0) {
-            struct stat st;
-            if (stat(this->_clients[it->second]->outputPath.c_str(), &st) == 0) {
-                    //std::cout << std::endl << "OutputSize: " <<  st.st_size << std::endl;
+            Client *t = this->_clients[it->second];
+            std::cout << "Process " << it->first << " finished. Status: " << status << std::endl;
+            if (WIFEXITED(status)) {
+                int exitStatus = WEXITSTATUS(status);
+                std::cout << "Process exited normally with status: " << exitStatus << std::endl;
+                if (exitStatus != 0) {
+                    this->errorResponse(t, 500);
+                    _childProcesses.erase(it++);
+                    return;
                 }
-            this->_clients[it->second]->getResponse().sendFile = true;
-            this->_clients[it->second]->state = METHOD;
-            handleResponse(this->_clients[it->second]);
+            } else if (WIFSIGNALED(status)) {
+                int signum = WTERMSIG(status);
+                std::cout << "Process terminated by signal: " << signum << std::endl;
+                this->errorResponse(t, 500);
+                _childProcesses.erase(it++);
+                return;
+            }
+            if (t->state != WRITING) {
+                return;
+            }
+            struct stat st;
+            if (stat(t->outputPath.c_str(), &st) == 0) {
+                std::cout << "OutputFileSize: " <<  st.st_size << std::endl;
+            }
+            t->getResponse().sendFile = true;
+            t->state = PROCESS_CGI;
+            handleResponse(t);
             _childProcesses.erase(it++);
             return;
         } else if (result == -1) {
@@ -675,12 +647,78 @@ bool Server::disconnect(Client &client)
     return false;
 }
 
-void Server::response(Client *t, int code)
+void Server::errorResponse(Client *t, int code)
 {
     Response &res = t->getResponse();
     res.setDefaultErrorBody(code);
     res.build();
-    t->state = RESPONSE;
+    t->state = PROCESS_RESPONSE;
     switchEvents(t->client_fd, "POLLOUT");
     handleClientWrite(t);
+}
+
+enum ClientState Server::_setState(Client *client)
+{
+    Request &request = client->getRequest();
+    if (isCGI(client)) {
+        return SET_CGI;
+    } else if (request.getMethod() == "GET") {
+        return GET;
+    } else if (request.getMethod() == "POST") {
+        return POST;
+    } else if (request.getMethod() == "DELETE") {
+        return DELETE;
+    } else {
+        return client->state;
+    }
+}
+
+std::string Server::getFileExtension(const std::string &uri)
+{
+    size_t dot = uri.rfind('.');
+    if (dot != std::string::npos) {
+        return uri.substr(dot);
+    } 
+    return "NOT FOUND";
+}
+
+std::string Server::generateAutoIndex(const std::string &dirPath, const std::string &requestPath)
+{
+    DIR *dir = opendir(dirPath.c_str());
+    if (!dir) {
+        return "403";
+    }
+    std::ostringstream html;
+    html << "<html><head><title>Index of " << requestPath << "</title></head><body>";
+    html << "<h1>Index of " << requestPath << "</h1><hr><pre>";
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        std::string name = entry->d_name;
+        if (name == ".") continue;
+        std::string link = requestPath + name;
+        if (entry->d_type == DT_DIR) {
+            link += "/";
+            name += "/";
+        }
+        html << "<a href=\"" << link << "\">" << name << "</a>\n"; 
+    }
+    closedir(dir);
+    html << "</pre><hr></body></html>";
+    return html.str();
+}
+
+void Server::setResponse(Client *client)
+{
+    Response &response = client->getResponse();
+    response.build();
+    client->state = PROCESS_RESPONSE;
+    this->switchEvents(client->client_fd, "POLLOUT");
+    this->handleClientWrite(client);
+}
+
+bool Server::isCGI(Client *client)
+{
+    return ((client->location->cgiPass.empty() == false || 
+         client->location->cgiBin.empty() == false ) &&
+        (getFileExtension(client->systemPath) == client->location->cgiExtension));
 }

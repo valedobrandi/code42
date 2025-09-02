@@ -22,9 +22,15 @@ enum ClientState
 {
     HEADER,
     BODY,
+    SET_CGI,
+    PROCESS_CGI,
+    GET,
+    POST,
+    DELETE,
     WRITING,
     METHOD,
-    RESPONSE,
+    SET_RESPONSE,
+    PROCESS_RESPONSE,
     COMPLETED
 };
 
@@ -41,6 +47,7 @@ public:
     std::vector<char> buffer;
     const int client_fd;
     const int server_fd;
+    size_t bodyOffSet;
     int write_fd;
     int fileFd;
     std::string writePath;
@@ -52,10 +59,10 @@ public:
 
     bool hasCGI;
     bool writingFile;
-    size_t bodyOffSet;
     int childPid;
     std::string outputPath;
     std::string inputPath;
+    std::string systemPath;
  
     Client(void);
     Client(int client_fd, int server_fd);

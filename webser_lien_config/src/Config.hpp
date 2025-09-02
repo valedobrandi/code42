@@ -18,46 +18,41 @@
 #include <vector>
 #include <list>
 
-struct LocationConfig
-{
+struct CommonConfig {
+    std::string errorPagePath;
+    int errorPageCode;
+    std::string redirectPath;
+    int redirectCode;
+
+    CommonConfig() :
+        errorPageCode(0),
+        redirectCode(0) {}
+};
+
+struct LocationConfig : public CommonConfig {
     int port;
     int server_fd;
     std::string server_name;
     std::string path;
     std::string root;
     std::string index;
-    std::string uploadStore;
-    std::string cgi_pass;
-    std::string errorPagePath;
-    int errorPageCode;
-    std::string redirectPath;
-    int redirectCode;
+    bool allow_upload;
+    std::string cgiExtension;
+    std::string cgiPass;
+    std::string cgiBin;
     bool autoIndex;
     size_t maxBodySize;
     std::vector<std::string> allowed_methods;
 
     LocationConfig() : port(0),
                        server_fd(0),
-                       server_name(""),
-                       path(""),
-                       root(""),
-                       index(""),
-                       uploadStore(""),
-                       cgi_pass(""),
-                       errorPagePath(""),
-                       errorPageCode(0),
-                       redirectPath(""),
-                       redirectCode(0),
+                       allow_upload( false ),
                        autoIndex(false),
                        maxBodySize(0),
-                       allowed_methods()
-    {
-    }
+                       allowed_methods() {}
 };
 
-struct ServerConfig
-{
-
+struct ServerConfig : public CommonConfig {
     int port;
     int server_fd;
     size_t maxBodySize;
@@ -82,7 +77,7 @@ private:
     void _validate(const ServerConfig &) const;
     size_t parseSize(const std::string &str);
     bool _isRootSet(const ServerConfig &) const;
-    std::vector<LocationConfig> _locations;
+    void _commonToken( std::vector<std::string> &tokens, CommonConfig &location );
 };
 
 std::ostream &operator<<(std::ostream &os, const LocationConfig &loc);

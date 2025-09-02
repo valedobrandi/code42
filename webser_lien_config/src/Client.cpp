@@ -38,6 +38,7 @@ Client::Client(int client_fd, int server_fd) :
     buffer( 1024 * 16 ),
     client_fd(client_fd), 
     server_fd(server_fd),
+    bodyOffSet(0),
     write_fd(-1),
     fileFd(-1),
     location(NULL), 

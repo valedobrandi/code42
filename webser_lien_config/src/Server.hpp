@@ -21,7 +21,6 @@
 
 #include "Client.hpp"
 #include "Config.hpp"
-#include "Connect.hpp"
 
 typedef std::vector<struct pollfd>::iterator fdsIt;
 typedef std::map<int,int>::iterator WriteIt;
@@ -45,8 +44,7 @@ public:
 private:
     std::set<int> _sockets;
     std::vector<struct pollfd> _fds;
-    std::vector<ServerConfig *> _connects;
-    std::map<int , std::vector<LocationConfig *> > _locations;
+    std::vector<LocationConfig *> _locations;
     std::map<int, Client *> _clients;
     std::map<int, int> _childProcesses;
 
@@ -54,14 +52,18 @@ private:
     void acceptNewConnection(int);
     void handleClientData(Client *);
     void handleResponse(Client *);
-    bool _isAllowedMethod(std::vector<std::string>, std::string);
+    bool isAllowedMethod(std::vector<std::string>, std::string);
     void runCgi(Client *client, const std::string &scriptPath, const std::string &interpreter);
-    bool _isDirectory(const std::string &path);
-    bool _isFile(const std::string &path);
+    bool isDirectory(const std::string &path);
+    bool isFile(const std::string &path);
     void checkChildProcesses();
     bool disconnect(Client &client);
-    void response( Client*, int );
-
+    void errorResponse( Client*, int );
+    enum ClientState _setState(Client *client);
+    std::string getFileExtension(const std::string &uri);
+    std::string generateAutoIndex(const std::string &dirPath, const std::string &requestPath);
+    void setResponse( Client *client );
+    bool isCGI(Client *client);
 };
 
 #endif

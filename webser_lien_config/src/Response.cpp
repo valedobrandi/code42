@@ -52,7 +52,9 @@ void Response::setFileContentLength(std::string path, size_t bodyOffSet)
         std::ostringstream oss;
         oss << st.st_size - bodyOffSet;
         _headers["Content-Length"] = oss.str();
-        _outputLength += st.st_size - bodyOffSet;
+        std::cout << "bodyOffSet: " << bodyOffSet << std::endl;
+        std::cout << "st.st_size: " << st.st_size << std::endl;
+        _outputLength = st.st_size - bodyOffSet;
     }
 }
 
