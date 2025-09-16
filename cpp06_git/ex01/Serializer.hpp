@@ -17,8 +17,7 @@
 #include <stdint.h>
 #include "data.hpp" 
 
-class Serializer
-{
+class Serializer {
     private:
 
         Serializer( void );

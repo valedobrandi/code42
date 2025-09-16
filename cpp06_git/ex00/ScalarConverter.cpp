@@ -65,16 +65,16 @@ void print(char c, int i, float f, double d)
 
     std::cout << "int: " << i << std::endl;
 
-    if (isnan(f))
+    if (std::isnan(f))
         std::cout << "float: nanf" << std::endl;
-    else if (isinf(f))
+    else if (std::isinf(f))
         std::cout << "float: " << (f > 0 ? "+inff" : "-inff") << std::endl;
     else
         std::cout << "float: " << f << "f" << std::endl;
     
-    if (isnan(d))
+    if (std::isnan(d))
         std::cout << "double: nanf" << std::endl;
-    else if (isinf(d))
+    else if (std::isinf(d))
         std::cout << "double: " << (d > 0 ? "+inf" : "-inf") << std::endl;
     else
         std::cout << "double: " << d << std::endl;
