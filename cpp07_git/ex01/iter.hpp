@@ -6,7 +6,7 @@
 /*   By: bde-albu <bde-albu@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/07 12:21:13 by bde-albu          #+#    #+#             */
-/*   Updated: 2025/08/07 12:21:14 by bde-albu         ###   ########.fr       */
+/*   Updated: 2025/09/17 09:07:10 by bde-albu         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,16 @@
 
 
 template <typename T>
-void iter(T *array, size_t i, void (*func)( T& ))
+void iter(T *array, size_t size, void (*func)( T& ))
 {
-    for (size_t t = 0; t < i; t++)
+    for (size_t t = 0; t < size; t++)
         func(array[t]);
 }
 
 template <typename T>
-void iter(const T *array, size_t i, void (*func)( const T& ))
+void iter(const T *array, size_t size, void (*func)( const T& ))
 {
-    for (size_t t = 0; t < i; t++)
+    for (size_t t = 0; t < size; t++)
         func(array[t]);
 }
 

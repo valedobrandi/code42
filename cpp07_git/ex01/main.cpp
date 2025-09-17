@@ -18,6 +18,10 @@ void capitalize(std::string& t)
         t[i] = std::toupper(t[i]);
 }
 
+void doubleValue(int& x) {
+    x *= 2;
+}
+
 int main(void)
 {
     {
@@ -41,6 +45,13 @@ int main(void)
         for (int i = 0; i < 3; i++)
             std::cout << t[i] << " ";
     }
-
+	std::cout << std::endl;
+	{
+		int arr2[] = {10, 20, 30, 40};
+	 	::iter(arr2, 4, doubleValue);
+		for (int i = 0; i < 4; i++)
+            std::cout << arr2[i] << " ";
+	}
+    std::cout << std::endl;
     return 0;
 }

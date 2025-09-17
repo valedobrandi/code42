@@ -4,7 +4,7 @@ CXX = c++
 
 CXXFLAGS = -Wall -Werror -Wextra -std=c++98
 
-SRC = main.cpp MyClass.cpp
+SRC = main.cpp
 
 OBJ = $(SRC:.cpp=.o)
 
@@ -13,11 +13,8 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJ)
 
-main.o: main.cpp MyClass.hpp
+main.o: main.cpp easyfind.hpp
 	$(CXX) $(CXXFLAGS) -c  main.cpp -o main.o
-
-MyClass.o: MyClass.cpp MyClass.hpp
-	$(CXX) $(CXXFLAGS) -c  MyClass.cpp -o MyClass.o
 
 clean:
 	rm -f $(OBJ)

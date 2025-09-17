@@ -1,23 +1,23 @@
 #ifndef WHATEVER_H
 #define WHATEVER_H
 
-template <typename Swap>
-void swap(Swap& a, Swap& b)
+template <typename T>
+void swap(T& a, T& b)
 {
-    Swap t = a;
+    T t = a;
     a = b;
     b = t;
 }
-template <typename Min>
-Min min(Min& a, Min& b)
+template <typename T>
+T min(const T& a, const T& b)
 {
     return (a < b ? a : b);
 }
 
-template <typename Max>
-Max max(Max& a, Max& b)
+template <typename T>
+T max(const T& a, const T& b)
 {
-    return (a > b ? a : b);
+    return (a < b ? b : a);
 }
 #endif
 
