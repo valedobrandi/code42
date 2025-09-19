@@ -3,6 +3,7 @@
 
 #include <vector>
 
+typedef std::vector<int>::const_iterator vectorIntIt;
 
 class Span {
     public:
@@ -19,6 +20,7 @@ class Span {
         void addNumber( unsigned int value );
         unsigned int shortestSpan( void );
         unsigned int longestSpan( void );
+        void addMultipleNumbers(vectorIntIt begin, vectorIntIt end);
 };
 
 #endif

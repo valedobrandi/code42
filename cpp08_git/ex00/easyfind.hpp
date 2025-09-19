@@ -5,13 +5,12 @@
 #include <stdexcept>
 
 template <typename T>
-int easyfind(T& arr, int b) {
-	for (size_t it = 0; it < arr.size(); ++it) {
-		if (arr[it] == b) {
-			return arr[it];
-		}
-	}
-	throw std::runtime_error("not find");
+int easyfind(T& container, int value) {
+	typename T::iterator it = std::find(container.begin(), container.end(), value);
+    if (it != container.end()) {
+        return *it;
+    }
+	throw std::runtime_error("not found");
 }
 
 #endif
