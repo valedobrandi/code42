@@ -13,7 +13,7 @@
 #ifndef ARRAY_CLASS_HPP
 # define ARRAY_CLASS_HPP
 
-# include <cstddef>
+#include <cstddef>
 #include <exception>
 #include <ostream>
 

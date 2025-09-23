@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef ITER_H
-#define ITER_H
+#ifndef ITER_HPP
+#define ITER_HPP
 
 #include <cstddef>
 
