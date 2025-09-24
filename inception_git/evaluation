@@ -1,0 +1,52 @@
+MYSQL_ROOT_PASSWORD=root
+MYSQL_DATABASE=wordpress
+MYSQL_USER=bde-albu
+MYSQL_PASSWORD=python
+WORDPRESS_DB_HOST=mariadb:3306
+
+
+wordpress
+
+environment:
+WORDPRESS_DB_HOST: ${WORDPRESS_DB_HOST}
+WORDPRESS_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+WORDPRESS_DB_USER: ${MYSQL_USER}
+MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+MYSQL_DATABASE: ${MYSQL_DATABASE}
+
+--dbname="$MYSQL_DATABASE" \
+--dbuser="$MYSQL_USER" \
+--dbpass="$MYSQL_PASSWORD" \
+--dbhost="$WORDPRESS_DB_HOST" \
+
+
+root@145a6aa88e5d:/usr/local/bin# echo $MYSQL_DATABASE $WORDPRESS_DB_USER $MYSQL_PASSWORD $WORDPRESS_DB_HOST
+wordpress bdealbu python mariadb:3306
+
+
+wp config create \
+  --dbname="$MYSQL_DATABASE" \
+  --dbuser="$WORDPRESS_DB_USER" \
+  --dbpass="$MYSQL_PASSWORD" \
+  --dbhost="$WORDPRESS_DB_HOST" \
+  --allow-root \
+  --path=/var/www/html;
+
+https://bde-albu.42.fr/
+
+EVALUATION
+
+A Docker network allows containers to communicate with each other. It creates a virtual bridge so services like WordPress and MariaDB can talk securely and directly, without exposing ports to the outside world.
+
+mysql -u root -p
+
+SHOW DATABASES;
+
+SHOW TABLES;
+
+SELECT comment_author, comment_author_email FROM wp_comments;
+
+DESCRIBE wp_posts;
+
+SELECT post_title FROM wp_posts;
+
