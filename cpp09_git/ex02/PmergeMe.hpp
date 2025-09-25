@@ -6,19 +6,17 @@
 #include <string>
 #include <iostream>
 
-typedef std::deque<int>::iterator dequeIt;
+typedef std::deque<int>::iterator dequeIntIt;
 
 class PmergeMe {
     public:
-        std::deque<int> deque_container;
-        std::list<int> list_container;
 
         PmergeMe(void);
         ~PmergeMe(void);
         PmergeMe(const PmergeMe &other);
         PmergeMe &operator=(const PmergeMe &other);
 
-        void deque_sort(std::string);
+        void deque_sort(std::deque<int>&);
         void list_sort(std::string);
 };
 
