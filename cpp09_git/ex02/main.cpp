@@ -3,6 +3,15 @@
 #include <cstdlib>
 
 
+void printNumbers(std::deque<int> &container, std::string step) {
+    std::cout << step;
+    for (size_t it = 0; it < container.size(); ++it) {
+        std::cout << container[it] << " ";
+    }
+    std::cout << std::endl;
+}
+
+
 int main(int argc, char **argv) {
     if (argc < 1) {
         std::cerr << "Error: bad input" << std::endl;
@@ -31,6 +40,7 @@ int main(int argc, char **argv) {
 	std::list<int> listContainer(dequeContainer.begin(), dequeContainer.end());
 	size_t size = dequeContainer.size();
 
+	printNumbers(dequeContainer, "Before: ");
     try
     {
         PmergeMe mergeInsert;
@@ -39,6 +49,7 @@ int main(int argc, char **argv) {
 
 		totalDeque = mergeInsert.dequeSort(dequeContainer);
 		totalList = mergeInsert.listSort(listContainer);
+		printNumbers(dequeContainer, "After: ");
 
 		std::cout << "Time to process a range of " << size <<
 		" elements with std::deque :" << totalDeque << " us" << std::endl;

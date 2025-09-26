@@ -88,14 +88,6 @@ void fordAlgorithmDeque(std::deque<int> &container) {
     container.swap(A);
 }
 
-void printNumbers(std::deque<int> &container, std::string step) {
-    std::cout << step;
-    for (size_t it = 0; it < container.size(); ++it) {
-        std::cout << container[it] << " ";
-    }
-    std::cout << std::endl;
-}
-
 long long  PmergeMe::dequeSort(std::deque<int> &container)
 {
 	struct timeval start, end;
