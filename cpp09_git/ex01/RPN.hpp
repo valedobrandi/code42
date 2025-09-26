@@ -8,14 +8,12 @@
 class RPN {
 
     public:
-        std::stack<int> st;
-
         RPN(void);
         ~RPN(void);
         RPN(const RPN &other);
         RPN &operator=(const RPN &other);
 
-        void calculate(std::string input);
+        void calculate(std::stack<int> &st, std::string input);
 };
 
 #endif

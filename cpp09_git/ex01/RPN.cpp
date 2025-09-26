@@ -18,7 +18,7 @@ RPN &RPN::operator=(const RPN &/* other */)
     return *this;
 }
 
-void RPN::calculate(std::string input)
+void RPN::calculate(std::stack<int> &st, std::string input)
 {
     int quantity_of_numbers = 0;
     int res = 0;

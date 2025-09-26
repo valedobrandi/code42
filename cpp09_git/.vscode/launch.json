@@ -5,7 +5,7 @@
             "name": "Debug BTC",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/home/bernardoalbuquerque/Documentos/code42/code42_git/cpp09_git/ex02/PmergeMe",
+            "program": "/home/bde-albu/code42/github/cpp09_git/ex02/PmergeMe",
             "args": ["423","490","123","476","911","580","567","988","304","202","483","628","684","538","351","906","212","639","321","543"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

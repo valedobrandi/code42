@@ -1,6 +1,7 @@
 #include "PmergeMe.hpp"
 #include <algorithm>
 #include <sys/time.h>
+#include <iterator>
 
 
 PmergeMe::PmergeMe(void)
@@ -20,7 +21,8 @@ PmergeMe &PmergeMe::operator=(const PmergeMe &/* other */)
     return *this;
 }
 
-std::deque<int> jacobs_index(int n) {
+
+std::deque<int> jacobIndex(int n) {
     std::deque<int> index;
     if (n == 0) return index;
 
@@ -52,11 +54,11 @@ std::deque<int> jacobs_index(int n) {
     return index;
 }
 
-void ford_algorithm_deque(std::deque<int> &container) {
+void fordAlgorithmDeque(std::deque<int> &container) {
     size_t n = container.size();
-    
+
     if (n <= 1) return;
-    
+
     std::deque<int> A, B;
     size_t i = 0;
 
@@ -73,26 +75,20 @@ void ford_algorithm_deque(std::deque<int> &container) {
 
     if (i < n) A.push_back(container[i]);
 
-    ford_algorithm_deque(A);
+    fordAlgorithmDeque(A);
 
-    std::deque<int> jacob_seq = jacobs_index(B.size());
+    std::deque<int> jacob_seq = jacobIndex(B.size());
 
     for (dequeIntIt it = jacob_seq.begin(); it != jacob_seq.end(); ++it) {
         int idx = *it;
         dequeIntIt pos = std::lower_bound(A.begin(), A.end(), B[idx]);
         A.insert(pos, B[idx]);
     }
-    
+
     container.swap(A);
 }
 
-void fordAlgorithmList(std::list<int> &container) {
-    size_t n = container.size();
-
-    if (n <= 1) return;
-}
-
-void print_deque(std::deque<int> &container, std::string step) {
+void printNumbers(std::deque<int> &container, std::string step) {
     std::cout << step;
     for (size_t it = 0; it < container.size(); ++it) {
         std::cout << container[it] << " ";
@@ -100,31 +96,86 @@ void print_deque(std::deque<int> &container, std::string step) {
     std::cout << std::endl;
 }
 
-void PmergeMe::deque_sort(std::deque<int> &container)
+long long  PmergeMe::dequeSort(std::deque<int> &container)
 {
-    print_deque(container, "Before: ");
+	struct timeval start, end;
+    gettimeofday(&start, NULL);
+    fordAlgorithmDeque(container);
+    gettimeofday(&end, NULL);
 
-    struct timeval deque_start, deque_end;
-    gettimeofday(&deque_start, NULL);
-    ford_algorithm_deque(container);
-    gettimeofday(&deque_end, NULL);
+	long sec = end.tv_sec - start.tv_sec;
+    long usec = end.tv_usec - start.tv_usec;
+	if (usec < 0) { sec--; usec += 1000000;};
+    return sec * 1000000LL + usec;
 
-    /* struct timeval list_start, list_end;
-    gettimeofday(&list_start, NULL);
-    ford_algorithm(this->list_container);
-    gettimeofday(&list_end, NULL); */
-
-    print_deque(container, "After: ");
-
-    long deque_seconds = deque_end.tv_sec - deque_start.tv_sec;
-    long deque_usec = deque_seconds * 1000000 + (deque_end.tv_usec - deque_start.tv_usec);
-    std::cout << "Time to process a range of " << container.size() <<
-    " elements with std::deque: " << deque_usec << " us" << std::endl;
-
-    /* long list_seconds = list_end.tv_sec - list_start.tv_sec;
-    long list_usec = list_seconds * 1000000 + (list_end.tv_usec - list_start.tv_usec);
-    std::cout << "Time to process a range of " << list_container.size() <<
-    " elements with std::list :" << list_usec << " us" << std::endl; */
 }
 
+template <typename T>
+typename std::list<T>::iterator binarInsert(std::list<T> &lst, const T& value) {
+	listIntIt first = lst.begin();
+	listIntIt last = lst.end();
+	int len = std::distance(first, last);
+	while (len > 0) {
+		listIntIt mid = first;
+		int half = len / 2;
+		std::advance(mid, half);
+		if (*mid < value) {
+			first = ++mid;
+			len -= half+1;
+		} else {
+			len = half;
+		}
+	}
+	return first;
+}
+
+void fordAlgorithmList(std::list<int> &container) {
+    size_t n = container.size();
+
+    if (n <= 1) return;
+
+	std::list<int> A, B;
+	listIntIt it = container.begin();
+	while ( it != container.end()) {
+		listIntIt nextIt = it;
+		++nextIt;
+		if (nextIt == container.end()) break;
+		if (*it > *nextIt) {
+			A.push_back(*it);
+			B.push_back(*nextIt);
+		} else {
+			A.push_back(*nextIt);
+			B.push_back(*it);
+		}
+		++it;
+    	++it;
+	}
+	if (it != container.end()) {
+		A.push_back(*it);
+	}
+	fordAlgorithmList(A);
+	container.clear();
+	std::deque<int> jacobSeq = jacobIndex(B.size());
+	for (dequeIntIt it = jacobSeq.begin(); it != jacobSeq.end(); ++it) {
+        listIntIt idx = B.begin();
+		std::advance(idx, *it);
+        listIntIt pos = binarInsert(A, *idx);
+        A.insert(pos, *idx);
+    }
+	container.splice(container.begin(), A);
+}
+
+
+long long  PmergeMe::listSort(std::list<int> &container)
+{
+	struct timeval start, end;
+    gettimeofday(&start, NULL);
+    fordAlgorithmList(container);
+    gettimeofday(&end, NULL);
+
+	long sec = end.tv_sec - start.tv_sec;
+    long usec = end.tv_usec - start.tv_usec;
+	if (usec < 0) { sec--; usec += 1000000;};
+    return sec * 1000000LL + usec;
+}
 

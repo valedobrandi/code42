@@ -28,11 +28,23 @@ int main(int argc, char **argv) {
         }
         dequeContainer.push_back(value);
     }
+	std::list<int> listContainer(dequeContainer.begin(), dequeContainer.end());
+	size_t size = dequeContainer.size();
 
     try
     {
-        PmergeMe deque;
-        deque.deque_sort(dequeContainer);
+        PmergeMe mergeInsert;
+
+		long long totalDeque = 0, totalList = 0;
+
+		totalDeque = mergeInsert.dequeSort(dequeContainer);
+		totalList = mergeInsert.listSort(listContainer);
+
+		std::cout << "Time to process a range of " << size <<
+		" elements with std::deque :" << totalDeque << " us" << std::endl;
+
+		std::cout << "Time to process a range of " << size <<
+		" elements with std::list :" << totalList << " us" << std::endl;
     }
     catch(const std::exception& e)
     {
@@ -40,5 +52,5 @@ int main(int argc, char **argv) {
         return 1;
     }
     return 0;
-    
+
 }

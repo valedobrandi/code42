@@ -19,7 +19,7 @@ std::string trim(const std::string& str) {
     return str.substr(start, end - start);
 }
 
-bool BitcoinExchange::load_file(std::string filePath, std::vector<std::string>& dataBase)
+bool BitcoinExchange::load(std::string filePath, std::vector<std::string>& container)
 {
     std::ifstream file(filePath.c_str());
     if (!file.is_open()) {
@@ -30,7 +30,7 @@ bool BitcoinExchange::load_file(std::string filePath, std::vector<std::string>& 
     bool header = true;
     while (std::getline(file, line)) {
         if (header) { header = false; continue; }
-        dataBase.push_back(line);
+        container.push_back(line);
     }
     file.close();
     return true;
@@ -69,7 +69,7 @@ std::vector<std::string> exchange_date(std::string str_date) {
         date.push_back(token);
     }
     return date;
-} 
+}
 
 bool is_date_format_valid(std::string date) {
     std::istringstream oss(date);
@@ -81,12 +81,12 @@ bool is_date_format_valid(std::string date) {
         }
         tokens.push_back(token);
     }
-    if (tokens.size() != 3 || 
+    if (tokens.size() != 3 ||
         !is_valid_date(atoi(tokens[0].c_str()), atoi(tokens[1].c_str()), atoi(tokens[2].c_str()))) {
         return false;
     }
     return true;
-    
+
 }
 
 bool is_valid_number(const std::string& token) {
@@ -117,19 +117,19 @@ bool is_number_positive(std::string token) {
 }
 
 bool validate_tokens(std::vector<std::string> &tokens, std::string token) {
-    if (tokens.size() != 2 || 
+    if (tokens.size() != 2 ||
         !is_date_format_valid(tokens[0])) {
         ERROR_BAD_IMPUT(token);
         return false;
     }
     if (!is_valid_number(tokens[1])) return false;
-    
+
     return true;
 }
 
-std::string BitcoinExchange::get_exchange_rate(std::string date) {
+std::string BitcoinExchange::getExchangeRate(std::string date, std::vector<std::string> &database) {
     std::string find_date;
-    for (vectorStringIt it = _data_exchange.begin(); it != _data_exchange.end(); ++it) {
+    for (vectorStringIt it = database.begin(); it != database.end(); ++it) {
         std::string line = *it;
         size_t pos = line.find(',');
         if (pos == std::string::npos) continue;
@@ -146,10 +146,13 @@ std::string BitcoinExchange::get_exchange_rate(std::string date) {
     return find_date;
 }
 
-void BitcoinExchange::process_exchange(void)
-{   
+void BitcoinExchange::processExchange(
+	std::vector<std::string> &database,
+	std::vector<std::string> &exchange
+)
+{
     vectorStringIt it;
-    for (it = _entries_exchange.begin(); it != _entries_exchange.end(); ++it) {
+    for (it = exchange.begin(); it != exchange.end(); ++it) {
         std::istringstream oss(*it);
         std::string token;
         std::vector<std::string> tokens;
@@ -158,7 +161,7 @@ void BitcoinExchange::process_exchange(void)
             tokens.push_back(trim(token));
         }
         if (validate_tokens(tokens, *it) == false) continue;
-        std::string match_date = get_exchange_rate(tokens[0]);
+        std::string match_date = getExchangeRate(tokens[0], database);
         size_t pos = match_date.find(',');
         std::string exchange_rate = match_date.substr(pos + 1);
         double exchange = atof(exchange_rate.c_str()) * atof(tokens[1].c_str());
@@ -166,43 +169,31 @@ void BitcoinExchange::process_exchange(void)
     }
 }
 
-bool BitcoinExchange::run_exchange(char *filePath) {
-    std::string path(filePath);
-    if (!load_file(path, _entries_exchange)) {
-            return false;
-        }
-    return true;
+void BitcoinExchange::runExchange(
+	char *databaseFilePath,
+	char *exchangeFileParh,
+	std::vector<std::string> database,
+	std::vector<std::string> exchange) {
+
+    std::string databasePath(databaseFilePath);
+    if (load(databaseFilePath, database) == false) return ;
+	if (load(exchangeFileParh, exchange) == false) return ;
+	processExchange( database, exchange );
 }
 
-BitcoinExchange::BitcoinExchange(std::string dataBase): data_base(data_base)
+BitcoinExchange::BitcoinExchange()
 {
-    
 }
 
 BitcoinExchange::~BitcoinExchange(void)
 {
 }
 
-BitcoinExchange::BitcoinExchange(const BitcoinExchange &other): data_base(other.data_base)
+BitcoinExchange::BitcoinExchange(const BitcoinExchange &/* other */)
 {
-    this->_data_exchange.clear();
-    for (size_t it = 0; it < other._data_exchange.size(); ++it)
-        _data_exchange[it] = other._data_exchange[it];
-    this->_entries_exchange.clear();
-    for (size_t it = 0; it < other._entries_exchange.size(); ++it)
-        _entries_exchange[it] = other._entries_exchange[it];
 }
 
-BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &other)
+BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &/* other */)
 {
-    if (this != &other) {
-        data_base = other.data_base;
-        this->_data_exchange.clear();
-    for (size_t it = 0; it < other._data_exchange.size(); ++it)
-        _data_exchange[it] = other._data_exchange[it];
-    this->_entries_exchange.clear();
-    for (size_t it = 0; it < other._entries_exchange.size(); ++it)
-        _entries_exchange[it] = other._entries_exchange[it];
-    }
    return *this;
 }
