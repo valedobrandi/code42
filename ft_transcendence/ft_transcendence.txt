@@ -1,0 +1,13 @@
+#backend: PHP #frontend: typescript
+
+#Constrains 7 modules
+
+	#Major Module:
+		#node.js
+		#remote player
+		#multiplayer 4v4
+		#other game
+		#live chat
+	#Minor Module:
+		#tailwind
+		#SQLite
